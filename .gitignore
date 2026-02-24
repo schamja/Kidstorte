@@ -1,0 +1,8 @@
+.env
+.venv/
+__pycache__/
+chroma_db/
+.idea/
+.claude/
+static/images/*.png
+*.pyc
