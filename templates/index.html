@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cake Dreams – Handgemachte Kuchen aus Köln</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">Cake Dreams</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menü öffnen">☰</button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#products">Produkte</a></li>
+        <li><a href="#prices">Preise</a></li>
+        <li><a href="#process">Herstellung</a></li>
+        <li><a href="#about">Über uns</a></li>
+        <li><a href="#contact">Kontakt</a></li>
+        <li><a href="#" class="nav-cta" id="open-chat-nav">💬 Chat</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-badge">Handgemacht in Köln seit 2018</span>
+      <h1>Kuchen, die<br><span class="hero-accent">Träume wahr</span> machen</h1>
+      <p class="hero-sub">Individuelle Kuchen und Torten für jeden Anlass – frisch, kreativ und mit Liebe gebacken.</p>
+      <div class="hero-actions">
+        <a href="#products" class="btn btn-primary">Unsere Kuchen entdecken</a>
+        <button class="btn btn-secondary" id="open-chat-hero">🤖 KI-Berater starten</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUKTE -->
+  <section class="section" id="products">
+    <div class="container">
+      <span class="section-badge">Unser Sortiment</span>
+      <h2 class="section-title">Unsere Kuchen</h2>
+      <p class="section-subtitle">Jeder Kuchen wird frisch und mit hochwertigen Zutaten handgefertigt.</p>
+      <div class="product-grid">
+        <div class="product-card">
+          <div class="product-image" style="background: linear-gradient(135deg, #3e1f0d, #6b3a2a);"><span class="product-emoji">🍫</span></div>
+          <div class="product-body">
+            <div class="product-tags"><span class="tag tag-classic">Klassiker</span></div>
+            <h3>Chocolate Dream</h3>
+            <p>Saftiger Schokoladenkuchen mit intensiver Kakaonote und samtiger Ganache.</p>
+            <span class="product-allergens">⚠️ Milch, Gluten, Eier</span>
+            <div class="product-price">ab 35 €</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image" style="background: linear-gradient(135deg, #f5e6c8, #e8d5a3);"><span class="product-emoji">🍰</span></div>
+          <div class="product-body">
+            <div class="product-tags"><span class="tag tag-classic">Klassiker</span></div>
+            <h3>Vanilla Heaven</h3>
+            <p>Luftiger Vanillekuchen mit feiner Buttercreme und echten Madagaskar-Vanilleschoten.</p>
+            <span class="product-allergens">⚠️ Milch, Gluten, Eier</span>
+            <div class="product-price">ab 30 €</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image" style="background: linear-gradient(135deg, #7b2d8e, #c45ab3);"><span class="product-emoji">🫐</span></div>
+          <div class="product-body">
+            <div class="product-tags"><span class="tag tag-vegan">Vegan</span></div>
+            <h3>Berry Delight</h3>
+            <p>Veganer Beerenkuchen mit fruchtiger Glasur. 100% pflanzlich, 100% lecker.</p>
+            <span class="product-allergens">⚠️ Gluten</span>
+            <div class="product-price">ab 35 €</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image" style="background: linear-gradient(135deg, #d4463b, #f0887e);"><span class="product-emoji">🍓</span></div>
+          <div class="product-body">
+            <div class="product-tags"><span class="tag tag-seasonal">Saisonal</span></div>
+            <h3>Strawberry Bliss</h3>
+            <p>Frischer Erdbeerkuchen mit leichter Mascarponecreme und frischen Erdbeeren.</p>
+            <span class="product-allergens">⚠️ Milch, Gluten, Eier</span>
+            <div class="product-price">ab 35 €</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image" style="background: linear-gradient(135deg, #b8860b, #daa520);"><span class="product-emoji">🍮</span></div>
+          <div class="product-body">
+            <div class="product-tags"><span class="tag tag-premium">Premium</span></div>
+            <h3>Caramel Crunch</h3>
+            <p>Knuspriger Karamellkuchen mit gesalzenem Karamell und Nuss-Crunch-Topping.</p>
+            <span class="product-allergens">⚠️ Milch, Gluten, Eier, Nüsse</span>
+            <div class="product-price">ab 38 €</div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-image" style="background: linear-gradient(135deg, #c5b358, #e8df8b);"><span class="product-emoji">🍋</span></div>
+          <div class="product-body">
+            <div class="product-tags"><span class="tag tag-glutenfree">Glutenfrei</span></div>
+            <h3>Lemon Zest</h3>
+            <p>Erfrischender Zitronenkuchen mit Mandelmehl – komplett glutenfrei.</p>
+            <span class="product-allergens">⚠️ Eier, Nüsse, Milch</span>
+            <div class="product-price">ab 38 €</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREISE -->
+  <section class="section section-alt" id="prices">
+    <div class="container">
+      <span class="section-badge">Transparent und fair</span>
+      <h2 class="section-title">Preise und Größen</h2>
+      <p class="section-subtitle">Alle Preise inklusive Standarddekoration.</p>
+      <div class="price-table-wrapper">
+        <table class="price-table">
+          <thead>
+            <tr>
+              <th>Kuchen</th>
+              <th>Klein<br><small>6 Port.</small></th>
+              <th>Mittel<br><small>12 Port.</small></th>
+              <th>Groß<br><small>20 Port.</small></th>
+              <th>XL<br><small>30 Port.</small></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Chocolate Dream</strong></td><td>35 €</td><td>60 €</td><td>85 €</td><td>110 €</td></tr>
+            <tr><td><strong>Vanilla Heaven</strong></td><td>30 €</td><td>55 €</td><td>80 €</td><td>105 €</td></tr>
+            <tr><td><strong>Berry Delight</strong> 🌱</td><td>35 €</td><td>58 €</td><td>82 €</td><td>108 €</td></tr>
+            <tr><td><strong>Strawberry Bliss</strong></td><td>35 €</td><td>60 €</td><td>85 €</td><td>112 €</td></tr>
+            <tr><td><strong>Caramel Crunch</strong></td><td>38 €</td><td>65 €</td><td>90 €</td><td>118 €</td></tr>
+            <tr><td><strong>Lemon Zest</strong> (GF)</td><td>38 €</td><td>62 €</td><td>88 €</td><td>115 €</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="extras-grid">
+        <div class="extra-card"><div class="extra-icon">🎂</div><h4>Extra Schicht</h4><p class="extra-price">+15 €</p><p>Pro zusätzlicher Kuchenboden</p></div>
+        <div class="extra-card"><div class="extra-icon">✨</div><h4>Spezialdesign</h4><p class="extra-price">+20 €</p><p>Gold-Deko, Verzierungen</p></div>
+        <div class="extra-card"><div class="extra-icon">🎀</div><h4>Fondant-Design</h4><p class="extra-price">+25 €</p><p>Fondant-Überzug mit Deko</p></div>
+        <div class="extra-card"><div class="extra-icon">🦄</div><h4>Motivkuchen</h4><p class="extra-price">+35 €</p><p>Figuren aus Fondant</p></div>
+        <div class="extra-card"><div class="extra-icon">💖</div><h4>Herzform</h4><p class="extra-price">+10 €</p><p>Statt rund oder eckig</p></div>
+        <div class="extra-card"><div class="extra-icon">⚡</div><h4>Express (24h)</h4><p class="extra-price">+25 €</p><p>Fertig innerhalb von 24h</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HERSTELLUNG -->
+  <section class="section" id="process">
+    <div class="container">
+      <span class="section-badge">Von Hand gefertigt</span>
+      <h2 class="section-title">Unsere Herstellung</h2>
+      <p class="section-subtitle">Jeder Kuchen durchläuft mehrere Schritte – mit Sorgfalt und frischen Zutaten.</p>
+      <div class="process-timeline">
+        <div class="process-step"><div class="step-number">1</div><div class="step-content"><h4>Beratung und Bestellung</h4><p>Online, per Chat, telefonisch oder im Laden.</p></div></div>
+        <div class="process-step"><div class="step-number">2</div><div class="step-content"><h4>Frisch gebacken</h4><p>Mit Bio-Eiern und belgischer Schokolade.</p></div></div>
+        <div class="process-step"><div class="step-number">3</div><div class="step-content"><h4>Füllung und Creme</h4><p>Handgerührt – von Ganache bis Mascarpone.</p></div></div>
+        <div class="process-step"><div class="step-number">4</div><div class="step-content"><h4>Dekoration</h4><p>Fondant, Motivfiguren oder elegante Schrift.</p></div></div>
+        <div class="process-step"><div class="step-number">5</div><div class="step-content"><h4>Abholung oder Lieferung</h4><p>Kostenlos im Laden oder Lieferung ab 10 €.</p></div></div>
+      </div>
+      <div class="process-times">
+        <div class="time-card"><h4>Standardkuchen</h4><p class="time-value">24–48 Std.</p><p>Express möglich</p></div>
+        <div class="time-card"><h4>Fondantkuchen</h4><p class="time-value">2+ Tage</p><p>Kein Express</p></div>
+        <div class="time-card"><h4>Hochzeitstorten</h4><p class="time-value">3–5 Tage</p><p>Mit Beratung</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÜBER UNS -->
+  <section class="section section-alt" id="about">
+    <div class="container">
+      <span class="section-badge">Unsere Geschichte</span>
+      <h2 class="section-title">Über Cake Dreams</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p class="about-lead">Gegründet 2018 von Meisterkonditorin Maria Schneider – handwerkliche Qualität und kreative Kuchenkunst in Köln.</p>
+          <p>Vier leidenschaftliche Bäcker, frische Zutaten, keine künstlichen Zusatzstoffe.</p>
+          <div class="about-values">
+            <div class="value-item"><span class="value-icon">🌿</span><div><strong>Frisch und Regional</strong><p>Bio-Eier, belgische Schokolade</p></div></div>
+            <div class="value-item"><span class="value-icon">🤲</span><div><strong>Handgemacht</strong><p>Jeder Kuchen von Hand gefertigt</p></div></div>
+            <div class="value-item"><span class="value-icon">🌱</span><div><strong>Für alle</strong><p>Vegan und glutenfrei verfügbar</p></div></div>
+            <div class="value-item"><span class="value-icon">🤖</span><div><strong>KI-gestützt</strong><p>Chatbot berät rund um die Uhr</p></div></div>
+          </div>
+        </div>
+        <div class="about-stats">
+          <div class="stat-card"><span class="stat-number">500+</span><span class="stat-label">Kunden pro Monat</span></div>
+          <div class="stat-card"><span class="stat-number">6</span><span class="stat-label">Kuchensorten</span></div>
+          <div class="stat-card"><span class="stat-number">7</span><span class="stat-label">Jahre Erfahrung</span></div>
+          <div class="stat-card"><span class="stat-number">4</span><span class="stat-label">Meisterbäcker</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KONTAKT -->
+  <section class="section" id="contact">
+    <div class="container">
+      <span class="section-badge">Wir freuen uns auf Sie</span>
+      <h2 class="section-title">Kontakt und Öffnungszeiten</h2>
+      <div class="contact-grid">
+        <div class="contact-card"><h4>📍 Adresse</h4><p>Cake Dreams Konditorei<br>Bäckerstraße 12<br>50667 Köln</p></div>
+        <div class="contact-card"><h4>🕐 Öffnungszeiten</h4><p>Mo – Fr: 8:00 – 18:00<br>Sa: 9:00 – 16:00<br>So: Geschlossen</p></div>
+        <div class="contact-card"><h4>📞 Kontakt</h4><p>Tel: 0221-1234567<br>bestellung@cake-dreams.de<br>@cakedreams_koeln</p></div>
+        <div class="contact-card"><h4>🚚 Lieferung</h4><p>Köln: 10 €<br>30 km Umkreis: 20 €<br>Abholung: Kostenlos</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p>© 2025 Cake Dreams Konditorei – Handgemachte Kuchen aus Köln</p>
+    </div>
+  </footer>
+
+  <!-- CHATBOT WIDGET -->
+  <button class="chat-fab" id="chat-fab" title="KI-Berater öffnen">💬</button>
+
+  <div class="chat-widget" id="chat-widget">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <span class="chat-header-title">🎂 Cake Dreams Berater</span>
+        <span class="chat-header-status" id="chat-status">KI-gestützt</span>
+      </div>
+      <button class="chat-close" id="chat-close">✕</button>
+    </div>
+
+    <!-- Order Info Panel -->
+    <div class="chat-order-panel" id="order-panel">
+      <div class="order-tags" id="order-tags"></div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+      <div class="message assistant">
+        <div class="message-bubble">Hallo und willkommen bei Cake Dreams! 👋 Wie kann ich Ihnen helfen?</div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <div class="chat-options">
+        <label class="image-toggle">
+          <input type="checkbox" id="image-checkbox">
+          <span>🖼️ Bild generieren</span>
+        </label>
+        <button class="chat-img-btn" id="img-btn" title="Kuchen visualisieren">📸</button>
+        <button class="chat-reset-btn" id="reset-btn" title="Neues Gespräch">🔄</button>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="user-input" placeholder="Ihre Frage eingeben..." rows="1"></textarea>
+        <button id="send-btn" title="Senden">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Bild Overlay -->
+  <div class="image-overlay" id="image-overlay">
+    <img id="overlay-img" src="" alt="Kuchen Vorschau">
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
