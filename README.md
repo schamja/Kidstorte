@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🎂 Cake Dreams – LangGraph Agent
 
 Ein KI-Kundenberater für eine Konditorei, gebaut nach dem **LangGraph-Pattern**:
@@ -123,3 +124,6 @@ Dann öffnen: **http://localhost:5001**
 - **OpenAI DALL-E (gpt-image-1)** – Bildgenerierung
 - **ChromaDB** – Vektor-Datenbank für Dokumente
 - **LangGraph-Pattern** – Nodes + Edges + Shared State
+=======
+# Kidstorte
+>>>>>>> 64ef9d417ef8e6d1eff77902e78adcc1386746eb
