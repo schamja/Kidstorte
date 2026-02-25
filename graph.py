@@ -2,7 +2,8 @@
 Graph – Verbindet die Nodes mit Edges und Routing-Logik.
 
 Dies ist das Herzstück des Agenten: Es definiert den Ablauf.
-Implementiert das LangGraph-Pattern (Nodes + Edges + State) ohne die Library selbst.
+Jetzt STATELESS: Bekommt State als Parameter, gibt aktualisierten State zurück.
+Session-Management wird extern vom SessionManager übernommen.
 
 Ablauf:
     ┌──────────────────┐
@@ -28,6 +29,7 @@ Ablauf:
                     RESPONSE
 """
 
+import logging
 from state import AgentState
 from nodes import (
     classify_intent,
@@ -44,107 +46,81 @@ from nodes import (
     redirect,
 )
 
+logger = logging.getLogger("Kidstorte")
+
 
 class CakeDreamsGraph:
     """
-    Der Agent-Graph: Nimmt eine Nachricht, routet sie durch die Nodes,
-    und gibt eine Antwort zurück.
+    Stateless Agent-Graph: Bekommt State, läuft die Nodes durch,
+    gibt aktualisierten State zurück.
+    Session-Persistenz wird extern vom SessionManager gehandhabt.
     """
 
-    def __init__(self):
-        # Persistenter State über die gesamte Konversation
-        self.state: AgentState = {
-            "user_input": "",
-            "messages": [],
-            "intent": "",
-            "order_info": {},
-            "missing_fields": [],
-            "order_complete": False,
-            "context": "",
-            "sources": [],
-            "response": "",
-            "image_url": None,
-        }
-
-    def run(self, user_input: str) -> AgentState:
+    def run(self, state: AgentState, user_input: str) -> AgentState:
         """
         Führt einen kompletten Durchlauf durch den Graphen aus.
-        Input: Kundennachricht
-        Output: Aktualisierter State mit response und optional image_url
+
+        Args:
+            state: Der aktuelle Session-State (aus ChromaDB geladen)
+            user_input: Die Nachricht des Kunden
+
+        Returns:
+            Aktualisierter State mit response und optional image_url
         """
 
         # Reset pro Durchlauf
-        self.state["user_input"] = user_input
-        self.state["response"] = ""
-        self.state["image_url"] = None
+        state["user_input"] = user_input
+        state["response"] = ""
+        state["image_url"] = None
 
         # User-Nachricht zum Verlauf hinzufügen
-        self.state["messages"].append({"role": "user", "content": user_input})
+        state["messages"].append({"role": "user", "content": user_input})
 
         # Nur die letzten 20 Nachrichten behalten
-        if len(self.state["messages"]) > 20:
-            self.state["messages"] = self.state["messages"][-20:]
+        if len(state["messages"]) > 20:
+            state["messages"] = state["messages"][-20:]
 
         # ── SCHRITT 1: Intent erkennen ──
-        self.state = classify_intent(self.state)
-        intent = self.state["intent"]
+        state = classify_intent(state)
+        intent = state["intent"]
 
         # ── SCHRITT 2: Routing basierend auf Intent ──
         if intent == "greeting":
-            self.state = greet(self.state)
+            state = greet(state)
 
         elif intent == "order":
-            self.state = extract_info(self.state)
-            self.state = check_complete(self.state)
+            state = extract_info(state)
+            state = check_complete(state)
 
-            if self.state["order_complete"]:
-                self.state = summarize_order(self.state)
+            if state["order_complete"]:
+                state = summarize_order(state)
             else:
-                self.state = ask_next(self.state)
+                state = ask_next(state)
 
         elif intent == "price":
-            self.state = retrieve_docs(self.state)
-            self.state = calculate_price(self.state)
+            state = retrieve_docs(state)
+            state = calculate_price(state)
 
         elif intent == "image":
-            self.state = generate_image(self.state)
+            state = generate_image(state)
 
         elif intent == "info":
-            self.state = retrieve_docs(self.state)
-            self.state = answer_question(self.state)
+            state = retrieve_docs(state)
+            state = answer_question(state)
 
         elif intent == "change":
-            self.state = update_order(self.state)
+            state = update_order(state)
 
         elif intent == "offtopic":
-            self.state = redirect(self.state)
+            state = redirect(state)
 
         else:
-            self.state["response"] = "Wie kann ich Ihnen helfen?"
+            state["response"] = "Wie kann ich Ihnen helfen?"
 
         # Bot-Antwort zum Verlauf hinzufügen
-        self.state["messages"].append({
+        state["messages"].append({
             "role": "assistant",
-            "content": self.state["response"]
+            "content": state["response"]
         })
 
-        return self.state
-
-    def reset(self):
-        """Setzt den gesamten State zurück (neues Gespräch)."""
-        self.state = {
-            "user_input": "",
-            "messages": [],
-            "intent": "",
-            "order_info": {},
-            "missing_fields": [],
-            "order_complete": False,
-            "context": "",
-            "sources": [],
-            "response": "",
-            "image_url": None,
-        }
-
-    def get_order_info(self):
-        """Gibt die aktuell gesammelten Bestellinfos zurück."""
-        return self.state.get("order_info", {})
+        return state
