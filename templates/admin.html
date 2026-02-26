@@ -1,10 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kidstorte – Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-$END$
+<body class="admin-body">
+
+{% if page == "login" %}
+<!-- ==================== LOGIN ==================== -->
+<div class="admin-login-container">
+  <div class="admin-login-card">
+    <h1>Kidstorte Admin</h1>
+    <p class="admin-login-sub">Melden Sie sich an, um den Chatbot zu verwalten.</p>
+    <form id="login-form">
+      <input type="password" name="password" id="admin-password" placeholder="Passwort eingeben" required class="admin-input">
+      <button type="submit" class="btn btn-admin-primary" style="width:100%;margin-top:8px;">Anmelden</button>
+    </form>
+  </div>
+</div>
+<script>
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData();
+  formData.append("password", document.getElementById("admin-password").value);
+  const res = await fetch("/admin/login", { method: "POST", body: formData });
+  const data = await res.json();
+  if (data.redirect) window.location.href = data.redirect;
+  else alert("Falsches Passwort");
+});
+</script>
+
+{% elif page == "dashboard" %}
+<!-- ==================== DASHBOARD ==================== -->
+<nav class="admin-nav">
+  <span class="admin-nav-title">Kidstorte Admin</span>
+  <div class="admin-nav-actions">
+    <a href="/" class="admin-nav-link">Zur Website</a>
+    <a href="#" id="logout-btn" class="admin-nav-link">Abmelden</a>
+  </div>
+</nav>
+
+<div class="admin-container">
+
+  <!-- STATISTIKEN -->
+  <section class="admin-section">
+    <h2>Statistiken</h2>
+    <div class="admin-stats-grid">
+      <div class="admin-stat-card">
+        <span class="admin-stat-number">{{ stats.total_sessions }}</span>
+        <span class="admin-stat-label">Sitzungen gesamt</span>
+      </div>
+      <div class="admin-stat-card">
+        <span class="admin-stat-number">{{ stats.active_sessions_1h }}</span>
+        <span class="admin-stat-label">Aktiv (letzte Stunde)</span>
+      </div>
+      <div class="admin-stat-card">
+        <span class="admin-stat-number">{{ stats.total_orders }}</span>
+        <span class="admin-stat-label">Bestellungen</span>
+      </div>
+      <div class="admin-stat-card">
+        <span class="admin-stat-number">{{ stats.completed_orders }}</span>
+        <span class="admin-stat-label">Abgeschlossen</span>
+      </div>
+      <div class="admin-stat-card">
+        <span class="admin-stat-number">{{ stats.total_messages }}</span>
+        <span class="admin-stat-label">Nachrichten gesamt</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMPT-KONFIGURATION -->
+  <section class="admin-section">
+    <h2>Prompt-Konfiguration</h2>
+    <p class="admin-hint">Änderungen wirken sofort beim nächsten Chat-Request (kein Neustart nötig).</p>
+    <form id="prompts-form">
+      <div class="admin-form-group">
+        <label>Bot-Ton / Persönlichkeit</label>
+        <input type="text" name="bot_tone" value="{{ config.bot_personality.tone }}" class="admin-input">
+      </div>
+
+      {% for key, value in config.prompts.items() %}
+      <div class="admin-form-group">
+        <label>{{ key }}</label>
+        <textarea name="prompt_{{ key }}" class="admin-textarea" rows="{% if value|length > 100 %}8{% else %}3{% endif %}">{{ value }}</textarea>
+      </div>
+      {% endfor %}
+
+      <button type="submit" class="btn btn-admin-primary">Prompts speichern</button>
+      <span id="save-status" class="admin-save-status"></span>
+    </form>
+  </section>
+
+  <!-- AKTIVE SITZUNGEN -->
+  <section class="admin-section">
+    <h2>Aktive Sitzungen</h2>
+    <div class="admin-actions-bar">
+      <button id="cleanup-btn" class="btn btn-admin-secondary">Alte Sitzungen aufräumen (24h+)</button>
+    </div>
+
+    {% if sessions %}
+    <div class="admin-sessions-table-wrapper">
+      <table class="admin-sessions-table">
+        <thead>
+          <tr>
+            <th>Session ID</th>
+            <th>Erstellt</th>
+            <th>Letzter Zugriff</th>
+            <th>Nachrichten</th>
+            <th>Bestellung</th>
+            <th>Aktion</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for session in sessions %}
+          <tr id="session-{{ session.session_id }}">
+            <td><code>{{ session.session_id[:12] }}...</code></td>
+            <td>{{ session.created | timestamp_format }}</td>
+            <td>{{ session.last_accessed | timestamp_format }}</td>
+            <td>{{ session.message_count }}</td>
+            <td>
+              {% if session.order_complete %}
+                <span class="admin-badge admin-badge-success">Abgeschlossen</span>
+              {% elif session.has_order %}
+                <span class="admin-badge admin-badge-pending">In Bearbeitung</span>
+              {% else %}
+                <span class="admin-badge">Keine</span>
+              {% endif %}
+            </td>
+            <td><button class="btn-delete-session" data-id="{{ session.session_id }}">Löschen</button></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="admin-empty">Keine aktiven Sitzungen vorhanden.</p>
+    {% endif %}
+  </section>
+
+</div>
+
+<script>
+// Prompts speichern
+document.getElementById("prompts-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const res = await fetch("/admin/prompts", { method: "POST", body: formData });
+  const data = await res.json();
+  const status = document.getElementById("save-status");
+  status.textContent = data.status === "ok" ? "Gespeichert!" : "Fehler!";
+  status.style.color = data.status === "ok" ? "#4CAF50" : "#E57373";
+  setTimeout(() => status.textContent = "", 3000);
+});
+
+// Session löschen
+document.querySelectorAll(".btn-delete-session").forEach(btn => {
+  btn.addEventListener("click", async () => {
+    const id = btn.dataset.id;
+    if (!confirm("Sitzung wirklich löschen?")) return;
+    await fetch(`/admin/sessions/${id}/delete`, { method: "POST" });
+    const row = document.getElementById(`session-${id}`);
+    if (row) row.remove();
+  });
+});
+
+// Alte Sitzungen aufräumen
+document.getElementById("cleanup-btn").addEventListener("click", async () => {
+  const res = await fetch("/admin/sessions/cleanup", { method: "POST" });
+  const data = await res.json();
+  alert(`${data.deleted} alte Sitzungen gelöscht.`);
+  location.reload();
+});
+
+// Abmelden
+document.getElementById("logout-btn").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const res = await fetch("/admin/logout");
+  const data = await res.json();
+  if (data.redirect) window.location.href = data.redirect;
+});
+</script>
+
+{% endif %}
 </body>
 </html>
