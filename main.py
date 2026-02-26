@@ -1,10 +1,10 @@
 """
-Cake Dreams – FastAPI Server mit Session-basiertem LangGraph Agent
+Kidstorte – FastAPI Server mit Session-basiertem LangGraph Agent
 """
-
 import datetime
+import time
 import logging
-from fastapi import FastAPI, Request, Response, HTTPException, Form
+from fastapi import FastAPI, Request, Response, HTTPException, Form, Body
 from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -14,13 +14,12 @@ from pathlib import Path
 from graph import CakeDreamsGraph
 from session_manager import SessionManager
 from config import ADMIN_PASSWORD, load_prompts_config, save_prompts_config
+from monitoring import setup_logging, metrics
+from cost_optimizer import response_cache, estimate_tokens, get_model_for_task
 
-# --- Logging ---
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(name)s] %(levelname)s: %(message)s"
-)
-logger = logging.getLogger("cake_dreams")
+# --- Logging (strukturiert JSON) ---
+setup_logging(level="INFO", json_logs=False)
+logger = logging.getLogger("kidstorte")
 
 # --- App ---
 app = FastAPI(title="Cake Dreams Agent")
@@ -81,6 +80,8 @@ def index():
 @app.post("/api/chat")
 async def chat(request_body: ChatRequest, request: Request, response: Response):
     session_id = get_session_id(request, response)
+    t_start = time.time()
+    metrics.inc("chat.requests")
 
     try:
         question = request_body.question.strip()
@@ -89,6 +90,14 @@ async def chat(request_body: ChatRequest, request: Request, response: Response):
 
         # Session-State laden
         state = session_mgr.load_session(session_id)
+
+        # Wenn vorherige Bestellung abgeschlossen → automatisch neue Session
+        session_was_reset = False
+        if state.get("order_complete"):
+            session_mgr.delete_session(session_id)
+            state = {}
+            session_was_reset = True
+
         state["session_id"] = session_id
 
         # Graph durchlaufen
@@ -97,20 +106,95 @@ async def chat(request_body: ChatRequest, request: Request, response: Response):
         # Session-State speichern
         session_mgr.save_session(session_id, state)
 
+        # Tokens tracken
+        answer = state.get("response", "")
+        model = get_model_for_task("generate")
+        tokens_in = estimate_tokens(question)
+        tokens_out = estimate_tokens(answer)
+        metrics.record_tokens(tokens_in, tokens_out, model)
+        metrics.inc("chat.success")
+
         return {
-            "answer": state.get("response", ""),
+            "answer": answer,
             "image_url": state.get("image_url"),
             "intent": state.get("intent", ""),
             "order_info": state.get("order_info", {}),
             "order_complete": state.get("order_complete", False),
+            "session_reset": session_was_reset,
         }
 
     except Exception as e:
+        metrics.inc("chat.errors")
+        metrics.record_error(str(e), "chat")
         logger.exception(f"Fehler im Chat-Endpoint: {e}")
         return JSONResponse(
             status_code=500,
             content={"detail": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."}
         )
+    finally:
+        ms = (time.time() - t_start) * 1000
+        metrics.record_latency("chat", ms)
+
+
+@app.post("/api/reset-cache")
+async def reset_cache(request: Request):
+    """Löscht den Response-Cache (nur Admin)"""
+    if request.cookies.get("admin_auth") != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Nicht autorisiert")
+    response_cache._cache.clear()
+    response_cache._timestamps.clear()
+    return JSONResponse({"status": "ok", "message": "Cache geleert"})
+
+
+@app.get("/api/chat/stream")
+async def chat_stream(request: Request, message: str):
+    """Streaming chat via SSE"""
+    from fastapi.responses import StreamingResponse
+    import json as _json
+
+    session_id = request.cookies.get(SESSION_COOKIE) or session_mgr.create_session_id()
+    state = session_mgr.load_session(session_id) or {}
+
+    async def event_generator():
+        try:
+            from openai import AsyncOpenAI
+            from config import OPENAI_API_KEY, CHAT_MODEL, load_prompts_config
+            client = AsyncOpenAI(api_key=OPENAI_API_KEY)
+            cfg = load_prompts_config()
+            tone = cfg.get("bot_personality", {}).get("tone", "freundlich")
+
+            messages = state.get("messages", [])
+            messages.append({"role": "user", "content": message})
+
+            stream = await client.chat.completions.create(
+                model=CHAT_MODEL,
+                messages=[
+                    {"role": "system", "content": f"Du bist ein {tone} Kuchenberater für Kidstorte."},
+                    *messages[-10:]
+                ],
+                stream=True,
+                max_tokens=500,
+            )
+            full_response = ""
+            async for chunk in stream:
+                delta = chunk.choices[0].delta.content or ""
+                if delta:
+                    full_response += delta
+                    yield f"data: {_json.dumps({'token': delta})}\n\n"
+
+            # Save assistant message
+            messages.append({"role": "assistant", "content": full_response})
+            state["messages"] = messages
+            session_mgr.save_session(session_id, state)
+            yield f"data: {_json.dumps({'done': True})}\n\n"
+        except Exception as e:
+            yield f"data: {_json.dumps({'error': str(e)})}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.post("/api/generate-image")
@@ -249,6 +333,61 @@ async def admin_logout():
     resp = JSONResponse(content={"redirect": "/admin/login"})
     resp.delete_cookie("admin_auth")
     return resp
+
+
+@app.post("/api/chat/functions")
+async def chat_with_tools(request: Request, body: dict = Body(...)):
+    """Chat mit OpenAI Function Calling"""
+    from function_calling import chat_with_functions
+    from config import load_prompts_config
+
+    session_id = request.cookies.get(SESSION_COOKIE) or session_mgr.create_session_id()
+    state = session_mgr.load_session(session_id) or {}
+    messages = state.get("messages", [])
+
+    user_msg = body.get("message", "")
+    messages.append({"role": "user", "content": user_msg})
+
+    cfg = load_prompts_config()
+    tone = cfg.get("bot_personality", {}).get("tone", "freundlich")
+    system = f"Du bist ein {tone} Kuchenberater für Kidstorte. Nutze die verfügbaren Funktionen um Bestellungen zu erfassen und Preise zu berechnen."
+
+    result = chat_with_functions(messages, system)
+    messages.append({"role": "assistant", "content": result["response"]})
+    state["messages"] = messages
+
+    # Order updates in state übernehmen
+    if result["order_updates"]:
+        order_info = state.get("order_info", {})
+        order_info.update(result["order_updates"])
+        state["order_info"] = order_info
+
+    session_mgr.save_session(session_id, state)
+
+    return JSONResponse({
+        "response": result["response"],
+        "tool_calls": result["tool_calls"],
+        "order_updates": result["order_updates"],
+        "session_id": session_id,
+    })
+
+
+# ==========================================
+# METRICS ENDPOINT
+# ==========================================
+
+@app.get("/metrics")
+async def get_metrics(request: Request):
+    """Metriken-Endpunkt (nur Admin oder lokal)"""
+    # Nur im lokalen Netz oder mit Admin-Cookie
+    if request.cookies.get("admin_auth") != ADMIN_PASSWORD:
+        client_ip = request.client.host if request.client else "unknown"
+        if client_ip not in ("127.0.0.1", "::1", "localhost"):
+            raise HTTPException(status_code=401, detail="Nicht autorisiert")
+
+    snapshot = metrics.snapshot()
+    snapshot["cache"] = response_cache.stats()
+    return JSONResponse(snapshot)
 
 
 # --- Database Diagram ---

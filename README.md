@@ -1,5 +1,5 @@
-<<<<<<< HEAD
-# 🎂 Cake Dreams – LangGraph Agent
+
+# Kidstorte – LangGraph Agent
 
 Ein KI-Kundenberater für eine Konditorei, gebaut nach dem **LangGraph-Pattern**:
 Nodes + Edges + Shared State.
@@ -127,3 +127,6 @@ Dann öffnen: **http://localhost:5001**
 =======
 # Kidstorte
 >>>>>>> 64ef9d417ef8e6d1eff77902e78adcc1386746eb
+#Das Admin-Passwort ist: cakedreams2024
+
+#Login unter: http://localhost:5001/admin/login

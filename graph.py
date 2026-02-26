@@ -68,6 +68,12 @@ class CakeDreamsGraph:
             Aktualisierter State mit response und optional image_url
         """
 
+        # Fehlende Felder initialisieren (leere/neue Session)
+        if "messages" not in state:
+            state["messages"] = []
+        if "order_info" not in state:
+            state["order_info"] = {}
+
         # Reset pro Durchlauf
         state["user_input"] = user_input
         state["response"] = ""
@@ -86,6 +92,10 @@ class CakeDreamsGraph:
 
         # ── SCHRITT 2: Routing basierend auf Intent ──
         if intent == "greeting":
+            # Begrüßung = neues Gespräch → Bestelldaten zurücksetzen
+            state["order_info"] = {}
+            state["order_complete"] = False
+            state["missing_fields"] = []
             state = greet(state)
 
         elif intent == "order":

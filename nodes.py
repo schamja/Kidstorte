@@ -162,7 +162,7 @@ def check_complete(state: AgentState) -> AgentState:
 # ═══════════════════════════════════════
 @safe_node(fallback_response="Was möchten Sie mir noch zu Ihrem Kuchen erzählen?")
 def ask_next(state: AgentState) -> AgentState:
-    """Fragt nach der nächsten fehlenden Info. Bestätigt zuerst was der Kunde gesagt hat."""
+    """Fragt nach der nächsten fehlenden Info. Wählt kontextbasiert die natürlichste Frage."""
 
     config = load_prompts_config()
     system_prompt = config["prompts"]["ask_next"]
@@ -171,16 +171,21 @@ def ask_next(state: AgentState) -> AgentState:
     missing = state.get("missing_fields", [])
     order_info = state.get("order_info", {})
     last_input = state.get("user_input", "")
+    history = format_history(state.get("messages", [])[-8:])
 
-    next_field = missing[0] if missing else None
-    next_question = field_questions.get(next_field, "")
+    # Alle noch fehlenden Fragen aufzählen – LLM wählt die passendste
+    missing_questions = "\n".join(
+        f"- {field}: {field_questions.get(field, field)}"
+        for field in missing
+    )
 
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content":
-            f"Kunde hat gesagt: '{last_input}'\n"
-            f"Bisher gesammelt: {json.dumps(order_info, ensure_ascii=False)}\n"
-            f"Nächste Frage die du stellen musst: {next_question}"}
+            f"Gesprächsverlauf:\n{history}\n\n"
+            f"Letzte Kundennachricht: '{last_input}'\n"
+            f"Bisher gesammelt: {json.dumps(order_info, ensure_ascii=False)}\n\n"
+            f"Noch fehlende Informationen (wähle die eine natürlichste):\n{missing_questions}"}
     ]
 
     state["response"] = _llm_chat(messages, temperature=0.4, max_tokens=150)
@@ -339,16 +344,45 @@ def generate_image(state: AgentState) -> AgentState:
 # ═══════════════════════════════════════
 # NODE 11: UPDATE ORDER (Änderungen)
 # ═══════════════════════════════════════
-@safe_node(fallback_response="Ich konnte die Änderung leider nicht verarbeiten.")
+@safe_node(fallback_response="Was möchten Sie an Ihrer Bestellung ändern oder hinzufügen?")
 def update_order(state: AgentState) -> AgentState:
-    """Verarbeitet Änderungswünsche an der bestehenden Bestellung."""
+    """Verarbeitet Änderungswünsche oder Ergänzungen an der bestehenden Bestellung."""
 
+    order_info_before = dict(state.get("order_info", {}))
     state = extract_info(state)
+    order_info_after = state.get("order_info", {})
 
-    state["response"] = (
-        f"Klar, ich habe die Änderung übernommen! "
-        f"Möchten Sie ein neues Vorschaubild sehen oder den aktualisierten Preis wissen?"
-    )
+    # Prüfen ob tatsächlich neue Infos extrahiert wurden
+    new_keys = {k for k, v in order_info_after.items()
+                if k not in order_info_before or order_info_before[k] != v}
+
+    if not new_keys:
+        # Nichts extrahiert → fragen was der Kunde möchte
+        config = load_prompts_config()
+        field_questions = get_field_questions()
+        current = json.dumps(order_info_after, ensure_ascii=False) if order_info_after else "noch keine"
+
+        messages = [
+            {"role": "system", "content":
+                "Du bist ein freundlicher Kuchenberater bei Kidstorte. "
+                "Der Kunde möchte etwas an seiner Bestellung ändern oder hinzufügen, "
+                "hat aber noch nicht gesagt was. Frage freundlich und konkret was er ändern/ergänzen möchte. "
+                "Nenne dabei die Möglichkeiten: Geschmack, Form, Schichten, Füllung, Dekoration, Farbe. "
+                "Maximal 2 Sätze. Kein Markdown."},
+            {"role": "user", "content":
+                f"Kunde: '{state.get('user_input', '')}'\n"
+                f"Bisherige Bestellung: {current}"}
+        ]
+        state["response"] = _llm_chat(messages, temperature=0.3, max_tokens=100)
+    else:
+        changed = ", ".join(new_keys)
+        state["response"] = (
+            f"Perfekt, ich habe {changed} für Sie aktualisiert! "
+            f"Möchten Sie noch etwas ändern oder soll ich den aktualisierten Preis berechnen?"
+        )
+        # check_complete neu ausführen
+        state = check_complete(state)
+
     return state
 
 
