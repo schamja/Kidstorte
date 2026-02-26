@@ -21,6 +21,48 @@ const navToggle = document.getElementById("nav-toggle");
 const navLinks = document.getElementById("nav-links");
 const navbar = document.getElementById("navbar");
 
+// --- Streaming Toggle ---
+let streamingEnabled = false;
+
+// Create and inject the stream toggle button next to the send button
+(function injectStreamToggle() {
+  const streamBtn = document.createElement("button");
+  streamBtn.id = "stream-btn";
+  streamBtn.title = "Streaming-Modus umschalten";
+  streamBtn.textContent = "⚡ Stream";
+  streamBtn.style.cssText = [
+    "padding: 6px 10px",
+    "border: 1px solid #ccc",
+    "border-radius: 6px",
+    "background: #f5f5f5",
+    "color: #555",
+    "font-size: 12px",
+    "cursor: pointer",
+    "transition: background 0.2s, color 0.2s",
+    "white-space: nowrap",
+  ].join(";");
+
+  streamBtn.addEventListener("click", () => {
+    streamingEnabled = !streamingEnabled;
+    if (streamingEnabled) {
+      streamBtn.style.background = "#f5a623";
+      streamBtn.style.color = "#fff";
+      streamBtn.style.borderColor = "#e09510";
+      chatStatus.textContent = "Streaming aktiv";
+    } else {
+      streamBtn.style.background = "#f5f5f5";
+      streamBtn.style.color = "#555";
+      streamBtn.style.borderColor = "#ccc";
+      chatStatus.textContent = "KI-gestützt";
+    }
+  });
+
+  // Insert right before the send button's parent container, or after sendBtn
+  if (sendBtn && sendBtn.parentNode) {
+    sendBtn.parentNode.insertBefore(streamBtn, sendBtn);
+  }
+})();
+
 // Field labels for order panel
 const fieldLabels = {
   anlass: "🎉", gaeste: "👥", geschmack: "🍰",
@@ -61,6 +103,13 @@ async function sendMessage() {
   sendBtn.disabled = true;
   chatStatus.textContent = "Denkt...";
 
+  if (streamingEnabled) {
+    await sendMessageStreaming(text);
+    sendBtn.disabled = false;
+    userInput.focus();
+    return;
+  }
+
   const typing = showTyping("Schreibt...");
 
   try {
@@ -74,10 +123,16 @@ async function sendMessage() {
     typing.remove();
 
     if (res.ok) {
+      if (data.session_reset) {
+        orderPanel.style.display = "none";
+        orderTags.innerHTML = "";
+        document.getElementById("new-order-btn")?.parentElement?.remove();
+      }
       appendMessage("assistant", data.answer);
       if (data.image_url) appendImage(data.image_url);
       updateOrderPanel(data.order_info);
       chatStatus.textContent = data.intent || "KI-gestützt";
+      if (data.order_complete) showNewOrderButton();
     } else {
       appendMessage("assistant", "Fehler: " + (data.detail || "Unbekannt"));
     }
@@ -88,6 +143,60 @@ async function sendMessage() {
 
   sendBtn.disabled = false;
   userInput.focus();
+}
+
+// --- Streaming Nachricht via SSE ---
+async function sendMessageStreaming(text) {
+  chatStatus.textContent = "Streamt...";
+
+  // Create an assistant bubble we'll fill token by token
+  const div = document.createElement("div");
+  div.className = "message assistant";
+  const bubble = document.createElement("div");
+  bubble.className = "message-bubble";
+  bubble.textContent = "";
+  div.appendChild(bubble);
+  chatMessages.appendChild(div);
+
+  try {
+    const url = "/api/chat/stream?message=" + encodeURIComponent(text);
+    const evtSource = new EventSource(url);
+
+    await new Promise((resolve, reject) => {
+      evtSource.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.token) {
+            bubble.textContent += payload.token;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+          if (payload.done) {
+            evtSource.close();
+            chatStatus.textContent = "Streaming abgeschlossen";
+            resolve();
+          }
+          if (payload.error) {
+            evtSource.close();
+            bubble.textContent = "Fehler: " + payload.error;
+            reject(new Error(payload.error));
+          }
+        } catch (e) {
+          // ignore parse errors on individual chunks
+        }
+      };
+      evtSource.onerror = (err) => {
+        evtSource.close();
+        if (!bubble.textContent) {
+          bubble.textContent = "Verbindungsfehler beim Streaming.";
+        }
+        resolve(); // resolve so the UI unblocks
+      };
+    });
+  } catch (err) {
+    if (!bubble.textContent) {
+      bubble.textContent = "Streaming-Fehler: " + err.message;
+    }
+  }
 }
 
 // --- Bild generieren (separater Button) ---
@@ -123,10 +232,39 @@ async function resetChat() {
   try {
     await fetch("/api/reset", { method: "POST" });
   } catch (e) {}
-  chatMessages.innerHTML = '<div class="message assistant"><div class="message-bubble">Hallo und willkommen bei Cake Dreams! 👋 Wie kann ich Ihnen helfen?</div></div>';
+  chatMessages.innerHTML = '<div class="message assistant"><div class="message-bubble">Hallo und willkommen bei Kidstorte! 👋 Wie kann ich Ihnen helfen?</div></div>';
   orderPanel.style.display = "none";
   orderTags.innerHTML = "";
   chatStatus.textContent = "KI-gestützt";
+}
+
+// --- "Neue Bestellung"-Button nach abgeschlossener Bestellung ---
+function showNewOrderButton() {
+  // Nur einmal einfügen
+  if (document.getElementById("new-order-btn")) return;
+  const div = document.createElement("div");
+  div.style.cssText = "display:flex;justify-content:center;margin:12px 0;";
+  const btn = document.createElement("button");
+  btn.id = "new-order-btn";
+  btn.textContent = "🎂 Neue Bestellung starten";
+  btn.style.cssText = [
+    "padding:10px 20px",
+    "background:linear-gradient(135deg,#e8b4a0,#d4956a)",
+    "color:#fff",
+    "border:none",
+    "border-radius:20px",
+    "font-size:14px",
+    "font-weight:600",
+    "cursor:pointer",
+    "box-shadow:0 2px 8px rgba(0,0,0,0.15)",
+  ].join(";");
+  btn.addEventListener("click", () => {
+    div.remove();
+    resetChat();
+  });
+  div.appendChild(btn);
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // --- Hilfsfunktionen ---
