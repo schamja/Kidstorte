@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎂 Kidstorte – Technische Dokumentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fdf6ec;
+    --brown: #3d1f0a;
+    --caramel: #c47a2b;
+    --caramel-light: #e8a84f;
+    --rose: #e8635a;
+    --mint: #4a9e8a;
+    --lavender: #8b6bb5;
+    --sky: #4a7fb5;
+    --card: #fffdf8;
+    --border: #e8d9c0;
+    --code-bg: #1e1410;
+    --code-text: #f0d9b5;
+    --code-accent: #e8a84f;
+    --code-green: #7ec8a0;
+    --code-red: #e8635a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--brown);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--brown);
+    color: var(--cream);
+    padding: 56px 40px 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 80% 50%, rgba(196,122,43,0.25) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  header .emoji { font-size: 56px; display: block; margin-bottom: 16px; }
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  header p {
+    font-size: 14px;
+    opacity: 0.65;
+    max-width: 520px;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── Nav pills ── */
+  nav {
+    background: var(--brown);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 0 40px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  nav a {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--caramel-light);
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  nav a:hover { background: var(--caramel); color: var(--brown); }
+
+  /* ── Main layout ── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Section ── */
+  section {
+    margin-bottom: 52px;
+    scroll-margin-top: 24px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-num {
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--caramel);
+    background: rgba(196,122,43,0.12);
+    border: 1px solid rgba(196,122,43,0.3);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(18px, 3vw, 24px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--brown);
+  }
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--brown);
+    margin: 28px 0 12px;
+  }
+
+  p { margin-bottom: 12px; }
+
+  /* ── Code blocks ── */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    padding: 20px 22px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 16px 0;
+    border: 1px solid rgba(255,255,255,0.05);
+    white-space: pre;
+  }
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: rgba(196,122,43,0.12);
+    color: var(--caramel);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(196,122,43,0.2);
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+
+  /* ── Syntax highlights ── */
+  .c-green  { color: #7ec8a0; }
+  .c-red    { color: #e8635a; }
+  .c-yellow { color: #e8c84f; }
+  .c-blue   { color: #7ab5e8; }
+  .c-orange { color: #e8a84f; }
+  .c-dim    { opacity: 0.45; }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; margin: 16px 0; border-radius: 10px; border: 1px solid var(--border); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  thead th {
+    background: var(--brown);
+    color: var(--cream);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 10px 14px;
+    text-align: left;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:nth-child(even) td { background: rgba(196,122,43,0.04); }
+  td { padding: 9px 14px; vertical-align: top; }
+  td code { font-size: 11.5px; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin: 16px 0;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .card-mini {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .card-mini .label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--caramel);
+    margin-bottom: 4px;
+  }
+  .card-mini .value {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--brown);
+  }
+
+  /* ── File tree ── */
+  .file-tree {
+    background: var(--code-bg);
+    color: var(--code-text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+    padding: 20px 22px;
+    border-radius: 10px;
+    margin: 16px 0;
+  }
+  .file-tree .folder { color: #e8a84f; font-weight: 500; }
+  .file-tree .file   { color: #7ab5e8; }
+  .file-tree .dim    { opacity: 0.4; }
+  .file-tree .comment { color: #7ec8a0; }
+
+  /* ── Stars ── */
+  .star-full  { color: #f5c518; }
+  .star-empty { color: #ccc; }
+
+  /* ── Tags ── */
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+  }
+  .tag-green  { background: rgba(74,158,138,0.15); color: var(--mint); border: 1px solid rgba(74,158,138,0.3); }
+  .tag-red    { background: rgba(232,99,90,0.15);  color: var(--rose); border: 1px solid rgba(232,99,90,0.3); }
+  .tag-yellow { background: rgba(232,200,79,0.15); color: #a07c00; border: 1px solid rgba(232,200,79,0.3); }
+  .tag-blue   { background: rgba(74,127,181,0.15); color: var(--sky);  border: 1px solid rgba(74,127,181,0.3); }
+
+  /* ── Callout ── */
+  .callout {
+    background: rgba(196,122,43,0.08);
+    border-left: 3px solid var(--caramel);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .callout strong { color: var(--caramel); }
+
+  /* ── Flow diagram ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 16px 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .flow-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 28px;
+  }
+  .flow-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--caramel);
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+  .flow-bar {
+    width: 2px;
+    flex: 1;
+    min-height: 20px;
+    background: linear-gradient(to bottom, var(--caramel), var(--border));
+    margin: 3px 0;
+  }
+  .flow-content {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 4px;
+    font-size: 13.5px;
+    flex: 1;
+  }
+  .flow-content strong { color: var(--caramel); font-family: 'DM Mono', monospace; font-size: 12px; }
+
+  /* ── Two-col ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* ── Model chips ── */
+  .model-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .model-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .model-card .model-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--caramel);
+    background: rgba(196,122,43,0.1);
+    border: 1px solid rgba(196,122,43,0.2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+  .model-card ul { list-style: none; }
+  .model-card ul li {
+    font-size: 13px;
+    padding: 2px 0;
+    padding-left: 14px;
+    position: relative;
+    color: #5a3d20;
+  }
+  .model-card ul li::before { content: '→'; position: absolute; left: 0; color: var(--caramel); font-size: 11px; top: 3px; }
+
+  /* ── Divider ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--brown);
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="emoji">🎂</span>
+  <h1>Kidstorte<br>Technische Dokumentation</h1>
+  <p>Wie alle Teile zusammenhängen · Wo Daten gespeichert werden · KI-Technologien erklärt</p>
+</header>
+
+<nav>
+  <a href="#s1">Großes Bild</a>
+  <a href="#s2">Dateien</a>
+  <a href="#s3">Datenspeicher</a>
+  <a href="#s4">RAG</a>
+  <a href="#s5">LangGraph</a>
+  <a href="#s6">Multimodal</a>
+  <a href="#s7">Prompts</a>
+  <a href="#s8">KI-Modelle</a>
+  <a href="#s9">Ablauf</a>
+  <a href="#s10">Referenz</a>
+  <a href="#s11">Tech-Stack</a>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════ 1 -->
+<section id="s1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>Das große Bild – Wie alles zusammenhängt</h2>
+  </div>
+  <p>Stell dir das System wie eine <strong>Bäckerei mit mehreren Abteilungen</strong> vor. Jede Datei ist eine Abteilung. Sie arbeiten zusammen, aber jede hat ihre eigene Aufgabe.</p>
+<pre>
+┌─────────────────────────────────────────────┐
+│                   <span class="c-yellow">KUNDE</span>                       │
+│             (Browser / App)                 │
+└──────────────────────┬──────────────────────┘
+                       │  schreibt eine Nachricht
+                       ▼
+┌─────────────────────────────────────────────┐
+│                  <span class="c-orange">main.py</span>                      │
+│           "Der Empfang / Rezeption"         │
+│  Nimmt Nachricht entgegen, gibt Cookie aus, │
+│  leitet weiter, schickt Antwort zurück      │
+└──────────────────────┬──────────────────────┘
+                       │
+          ┌────────────┼────────────┐
+          ▼            ▼            ▼
+   <span class="c-blue">session_mgr.py</span>    <span class="c-green">graph.py</span>    <span class="c-red">order_db.py</span>
+   "Gedächtnis"    "Dirigent"   "Kassenbuch"
+   (ChromaDB)      (Routing)    (SQLite)
+                       │
+            ┌──────────┼──────────┐
+            ▼          ▼          ▼
+         <span class="c-orange">nodes.py   nodes.py   nodes.py</span>
+         (classify, extract, ask, generate...)
+            │
+  ┌─────────┼──────────┐
+  ▼         ▼          ▼
+<span class="c-yellow">OpenAI</span>   <span class="c-green">HuggingFace</span>  <span class="c-blue">ChromaDB</span>
+(GPT-4o  (FLUX/SDXL   (RAG Wissen)
+ mini,    Bilder)
+ gpt-image-1)
+</pre>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 2 -->
+<section id="s2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>Alle Dateien und ihre Verbindungen</h2>
+  </div>
+
+  <h3><code>main.py</code> → verbindet sich mit ALLEN anderen Dateien</h3>
+  <div class="file-tree">
+<span class="folder">main.py</span>
+  ├── importiert <span class="file">graph.py</span>          <span class="comment">→ startet KI-Durchlauf</span>
+  ├── importiert <span class="file">session_manager</span>   <span class="comment">→ lädt/speichert Gespräche</span>
+  ├── importiert <span class="file">order_db.py</span>       <span class="comment">→ speichert Bestellungen</span>
+  ├── importiert <span class="file">config.py</span>         <span class="comment">→ liest Einstellungen</span>
+  ├── importiert <span class="file">monitoring.py</span>     <span class="comment">→ zählt Metriken</span>
+  ├── importiert <span class="file">cost_optimizer</span>    <span class="comment">→ schätzt Token-Kosten</span>
+  ├── importiert <span class="file">email_service</span>     <span class="comment">→ schickt E-Mails</span>
+  └── importiert <span class="file">pdf_order.py</span>      <span class="comment">→ erstellt PDFs</span>
+  </div>
+
+  <h3><code>graph.py</code> → verbindet sich mit nodes.py und state.py</h3>
+  <div class="file-tree">
+<span class="folder">graph.py</span>
+  ├── importiert <span class="file">nodes.py</span>          <span class="comment">→ ruft jeden KI-Schritt auf</span>
+  ├── importiert <span class="file">state.py</span>          <span class="comment">→ kennt das Klemmbrett-Format</span>
+  └── <span class="comment">LOGIK: entscheidet welcher Node wann aufgerufen wird</span>
+  </div>
+
+  <h3><code>nodes.py</code> → das Herzstück, verbindet sich mit allem</h3>
+  <div class="file-tree">
+<span class="folder">nodes.py</span>
+  ├── importiert <span class="file">config.py</span>         <span class="comment">→ liest Prompts aus YAML</span>
+  ├── importiert <span class="file">state.py</span>          <span class="comment">→ liest/schreibt AgentState</span>
+  ├── importiert <span class="file">error_handler.py</span>  <span class="comment">→ Fehler abfangen</span>
+  ├── nutzt <span class="c-yellow">OpenAI API</span>             <span class="comment">→ GPT-4o-mini (Text + Vision)</span>
+  ├── nutzt <span class="c-yellow">OpenAI API</span>             <span class="comment">→ gpt-image-1 (Bilder generieren)</span>
+  ├── nutzt <span class="c-green">HuggingFace API</span>        <span class="comment">→ FLUX/SDXL (Backup-Bilder)</span>
+  └── nutzt <span class="c-blue">ChromaDB</span>               <span class="comment">→ RAG Wissensbasis durchsuchen</span>
+  </div>
+
+  <h3><code>state.py</code> → wird von ALLEN anderen gelesen</h3>
+  <div class="file-tree">
+<span class="folder">state.py</span>  <span class="comment">(das Klemmbrett)</span>
+  ← <span class="file">graph.py</span> liest und schreibt
+  ← <span class="file">nodes.py</span> liest und schreibt
+  ← <span class="file">session_manager.py</span> speichert und lädt
+  ← <span class="file">main.py</span> liest die finale Antwort
+  </div>
+
+  <h3><code>config.py</code> → wird von fast ALLEN anderen gelesen</h3>
+  <div class="file-tree">
+<span class="folder">config.py</span>
+  ← liest <span class="c-orange">.env</span> Datei (API-Keys, Passwörter)
+  ← liest <span class="c-orange">prompts_config.yaml</span> (KI-Anweisungen)
+  → gibt alles an <span class="file">nodes.py</span>, <span class="file">main.py</span>, <span class="file">email_service</span>, etc.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 3 -->
+<section id="s3">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>Wo werden Daten gespeichert?</h2>
+  </div>
+
+  <h3>Übersicht aller Speicherorte</h3>
+  <div class="file-tree">
+<span class="c-dim">Projekt-Ordner/</span>
+│
+├── <span class="folder">chroma_db/</span>              <span class="comment">← ChromaDB Datenbank</span>
+│   ├── <span class="folder">sessions/</span>           <span class="comment">← laufende Gespräche (24h)</span>
+│   └── <span class="folder">cake_chunks/</span>        <span class="comment">← Wissensbasis (für immer)</span>
+│
+├── <span class="file">kidstorte.db</span>            <span class="comment">← SQLite Datenbank</span>
+│   ├── <span class="c-green">orders</span> Tabelle      <span class="comment">← Bestellungen (für immer)</span>
+│   └── <span class="c-green">ratings</span> Tabelle     <span class="comment">← Bewertungen (für immer)</span>
+│
+├── <span class="folder">static/</span>
+│   ├── <span class="folder">images/</span>             <span class="comment">← KI-generierte Bilder (.png)</span>
+│   └── <span class="folder">pdfs/</span>               <span class="comment">← Bestell-PDFs</span>
+│
+├── <span class="folder">Bilder/</span>                 <span class="comment">← Referenzbilder Portfolio (du pflegst sie)</span>
+│   ├── <span class="file">elsa_kuchen.jpg</span>
+│   └── <span class="file">ronaldo_kuchen.jpg</span>
+│
+├── <span class="folder">documents/</span>              <span class="comment">← Wissensdokumente (.md Dateien)</span>
+│   ├── <span class="file">preise.md</span>
+│   └── <span class="file">faq.md</span>
+│
+└── <span class="c-yellow">Browser (Cookie)</span>        <span class="comment">← Session-ID (24h, dann weg)</span>
+  </div>
+
+  <h3>Wie lange bleibt was?</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Was</th><th>Wo</th><th>Wie lange</th><th>Wer löscht</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Laufendes Gespräch</td><td><code>ChromaDB/sessions</code></td><td><span class="tag tag-red">24 Stunden</span></td><td>Automatisch</td></tr>
+        <tr><td>Wissensbasis (RAG)</td><td><code>ChromaDB/cake_chunks</code></td><td><span class="tag tag-green">Für immer</span></td><td>Du manuell</td></tr>
+        <tr><td>Bestellungen</td><td><code>kidstorte.db/orders</code></td><td><span class="tag tag-green">Für immer</span></td><td>Du manuell</td></tr>
+        <tr><td>Bewertungen</td><td><code>kidstorte.db/ratings</code></td><td><span class="tag tag-green">Für immer</span></td><td>Du manuell</td></tr>
+        <tr><td>Generierte Bilder</td><td><code>static/images/</code></td><td><span class="tag tag-green">Für immer</span></td><td>Du manuell</td></tr>
+        <tr><td>Bestell-PDFs</td><td><code>static/pdfs/</code></td><td><span class="tag tag-green">Für immer</span></td><td>Du manuell</td></tr>
+        <tr><td>Referenzbilder</td><td><code>Bilder/</code></td><td><span class="tag tag-green">Für immer</span></td><td>Du pflegst sie</td></tr>
+        <tr><td>Session-Cookie</td><td>Browser</td><td><span class="tag tag-red">24 Stunden</span></td><td>Browser automatisch</td></tr>
+        <tr><td>Metriken</td><td>RAM</td><td><span class="tag tag-yellow">Bis Neustart</span></td><td>Automatisch</td></tr>
+        <tr><td>Response-Cache</td><td>RAM</td><td><span class="tag tag-yellow">Bis Neustart</span></td><td>Automatisch</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 4 -->
+<section id="s4">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>Was ist RAG? Wie stark ist es hier?</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <strong>❌ Ohne RAG</strong>
+      <pre style="margin-top:10px;font-size:11.5px">Kunde: "Was kostet ein Schoko-Kuchen?"
+KI: erfindet einen Preis
+    → halluziniert ❌</pre>
+    </div>
+    <div class="card">
+      <strong>✅ Mit RAG</strong>
+      <pre style="margin-top:10px;font-size:11.5px">Kunde: "Was kostet ein Schoko-Kuchen?"
+System: sucht in ChromaDB
+→ findet: "Schokolade ab 35€"
+KI: antwortet mit echtem Preis ✅</pre>
+    </div>
+  </div>
+
+  <h3>Wie RAG in Kidstorte funktioniert</h3>
+<pre>
+<span class="c-yellow">SCHRITT 1</span> – Einmalig (ingest.py):
+  preise.md + faq.md
+       │
+       ▼ In kleine Stücke schneiden ("Chunks")
+       │
+       ▼ OpenAI Embedding → Zahlen-Vektor
+  "Schokolade kostet 35€" → [0.23, -0.84, 0.41, ...]
+       │
+       ▼ ChromaDB speichert: Text + Zahlen
+
+<span class="c-yellow">SCHRITT 2</span> – Bei jeder Preisfrage (nodes.py):
+  Kundenfrage: "Was kostet das?"
+       │
+       ▼ Frage auch zu Zahlen umwandeln
+  → [0.22, -0.85, 0.40, ...]
+       │
+       ▼ ChromaDB vergleicht mit allen Zahlen
+  → findet ähnlichsten Chunk (= Preisliste)
+       │
+       ▼ KI beantwortet mit echtem Inhalt ✅
+</pre>
+
+  <h3>Wie stark ist das RAG hier?</h3>
+  <div class="two-col">
+    <div class="card">
+      <strong style="color:var(--mint)">✅ Stärken</strong>
+      <ul style="margin-top:10px;padding-left:18px;font-size:13.5px">
+        <li>Antwortet NUR mit Infos aus deinen Dokumenten</li>
+        <li>Keine erfundenen Preise oder Infos</li>
+        <li>Automatisch aktuell wenn du neu ingest</li>
+      </ul>
+    </div>
+    <div class="card">
+      <strong style="color:var(--rose)">⚠️ Schwächen</strong>
+      <ul style="margin-top:10px;padding-left:18px;font-size:13.5px">
+        <li>Nur bei <code>intent = "price"</code> oder <code>"info"</code> aktiv</li>
+        <li>Bestelldetails kommen NICHT aus RAG</li>
+        <li>Nur <code>.md</code> Dateien unterstützt</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout"><strong>Bewertung: Mittelstark</strong> – gut für Preise und FAQ, nicht für die eigentliche Bestelllogik</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 5 -->
+<section id="s5">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>Was ist LangGraph? Ist es wirklich hier drin?</h2>
+  </div>
+
+  <div class="callout"><strong>LangGraph ist NICHT installiert.</strong> Das Projekt nutzt ein selbst gebautes LangGraph-Muster – es funktioniert genauso, aber ohne die echte Bibliothek.</div>
+
+<pre>
+<span class="c-dim"># Echter LangGraph würde so aussehen:</span>
+<span class="c-red">from langgraph.graph import StateGraph</span>  <span class="c-dim"># ← gibt es hier NICHT</span>
+
+<span class="c-dim"># Kidstorte macht es selbst in graph.py:</span>
+<span class="c-green">class</span> <span class="c-yellow">CakeDreamsGraph</span>:
+    <span class="c-green">def</span> <span class="c-blue">run</span>(self, state, user_input):
+        state = <span class="c-orange">guardrail</span>(state)
+        state = <span class="c-orange">classify_and_extract</span>(state)
+        <span class="c-green">if</span> intent == <span class="c-yellow">"order"</span>:
+            state = <span class="c-orange">extract_info</span>(state)
+            state = <span class="c-orange">check_complete</span>(state)
+        <span class="c-green">return</span> state
+</pre>
+
+  <h3>Vergleich: Echtes LangGraph vs. Kidstorte</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Funktion</th><th>Echtes LangGraph</th><th>Kidstorte</th></tr></thead>
+      <tbody>
+        <tr><td>Nodes (Schritte)</td><td>✅ Ja</td><td>✅ Ja (nodes.py)</td></tr>
+        <tr><td>Routing (Weichen)</td><td>✅ Ja</td><td>✅ Ja (graph.py)</td></tr>
+        <tr><td>State (Klemmbrett)</td><td>✅ Ja</td><td>✅ Ja (state.py)</td></tr>
+        <tr><td>Checkpointer (Speicher)</td><td>✅ Ja</td><td>✅ Ja (session_manager.py)</td></tr>
+        <tr><td>Streaming</td><td>✅ Ja</td><td>✅ Ja (/api/chat/stream)</td></tr>
+        <tr><td>Bibliothek installiert</td><td>✅ Ja</td><td>❌ Nein (selbst gebaut)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout"><strong>Fazit:</strong> Kidstorte ist ein LangGraph-Klon. Gleiche Idee, eigener Code.</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 6 -->
+<section id="s6">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>Multimodales RAG – Was ist das? Wo ist es?</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <strong>Monomodal</strong>
+      <p style="margin-top:8px;font-size:13.5px">Versteht NUR Text.<br>KI liest: "Ich will Elsa-Dekoration" → antwortet</p>
+    </div>
+    <div class="card">
+      <strong style="color:var(--mint)">Multimodal ✅</strong>
+      <p style="margin-top:8px;font-size:13.5px">Versteht Text UND Bilder gleichzeitig.<br>KI <em>sieht</em> dein Referenzfoto + liest Kundenwunsch → erstellt passendes Bild mit Änderungen</p>
+    </div>
+  </div>
+
+  <h3>3 Schritte in nodes.py</h3>
+<pre>
+<span class="c-yellow">SCHRITT 1</span>: _scan_reference_images + _find_best_reference
+  ↓ Lädt alle Bilder aus "Bilder/" Ordner
+  ↓ Schickt sie an <span class="c-orange">GPT-4o-mini Vision</span>
+  ↓ GPT sieht jedes Bild, vergleicht mit Kundenwunsch
+  ↓ Gibt zurück: <span class="c-green">"Bild 2 passt am besten (Score: 0.85)"</span>
+
+<span class="c-yellow">SCHRITT 2</span>: _find_best_reference
+  ↓ GPT-4o-mini beschreibt das beste Bild auf Englisch:
+  <span class="c-green">"Fondant figurine of ice queen with platinum blonde braid,
+   snowflake decorations, blue and white color scheme..."</span>
+  ↓ Diese Beschreibung ist die VORLAGE
+
+<span class="c-yellow">SCHRITT 3</span>: generate_single_image
+  ↓ gpt-image-1 bekommt: Vorlage + Kundenwünsche
+  ↓ Generiert: neues Bild das Vorlage ähnelt aber Wünsche umsetzt
+</pre>
+
+  <h3>Unterschied: normales RAG vs. multimodales RAG</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th></th><th>Normales RAG (Wissen)</th><th>Multimodales RAG (Bilder)</th></tr></thead>
+      <tbody>
+        <tr><td>Was wird gesucht?</td><td>Textdokumente (.md)</td><td>Bilder (.jpg, .png)</td></tr>
+        <tr><td>Wo gespeichert?</td><td>ChromaDB</td><td>Bilder/ Ordner</td></tr>
+        <tr><td>Wie wird gesucht?</td><td>Embedding-Zahlen</td><td>GPT-4o-mini Vision</td></tr>
+        <tr><td>Wann aktiviert?</td><td>Bei Preis/Info-Fragen</td><td>Bei Bild-Generierung</td></tr>
+        <tr><td>Ergebnis</td><td>Text-Antwort</td><td>Generiertes Bild</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 7 -->
+<section id="s7">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <h2>Die Prompt-Stärke – Wie gut ist das Prompt-System?</h2>
+  </div>
+
+  <h3>Wo stecken alle Prompts?</h3>
+  <div class="file-tree">
+<span class="folder">prompts_config.yaml</span>
+  ├── <span class="c-orange">classify_intent</span>    <span class="comment">→ Was will der Kunde? (greeting/order/price/...)</span>
+  ├── <span class="c-orange">extract_info</span>       <span class="comment">→ Welche Details hat er genannt?</span>
+  ├── <span class="c-orange">ask_next</span>           <span class="comment">→ Was soll ich als nächstes fragen?</span>
+  ├── <span class="c-orange">calculate_price</span>    <span class="comment">→ Berechne Preis als HTML-Tabelle</span>
+  ├── <span class="c-orange">answer_question</span>    <span class="comment">→ Beantworte allgemeine Fragen</span>
+  ├── <span class="c-orange">image_description</span>  <span class="comment">→ Beschreibe Kuchen in einem Satz</span>
+  ├── <span class="c-orange">greet</span>              <span class="comment">→ Begrüßungstext</span>
+  └── <span class="c-orange">redirect</span>           <span class="comment">→ Zurück zum Thema führen</span>
+  </div>
+
+  <h3>Was macht das Prompt-System besonders stark?</h3>
+
+  <div class="card" style="margin-bottom:12px">
+    <strong>1. Hot-Reload</strong> – Prompts ändern sich ohne Server-Neustart
+<pre style="margin-top:10px;font-size:12px">
+<span class="c-dim"># config.py prüft bei jedem Aufruf ob YAML geändert wurde</span>
+mtime = os.path.getmtime(PROMPTS_CONFIG_PATH)
+<span class="c-green">if</span> mtime != _prompts_cache[<span class="c-yellow">"mtime"</span>]:
+    <span class="c-dim"># Neu laden!</span>
+</pre>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <strong>2. Kombinierter Classify+Extract Call</strong> – spart 50% Kosten
+<pre style="margin-top:10px;font-size:12px">
+<span class="c-dim"># nodes.py – Ein einziger API-Call für zwei Aufgaben:</span>
+combined_prompt = classify_prompt + extract_prompt
+<span class="c-dim"># → gibt zurück: {"intent": "order", "extracted": {"geschmack": "Schoko"}}</span>
+</pre>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <strong>3. TODO-Listen-System</strong> – fragt nicht dieselbe Frage zweimal
+<pre style="margin-top:10px;font-size:12px">
+question_todo = {
+  <span class="c-yellow">"anlass"</span>:    <span class="c-green">"answered"</span>,  <span class="c-dim"># ✅ schon beantwortet</span>
+  <span class="c-yellow">"gaeste"</span>:    <span class="c-orange">"asked"</span>,     <span class="c-dim"># ⏳ gefragt, noch keine Antwort</span>
+  <span class="c-yellow">"geschmack"</span>: <span class="c-red">"pending"</span>,   <span class="c-dim"># 🔲 noch nicht gefragt</span>
+}
+</pre>
+  </div>
+
+  <div class="card" style="margin-bottom:12px">
+    <strong>4. Halluzinations-Schutz</strong>
+    <p style="margin-top:8px;font-size:13.5px;color:#5a3d20">
+      <code>STRENGSTE REGEL:</code> Extrahiere NUR was der Kunde WÖRTLICH gesagt hat!<br>
+      <code>ERFINDE NIEMALS Werte!</code><br>
+      Namen BUCHSTABENGENAU übernehmen! (Aron bleibt Aron, nicht Aaron!)
+    </p>
+  </div>
+
+  <h3>Bewertung der Prompt-Stärke</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Bereich</th><th>Stärke</th><th>Warum</th></tr></thead>
+      <tbody>
+        <tr><td>Intent-Erkennung</td><td><span class="star-full">★★★★★</span></td><td>Sehr detaillierte Regeln, viele Beispiele</td></tr>
+        <tr><td>Extraktion</td><td><span class="star-full">★★★★★</span></td><td>Halluzinations-Schutz, buchstabengenau</td></tr>
+        <tr><td>Fragen stellen</td><td><span class="star-full">★★★★</span><span class="star-empty">★</span></td><td>TODO-System verhindert Wiederholungen</td></tr>
+        <tr><td>Preisberechnung</td><td><span class="star-full">★★★</span><span class="star-empty">★★</span></td><td>Abhängig von RAG-Dokumenten</td></tr>
+        <tr><td>Bild-Prompts</td><td><span class="star-full">★★★★★</span></td><td>LLM generiert detaillierten englischen Prompt</td></tr>
+        <tr><td>Guardrail</td><td><span class="star-full">★★★★</span><span class="star-empty">★</span></td><td>LLM-basiert, im Zweifel durchlassen</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 8 -->
+<section id="s8">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <h2>Die KI-Modelle – Welches macht was?</h2>
+  </div>
+
+  <div class="model-grid">
+    <div class="model-card">
+      <div class="model-name">gpt-4o-mini · Text</div>
+      <ul>
+        <li>Guardrail-Check (erlaubt/blockiert?)</li>
+        <li>Intent erkennen</li>
+        <li>Bestelldetails extrahieren</li>
+        <li>Nächste Frage stellen</li>
+        <li>Preis berechnen</li>
+        <li>Allgemeine Fragen beantworten</li>
+        <li>Bild-Prompts auf Englisch generieren</li>
+      </ul>
+    </div>
+    <div class="model-card">
+      <div class="model-name">gpt-4o-mini · Vision</div>
+      <ul>
+        <li>Referenzbilder ansehen</li>
+        <li>Mit Kundenwunsch vergleichen</li>
+        <li>Bestes Bild auswählen + beschreiben</li>
+      </ul>
+    </div>
+    <div class="model-card">
+      <div class="model-name">gpt-image-1</div>
+      <ul>
+        <li>Kuchen-Vorschaubilder generieren</li>
+        <li>Primärer Bild-Provider</li>
+        <li>Bei normalen Wünschen (ohne echte Namen)</li>
+      </ul>
+    </div>
+    <div class="model-card">
+      <div class="model-name">HuggingFace FLUX.1</div>
+      <ul>
+        <li>Backup wenn Personennamen (Elsa, Ronaldo…)</li>
+        <li>Wenn gpt-image-1 nicht verfügbar</li>
+        <li>Kein Copyright-Filter</li>
+      </ul>
+    </div>
+    <div class="model-card">
+      <div class="model-name">HuggingFace SDXL</div>
+      <ul>
+        <li>Backup-Backup-Bildgenerierung</li>
+        <li>Wenn auch FLUX fehlschlägt</li>
+      </ul>
+    </div>
+    <div class="model-card">
+      <div class="model-name">text-embedding-3-small</div>
+      <ul>
+        <li>Texte in Zahlen umwandeln</li>
+        <li>Für RAG-Suche in ChromaDB</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Warum zwei Bild-Provider?</h3>
+<pre>
+Kundenwunsch: <span class="c-yellow">"Elsa Dekoration"</span>
+       │
+       ▼
+_deko_has_person_name(<span class="c-yellow">"elsa"</span>) → <span class="c-green">TRUE</span>
+       │
+       ▼
+<span class="c-red">OpenAI würde das BLOCKIEREN</span>
+(lässt keine echten Charakternamen zu)
+       │
+       ▼
+<span class="c-green">Direkt zu HuggingFace FLUX</span>
+(kein Copyright-Filter)
+       │
+       ▼
+Prompt: <span class="c-green">"ice queen princess with platinum blonde braid"</span>
+        (OpenAI) ODER <span class="c-orange">"Elsa from Frozen"</span> (HuggingFace)
+</pre>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 9 -->
+<section id="s9">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <h2>Der komplette Ablauf einer Bestellung</h2>
+  </div>
+
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-bar"></div></div>
+      <div class="flow-content"><strong>1. Seite öffnen</strong><br>main.py gibt Session-Cookie aus → <code>session_id = "abc123"</code></div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-bar"></div></div>
+      <div class="flow-content"><strong>2. Erste Nachricht</strong><br>"Hallo, ich möchte einen Kuchen für meinen Sohn"<br>→ guardrail ✅ → classify → intent="order" → ask_next: "Für wie viele Gäste?"</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-bar"></div></div>
+      <div class="flow-content"><strong>3. Alle Felder gefüllt</strong><br>check_complete() → <code>order_complete = True ✅</code> → summarize_order()</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-bar"></div></div>
+      <div class="flow-content"><strong>4. Bild generieren</strong><br>intent = "image" → _find_best_reference() → _build_llm_image_prompt() → gpt-image-1 oder FLUX</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-bar"></div></div>
+      <div class="flow-content"><strong>5. Bestellung finalisieren</strong><br>intent = "finalize" → <code>show_address_form = True</code> → Adressformular erscheint</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-bar"></div></div>
+      <div class="flow-content"><strong>6. Formular abschicken</strong><br>POST /api/submit-order → order_db.save_order() → PDF erstellen → E-Mail an Kunde + Designer</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div><div class="flow-bar"></div></div>
+      <div class="flow-content"><strong>7. Admin setzt Status "fertig"</strong><br>order_db.update_order_status(42, "fertig") → Bewertungs-E-Mail wird gesendet</div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-line"><div class="flow-dot"></div></div>
+      <div class="flow-content"><strong>8. Bewertung</strong><br>Kunde bewertet mit 5 Sternen → order_db.save_rating(42, 5, "Super lecker!")</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 10 -->
+<section id="s10">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <h2>Schnell-Referenz: Welche Datei für welche Aufgabe?</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Ich möchte…</th><th>Datei / Ort</th></tr></thead>
+      <tbody>
+        <tr><td>Begrüßungstext ändern</td><td><code>prompts_config.yaml</code> → <code>greet</code></td></tr>
+        <tr><td>Neue Pflichtfelder hinzufügen</td><td><code>prompts_config.yaml</code> → <code>required_fields</code></td></tr>
+        <tr><td>KI-Antwort-Stil ändern</td><td><code>prompts_config.yaml</code> → <code>bot_personality</code></td></tr>
+        <tr><td>Neues Referenzbild hinzufügen</td><td>Einfach in <code>Bilder/</code> Ordner legen</td></tr>
+        <tr><td>Preis ändern</td><td><code>pdf_order.py</code> → <code>PRICE_TABLE</code></td></tr>
+        <tr><td>Max. Bestellungen pro Tag</td><td>Admin-Panel oder <code>prompts_config.yaml</code></td></tr>
+        <tr><td>Neuen API-Key setzen</td><td><code>.env</code> Datei</td></tr>
+        <tr><td>Session-Dauer ändern</td><td><code>config.py</code> → <code>SESSION_TTL_HOURS</code></td></tr>
+        <tr><td>Neue E-Mail-Vorlage</td><td><code>email_service.py</code> → <code>_build_order_html()</code></td></tr>
+        <tr><td>Logs ansehen</td><td>Terminal (JSON-Format)</td></tr>
+        <tr><td>Metriken ansehen</td><td><code>http://localhost:5001/metrics</code></td></tr>
+        <tr><td>ER-Diagramm ansehen</td><td><code>http://localhost:5001/database-diagram</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 11 -->
+<section id="s11">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <h2>Technologie-Stack Zusammenfassung</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Schicht</th><th>Technologie</th><th>Wo im Code</th></tr></thead>
+      <tbody>
+        <tr><td>Web-Server</td><td>FastAPI</td><td><code>main.py</code></td></tr>
+        <tr><td>KI-Agent Logik</td><td>Eigenes LangGraph-Muster</td><td><code>graph.py</code></td></tr>
+        <tr><td>KI-Schritte</td><td>Python Funktionen</td><td><code>nodes.py</code></td></tr>
+        <tr><td>Text-KI</td><td>OpenAI gpt-4o-mini</td><td><code>nodes.py → _llm_chat()</code></td></tr>
+        <tr><td>Vision-KI</td><td>OpenAI gpt-4o-mini (multimodal)</td><td><code>nodes.py → _find_best_reference()</code></td></tr>
+        <tr><td>Bild-KI (primär)</td><td>OpenAI gpt-image-1</td><td><code>nodes.py → _generate_openai()</code></td></tr>
+        <tr><td>Bild-KI (backup)</td><td>HuggingFace FLUX + SDXL</td><td><code>nodes.py → _generate_huggingface()</code></td></tr>
+        <tr><td>RAG Suche</td><td>ChromaDB + Embeddings</td><td><code>nodes.py → retrieve_docs()</code></td></tr>
+        <tr><td>Multimodales RAG</td><td>GPT-4o-mini Vision</td><td><code>nodes.py → _find_best_reference()</code></td></tr>
+        <tr><td>Session-Speicher</td><td>ChromaDB</td><td><code>session_manager.py</code></td></tr>
+        <tr><td>Bestelldatenbank</td><td>SQLite</td><td><code>order_db.py</code></td></tr>
+        <tr><td>Konfiguration</td><td>YAML + dotenv</td><td><code>config.py</code></td></tr>
+        <tr><td>PDF-Erstellung</td><td>ReportLab</td><td><code>pdf_order.py</code></td></tr>
+        <tr><td>E-Mail-Versand</td><td>Python smtplib</td><td><code>email_service.py</code></td></tr>
+        <tr><td>Monitoring</td><td>Eigene Metriken</td><td><code>monitoring.py</code></td></tr>
+        <tr><td>Fehlerbehandlung</td><td>Retry + safe_node</td><td><code>error_handler.py</code></td></tr>
+        <tr><td>Kosten-Optimierung</td><td>Cache + Token-Schätzer</td><td><code>cost_optimizer.py</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  🎂 Kidstorte · Technische Dokumentation · Generiert mit Claude
+</footer>
+
+</body>
+</html>

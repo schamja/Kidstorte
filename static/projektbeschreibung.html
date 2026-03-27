@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Kidstorte – Projektbeschreibung</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 11pt;
+      color: #1a1a2e;
+      background: #fff;
+      line-height: 1.6;
+    }
+
+    /* ── Seite ── */
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 50px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      border-bottom: 3px solid #c4956a;
+      padding-bottom: 18px;
+      margin-bottom: 28px;
+    }
+    .header-logo {
+      font-size: 36px;
+    }
+    .header-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26pt;
+      color: #5a3825;
+      line-height: 1.1;
+    }
+    .header-subtitle {
+      font-size: 10pt;
+      color: #a07850;
+      font-weight: 500;
+      margin-top: 3px;
+    }
+    .header-meta {
+      margin-left: auto;
+      text-align: right;
+      font-size: 9pt;
+      color: #888;
+    }
+
+    /* ── Abschnitte ── */
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 15pt;
+      color: #5a3825;
+      margin: 28px 0 10px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #e8d5c0;
+    }
+    h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: #2d3a4a;
+      margin: 16px 0 5px;
+    }
+
+    p { margin-bottom: 8px; color: #333; }
+
+    /* ── Zielbox ── */
+    .goal-box {
+      background: linear-gradient(135deg, #fdf6ee, #fae8d4);
+      border-left: 4px solid #c4956a;
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 18px 0;
+      font-size: 12pt;
+      font-weight: 500;
+      color: #4a2e1a;
+      line-height: 1.7;
+    }
+
+    /* ── Ablauf-Diagramm ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0;
+      margin: 16px 0;
+      background: #f8f9fb;
+      border-radius: 10px;
+      padding: 16px 20px;
+    }
+    .flow-step {
+      background: #fff;
+      border: 1.5px solid #d1d9e6;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: #2d3a4a;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .flow-arrow {
+      color: #c4956a;
+      font-size: 14pt;
+      font-weight: 700;
+      padding: 0 6px;
+    }
+
+    /* ── Dateien-Tabelle ── */
+    .files-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 10pt;
+    }
+    .files-grid th {
+      background: #5a3825;
+      color: #fff;
+      padding: 9px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 9.5pt;
+    }
+    .files-grid th:first-child { border-radius: 6px 0 0 0; }
+    .files-grid th:last-child { border-radius: 0 6px 0 0; }
+    .files-grid td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #ede8e0;
+      vertical-align: top;
+    }
+    .files-grid tr:nth-child(even) td { background: #fdf8f3; }
+    .files-grid tr:last-child td { border-bottom: none; }
+    .file-name {
+      font-family: 'Courier New', monospace;
+      font-size: 9.5pt;
+      font-weight: 700;
+      color: #2d6a9f;
+      white-space: nowrap;
+    }
+    .file-role {
+      font-weight: 600;
+      color: #5a3825;
+      font-size: 9.5pt;
+    }
+
+    /* ── Technologien ── */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .tech-card {
+      background: #f8f9fb;
+      border: 1px solid #dde3ed;
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .tech-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .tech-name {
+      font-weight: 700;
+      font-size: 10pt;
+      color: #2d3a4a;
+    }
+    .tech-desc {
+      font-size: 9pt;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    /* ── KI-Konzepte ── */
+    .concept-list {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0;
+    }
+    .concept-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 7px 0;
+      border-bottom: 1px dashed #e8e0d8;
+    }
+    .concept-list li:last-child { border-bottom: none; }
+    .concept-tag {
+      background: #5a3825;
+      color: #fff;
+      font-size: 8pt;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .concept-text { font-size: 10pt; color: #333; }
+
+    /* ── Zusammenfassung ── */
+    .summary-box {
+      background: #1a1a2e;
+      color: #e8e0d8;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      font-size: 11pt;
+      line-height: 1.8;
+    }
+    .summary-box strong { color: #f9c06a; }
+
+    /* ── Footer ── */
+    .footer {
+      border-top: 1px solid #e8d5c0;
+      padding-top: 14px;
+      margin-top: 24px;
+      font-size: 8.5pt;
+      color: #aaa;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── Druckoptimierung ── */
+    @media print {
+      body { font-size: 10pt; }
+      .page { padding: 20px 30px; }
+      h2 { page-break-after: avoid; }
+      .tech-card, .flow { break-inside: avoid; }
+      .files-grid { page-break-inside: avoid; }
+      .summary-box { background: #1a1a2e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-logo">🎂</div>
+    <div>
+      <div class="header-title">Kidstorte</div>
+      <div class="header-subtitle">KI-gestützter Bestell-Chatbot für Konditoreien</div>
+    </div>
+    <div class="header-meta">
+      Projektbeschreibung<br>
+      <strong>März 2026</strong>
+    </div>
+  </div>
+
+  <!-- Ziel -->
+  <h2>1. Projektziel</h2>
+  <div class="goal-box">
+    🎯 Kidstorte ist ein KI-gesteuerter Chatbot für eine Konditorei. Kunden können auf der Website
+    ihre <strong>Traumtorte per Chat beschreiben</strong>, ein KI-generiertes Bild davon sehen und
+    am Ende eine Bestellung mit Kontaktdaten aufgeben — vollständig automatisiert.
+  </div>
+  <p>
+    Der Chatbot stellt gezielte Fragen (Anlass, Geschmack, Gäste, Dekoration usw.),
+    versteht die Antworten mithilfe von KI, erstellt ein Bild der gewünschten Torte
+    und schickt die fertige Bestellung per E-Mail an den Designer und den Kunden.
+    Im passwortgeschützten Admin-Panel kann der Betreiber alle Bestellungen verwalten
+    und die Bot-Texte live anpassen.
+  </p>
+
+  <!-- Ablauf -->
+  <h2>2. Gesprächsablauf</h2>
+  <div class="flow">
+    <div class="flow-step">👤 Kunde öffnet Website</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">💬 Chat beginnt</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">🤖 Bot stellt Fragen</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">🎂 Alle Infos gesammelt</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">🖼️ KI-Bild erstellt</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">📋 Adressformular</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">📧 E-Mails gesendet</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">✅ Bestellung gespeichert</div>
+  </div>
+
+  <!-- Dateien -->
+  <h2>3. Projektstruktur – Jede Datei erklärt</h2>
+
+  <h3>Backend (Python / Server)</h3>
+  <table class="files-grid">
+    <thead>
+      <tr>
+        <th>Datei</th>
+        <th>Rolle</th>
+        <th>Was macht sie?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="file-name">main.py</span></td>
+        <td><span class="file-role">Der Kellner</span></td>
+        <td>Empfängt alle Anfragen vom Browser, leitet sie weiter und gibt Antworten zurück. Enthält alle API-Endpunkte (/api/chat, /api/submit-order, /admin).</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">graph.py</span></td>
+        <td><span class="file-role">Der Dirigent</span></td>
+        <td>Steuert den Gesprächsablauf mit LangGraph. Entscheidet: Welcher Schritt kommt als nächstes? (Frage stellen → Bild erzeugen → Bestellen)</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">nodes.py</span></td>
+        <td><span class="file-role">Die Arbeiter</span></td>
+        <td>Führt die eigentliche KI-Arbeit aus: Intent klassifizieren, Bestelldaten sammeln, Bild mit DALL-E generieren, Bestellung finalisieren.</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">state.py</span></td>
+        <td><span class="file-role">Das Gedächtnis</span></td>
+        <td>Definiert den AgentState: Was weiß der Bot aktuell? (intent, order_info, messages, image_url, order_complete…)</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">session_manager.py</span></td>
+        <td><span class="file-role">Der Aktenschrank</span></td>
+        <td>Speichert jede Kundensitzung getrennt in ChromaDB. Ermöglicht Multi-User-Betrieb: Jeder Kunde hat seinen eigenen Gesprächsverlauf.</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">order_db.py</span></td>
+        <td><span class="file-role">Das Bestellbuch</span></td>
+        <td>Speichert abgeschlossene Bestellungen dauerhaft in SQLite. Funktionen: save_order(), get_all_orders(), update_order_status().</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">email_service.py</span></td>
+        <td><span class="file-role">Der Briefträger</span></td>
+        <td>Sendet HTML-E-Mails via SMTP an Designer (neue Bestellung) und Kunden (Bestätigung). Fällt sicher aus, wenn SMTP nicht konfiguriert ist.</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">config.py</span></td>
+        <td><span class="file-role">Die Einstellungen</span></td>
+        <td>Lädt alle geheimen Variablen aus der .env-Datei (API-Keys, SMTP-Passwort, Admin-Passwort) und stellt Funktionen zum Laden/Speichern der YAML-Config bereit.</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">monitoring.py</span></td>
+        <td><span class="file-role">Die Statistiken</span></td>
+        <td>Zählt Anfragen, Fehler, Antwortzeiten und Token-Verbrauch im Hintergrund. Erreichbar unter /metrics.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Frontend (Browser / HTML)</h3>
+  <table class="files-grid">
+    <thead>
+      <tr>
+        <th>Datei</th>
+        <th>Rolle</th>
+        <th>Was macht sie?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="file-name">templates/index.html</span></td>
+        <td><span class="file-role">Die Kunden-Website</span></td>
+        <td>Das Chatfenster für Kunden. Zeigt Nachrichten, KI-Tortenbild und das Adressformular bei Bestellabschluss.</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">templates/admin.html</span></td>
+        <td><span class="file-role">Das Admin-Panel</span></td>
+        <td>Passwortgeschütztes Dashboard: Bestellungen verwalten, Bot-Texte live bearbeiten, aktive Sitzungen anzeigen.</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">static/script.js</span></td>
+        <td><span class="file-role">Die Logik im Browser</span></td>
+        <td>Sendet Nachrichten per Fetch-API, zeigt Antworten an, steuert Adressformular und Reset-Button.</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">static/style.css</span></td>
+        <td><span class="file-role">Das Design</span></td>
+        <td>Alle visuellen Stile: Chat-Blasen, Adressformular, Admin-Tabellen, Animationen.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Konfiguration</h3>
+  <table class="files-grid">
+    <thead>
+      <tr>
+        <th>Datei</th>
+        <th>Inhalt</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="file-name">prompts_config.yaml</span></td>
+        <td>Alle Bot-Texte und System-Prompts. Können im Admin-Panel live geändert werden, ohne Server-Neustart.</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">.env</span></td>
+        <td>Geheime Schlüssel: OpenAI API-Key, SMTP-Zugangsdaten, Admin-Passwort. Wird nie ins Git eingecheckt.</td>
+      </tr>
+      <tr>
+        <td><span class="file-name">kidstorte.db</span></td>
+        <td>SQLite-Datenbankdatei mit allen abgeschlossenen Bestellungen (automatisch erstellt).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Technologien -->
+  <h2>4. Verwendete Technologien</h2>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <div class="tech-icon">⚡</div>
+      <div>
+        <div class="tech-name">FastAPI</div>
+        <div class="tech-desc">Python Web-Framework. Verarbeitet HTTP-Anfragen vom Browser schnell und asynchron.</div>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🔗</div>
+      <div>
+        <div class="tech-name">LangGraph</div>
+        <div class="tech-desc">Steuert den Gesprächsablauf als Graph. Jeder Knoten (Node) ist ein Schritt im Gespräch.</div>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🧠</div>
+      <div>
+        <div class="tech-name">OpenAI GPT-4.1-mini</div>
+        <div class="tech-desc">Beantwortet Kundenfragen, klassifiziert Absichten und sammelt Bestelldaten.</div>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🖼️</div>
+      <div>
+        <div class="tech-name">OpenAI DALL-E</div>
+        <div class="tech-desc">Generiert ein realistisches Bild der bestellten Torte auf Basis der Kundenbeschreibung.</div>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🗄️</div>
+      <div>
+        <div class="tech-name">ChromaDB</div>
+        <div class="tech-desc">Vektordatenbank für Sitzungen (Multi-User) und RAG-Wissensabruf.</div>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">💾</div>
+      <div>
+        <div class="tech-name">SQLite</div>
+        <div class="tech-desc">Relationale Datenbank für dauerhafte Bestellspeicherung inkl. Kundendaten und Status.</div>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">📧</div>
+      <div>
+        <div class="tech-name">SMTP / GMX</div>
+        <div class="tech-desc">Automatischer E-Mail-Versand an Designer und Kunden nach Bestellabschluss.</div>
+      </div>
+    </div>
+    <div class="tech-card">
+      <div class="tech-icon">🐍</div>
+      <div>
+        <div class="tech-name">Python + Pydantic</div>
+        <div class="tech-desc">Gesamte Serverlogik in Python. Pydantic validiert Datenstrukturen (State, Requests).</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KI-Konzepte -->
+  <h2>5. Eingesetzte KI-Konzepte</h2>
+  <ul class="concept-list">
+    <li>
+      <span class="concept-tag">LangGraph</span>
+      <div class="concept-text"><strong>Stateful Agent als Graph:</strong> Der Gesprächsfluss wird als gerichteter Graph modelliert. Jeder Knoten ist eine Funktion (z.B. collect_order_info). Der Graph entscheidet anhand des Zustands, welcher Knoten als nächstes ausgeführt wird.</div>
+    </li>
+    <li>
+      <span class="concept-tag">RAG</span>
+      <div class="concept-text"><strong>Retrieval Augmented Generation:</strong> Der Bot kann auf Wissen aus gespeicherten Dokumenten (z.B. Tortenkatalog) zugreifen, das in ChromaDB als Vektoren gespeichert ist, und dieses in seine Antworten einfließen lassen.</div>
+    </li>
+    <li>
+      <span class="concept-tag">Intent</span>
+      <div class="concept-text"><strong>Intent-Klassifikation:</strong> Bei jeder Nachricht erkennt der Bot die Absicht des Kunden (bestellen, fragen, Bild wünschen, bestätigen, abbrechen) und wählt die passende Aktion.</div>
+    </li>
+    <li>
+      <span class="concept-tag">Multi-User</span>
+      <div class="concept-text"><strong>Session-Management:</strong> Jeder Kunde bekommt eine eindeutige Session-ID per Cookie. Der Agent-Zustand wird pro Sitzung in ChromaDB gespeichert, sodass mehrere Kunden gleichzeitig chatten können.</div>
+    </li>
+    <li>
+      <span class="concept-tag">DALL-E</span>
+      <div class="concept-text"><strong>Text-to-Image:</strong> Aus den gesammelten Tortenmerkmalen wird ein beschreibender Prompt gebaut, der an DALL-E 3 gesendet wird, um ein realistisches Tortenbild zu generieren.</div>
+    </li>
+    <li>
+      <span class="concept-tag">Hot-Reload</span>
+      <div class="concept-text"><strong>Live-Konfiguration:</strong> Die System-Prompts werden aus einer YAML-Datei geladen und bei jedem Request neu eingelesen — Änderungen wirken sofort ohne Server-Neustart.</div>
+    </li>
+  </ul>
+
+  <!-- Zusammenfassung -->
+  <h2>6. Zusammenfassung für den Mentor</h2>
+  <div class="summary-box">
+    „<strong>Kidstorte</strong> ist ein vollständiger KI-Chatbot für eine Konditorei, entwickelt mit
+    <strong>FastAPI</strong> (Web-Server), <strong>LangGraph</strong> (Gesprächssteuerung) und
+    <strong>OpenAI GPT + DALL-E</strong> (KI-Intelligenz und Bildgenerierung).
+    <br><br>
+    Kunden beschreiben ihre Traumtorte im Chat. Der Bot sammelt alle nötigen Informationen,
+    erstellt ein <strong>KI-generiertes Bild</strong> der Torte und nimmt die Bestellung mit
+    Kontaktdaten entgegen. Die Bestellung wird in <strong>SQLite</strong> gespeichert und per
+    <strong>E-Mail</strong> an Designer und Kunden gesendet.
+    <br><br>
+    Das Projekt demonstriert: <strong>LangGraph Agents, RAG, Multi-User Sessions,
+    REST-API Design, Datenbankintegration und moderne KI-Bildgenerierung</strong> —
+    alles in einem produktionsreifen System."
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>🎂 Kidstorte – KI-Chatbot Projekt</span>
+    <span>FastAPI · LangGraph · OpenAI · ChromaDB · SQLite</span>
+    <span>März 2026</span>
+  </div>
+
+</div>
+
+<script>
+  // Auto-Print Dialog öffnen wenn ?print in URL
+  if (window.location.search.includes('print')) {
+    window.onload = () => window.print();
+  }
+</script>
+</body>
+</html>

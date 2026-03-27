@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kidstorte - Architektur &amp; Datenfluss</title>
+<style>
+:root{--braun:#5a3825;--braun-hell:#c4956a;--braun-bg:#fdf6ee;--green:#5a8c6f;--blue:#3b82f6;--red:#ef4444;--orange:#f59e0b;--purple:#8b5cf6;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--braun-bg);color:#333;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+h1{text-align:center;color:var(--braun);font-size:2.2em;margin:20px 0 10px}
+h2{color:var(--braun);margin:30px 0 15px;font-size:1.5em;border-bottom:2px solid var(--braun-hell);padding-bottom:8px}
+h3{color:var(--braun);margin:20px 0 10px}
+.subtitle{text-align:center;color:#666;margin-bottom:30px;font-size:1.1em}
+
+/* Navigation */
+.nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:20px 0 30px;position:sticky;top:0;background:var(--braun-bg);padding:10px 0;z-index:100;border-bottom:2px solid var(--braun-hell)}
+.nav a{padding:8px 16px;border-radius:20px;background:white;color:var(--braun);text-decoration:none;font-weight:600;border:2px solid var(--braun-hell);transition:all .2s}
+.nav a:hover,.nav a.active{background:var(--braun);color:white}
+
+/* Sections */
+section{background:white;border-radius:12px;padding:25px;margin:20px 0;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+
+/* File Cards */
+.file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;margin:15px 0}
+.file-card{border:2px solid #e5e7eb;border-radius:10px;padding:15px;transition:all .2s;cursor:pointer;position:relative}
+.file-card:hover{border-color:var(--braun);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.file-card.active{border-color:var(--braun);background:#fef9f3}
+.file-card .icon{font-size:1.8em;margin-bottom:8px}
+.file-card .name{font-weight:700;color:var(--braun);font-size:1.1em}
+.file-card .desc{color:#666;font-size:.9em;margin-top:5px}
+.file-card .tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.75em;font-weight:600;margin-top:8px}
+.tag-core{background:#dbeafe;color:#1d4ed8}
+.tag-api{background:#dcfce7;color:#166534}
+.tag-data{background:#fef3c7;color:#92400e}
+.tag-config{background:#f3e8ff;color:#6b21a8}
+.tag-util{background:#fce7f3;color:#9d174d}
+
+/* Flow Diagram */
+.flow{display:flex;flex-direction:column;gap:0;margin:20px 0;align-items:center}
+.flow-step{display:flex;align-items:center;gap:15px;padding:14px 20px;background:white;border:2px solid #e5e7eb;border-radius:10px;width:100%;max-width:800px;transition:all .2s}
+.flow-step:hover{border-color:var(--braun);background:#fef9f3}
+.flow-step .num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;flex-shrink:0}
+.flow-step .content{flex:1}
+.flow-step .file{font-size:.8em;color:var(--blue);font-weight:600;background:#eff6ff;padding:2px 8px;border-radius:4px;display:inline-block;margin-top:4px}
+.flow-step .llm{font-size:.8em;color:var(--orange);font-weight:600;background:#fffbeb;padding:2px 8px;border-radius:4px;display:inline-block;margin-top:4px;margin-left:4px}
+.flow-arrow{font-size:1.5em;color:var(--braun-hell);text-align:center;padding:2px 0;line-height:1}
+.step-green .num{background:var(--green)}
+.step-blue .num{background:var(--blue)}
+.step-orange .num{background:var(--orange)}
+.step-purple .num{background:var(--purple)}
+.step-red .num{background:var(--red)}
+
+/* Connection Diagram */
+.conn-diagram{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin:20px 0}
+.conn-box{border:2px solid #e5e7eb;border-radius:10px;padding:15px}
+.conn-box h4{color:var(--braun);margin-bottom:10px;font-size:1em}
+.conn-box ul{list-style:none;padding:0}
+.conn-box li{padding:4px 0;font-size:.9em;border-bottom:1px solid #f3f4f6}
+.conn-box li:last-child{border:none}
+.arr{color:var(--braun-hell);font-weight:700}
+
+/* Code Block */
+.code{background:#1e293b;color:#e2e8f0;padding:15px;border-radius:8px;font-family:'Fira Code',monospace;font-size:.85em;overflow-x:auto;margin:10px 0}
+.code .comment{color:#64748b}
+.code .keyword{color:#c084fc}
+.code .string{color:#86efac}
+.code .func{color:#93c5fd}
+
+/* Intent Table */
+table{width:100%;border-collapse:collapse;margin:15px 0}
+th{background:var(--braun);color:white;padding:10px 15px;text-align:left}
+td{padding:10px 15px;border-bottom:1px solid #e5e7eb}
+tr:nth-child(even){background:#f9fafb}
+tr:hover{background:#fef3c7}
+
+/* Technology Badges */
+.tech-badges{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.badge{padding:6px 14px;border-radius:20px;font-size:.85em;font-weight:600;display:flex;align-items:center;gap:5px}
+.badge-python{background:#3776ab;color:white}
+.badge-openai{background:#412991;color:white}
+.badge-fastapi{background:#009688;color:white}
+.badge-chromadb{background:#ff6f00;color:white}
+.badge-sqlite{background:#003b57;color:white}
+.badge-js{background:#f7df1e;color:#333}
+.badge-html{background:#e34f26;color:white}
+
+/* Responsive */
+@media(max-width:768px){
+  .conn-diagram{grid-template-columns:1fr}
+  .file-grid{grid-template-columns:1fr}
+  h1{font-size:1.6em}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Kidstorte - Systemarchitektur</h1>
+<p class="subtitle">LangGraph AI Agent mit RAG, Bildgenerierung &amp; automatischer Bestellabwicklung</p>
+
+<nav class="nav">
+  <a href="#overview">Dateien</a>
+  <a href="#flow">Bestellablauf</a>
+  <a href="#connections">Verbindungen</a>
+  <a href="#intents">Intent-Routing</a>
+  <a href="#image">Bildgenerierung</a>
+  <a href="#langgraph">LangGraph</a>
+  <a href="#rag">RAG</a>
+  <a href="#memory">Memory</a>
+  <a href="#multimodal">Multimodal</a>
+  <a href="#data">Datenfluss</a>
+  <a href="#calendar">Kalender</a>
+  <a href="#tech">Technologien</a>
+</nav>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 1: DATEI-ÜBERSICHT -->
+<!-- ═══════════════════════════════════ -->
+<section id="overview">
+<h2>1. Alle Dateien im Projekt</h2>
+
+<div class="file-grid">
+  <div class="file-card">
+    <div class="icon">🧠</div>
+    <div class="name">graph.py</div>
+    <div class="desc"><b>Der Dirigent</b> — Steuert den gesamten Ablauf. Empfängt User-Input, routet zum richtigen Node basierend auf dem Intent, gibt Response zurück.</div>
+    <span class="tag tag-core">CORE</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">⚙️</div>
+    <div class="name">nodes.py</div>
+    <div class="desc"><b>Das Gehirn</b> — Alle 12 Verarbeitungsknoten: Guardrail, Classify, Extract, CheckComplete, AskNext, Summarize, RAG, Price, Image, Update, Redirect, Finalize.</div>
+    <span class="tag tag-core">CORE (~1500 Zeilen)</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">🌐</div>
+    <div class="name">main.py</div>
+    <div class="desc"><b>Der Webserver</b> — FastAPI-App mit REST-Endpoints: /api/chat, /api/generate-image, /api/submit-order, /api/reset, /admin.</div>
+    <span class="tag tag-api">API</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">📦</div>
+    <div class="name">state.py</div>
+    <div class="desc"><b>Datenmodell</b> — TypedDict mit allen Session-Feldern: order_info, messages, question_todo, image_url, calculated_price etc.</div>
+    <span class="tag tag-data">DATA</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">💾</div>
+    <div class="name">session_manager.py</div>
+    <div class="desc"><b>Session-Verwaltung</b> — Speichert/Lädt Gesprächszustände in ChromaDB. Jede Session = ein Kunde.</div>
+    <span class="tag tag-data">DATA</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">🗄️</div>
+    <div class="name">order_db.py</div>
+    <div class="desc"><b>Bestelldatenbank</b> — SQLite: save_order(), get_order(), update_status(). Speichert finale Bestellungen.</div>
+    <span class="tag tag-data">DATA</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">📄</div>
+    <div class="name">pdf_order.py</div>
+    <div class="desc"><b>PDF-Generator</b> — ReportLab: Erzeugt professionelle Bestellbestätigungs-PDFs mit Logo, Tabellen, Preisen, Vorschaubild.</div>
+    <span class="tag tag-util">UTIL</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">📧</div>
+    <div class="name">email_service.py</div>
+    <div class="desc"><b>E-Mail-Versand</b> — SMTP: Sendet Bestätigungs-PDFs an Kunde und Konditor.</div>
+    <span class="tag tag-util">UTIL</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">🔧</div>
+    <div class="name">config.py</div>
+    <div class="desc"><b>Konfiguration</b> — Lädt .env Variablen: API-Keys (OpenAI, HuggingFace), Modellnamen, Datenbankpfade.</div>
+    <span class="tag tag-config">CONFIG</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">📝</div>
+    <div class="name">prompts_config.yaml</div>
+    <div class="desc"><b>Prompt-Vorlagen</b> — Alle LLM-Prompts, Pflichtfelder, Frage-Texte. Konfigurierbar ohne Code-Änderung.</div>
+    <span class="tag tag-config">CONFIG</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">🛡️</div>
+    <div class="name">error_handler.py</div>
+    <div class="desc"><b>Fehlerbehandlung</b> — retry_on_transient (Rate Limits), safe_node (Fallback-Responses), parse_llm_json.</div>
+    <span class="tag tag-util">UTIL</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">📊</div>
+    <div class="name">monitoring.py</div>
+    <div class="desc"><b>Monitoring</b> — Token-Tracking, Kosten pro Session, API-Call-Statistiken.</div>
+    <span class="tag tag-util">UTIL</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">📚</div>
+    <div class="name">ingest.py</div>
+    <div class="desc"><b>RAG-Import</b> — Liest Dokumente (Preisliste, FAQ, Allergene) und speichert Embeddings in ChromaDB.</div>
+    <span class="tag tag-data">DATA</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">🖥️</div>
+    <div class="name">templates/index.html</div>
+    <div class="desc"><b>Frontend</b> — Chat-UI mit Fortschrittsbalken, Bild-Vorschau, Adressformular, PDF-Download.</div>
+    <span class="tag tag-api">FRONTEND</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">🎨</div>
+    <div class="name">static/script.js</div>
+    <div class="desc"><b>Frontend-Logik</b> — Chat-Nachrichten, Bildanzeige, Fortschrittsbalken, Formular-Validierung.</div>
+    <span class="tag tag-api">FRONTEND</span>
+  </div>
+
+  <div class="file-card">
+    <div class="icon">🖼️</div>
+    <div class="name">Bilder/</div>
+    <div class="desc"><b>Referenz-Portfolio</b> — 62+ beschreibend benannte Bilder (z.B. elsa_3_etagen.png). Kostenlose Vorlage-Suche per Dateiname.</div>
+    <span class="tag tag-data">REFERENZ</span>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 2: BESTELLABLAUF -->
+<!-- ═══════════════════════════════════ -->
+<section id="flow">
+<h2>2. Bestellablauf (Schritt für Schritt)</h2>
+
+<div class="flow">
+  <div class="flow-step step-green">
+    <div class="num">1</div>
+    <div class="content">
+      <b>Kunde schreibt Nachricht</b><br>
+      Browser sendet POST /api/chat an FastAPI
+      <br><span class="file">main.py</span> <span class="file">script.js</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-blue">
+    <div class="num">2</div>
+    <div class="content">
+      <b>Session laden</b><br>
+      SessionManager lädt Gesprächszustand aus ChromaDB (oder erstellt neue Session)
+      <br><span class="file">session_manager.py</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-red">
+    <div class="num">3</div>
+    <div class="content">
+      <b>Guardrail prüft Eingabe</b><br>
+      LLM prüft: Beleidigung? Jailbreak? Spam? Off-Topic?
+      <br><span class="file">nodes.py → guardrail()</span> <span class="llm">1 LLM-Call</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-orange">
+    <div class="num">4</div>
+    <div class="content">
+      <b>Intent erkennen + Infos extrahieren (Combined)</b><br>
+      EIN LLM-Call erkennt Intent (greeting/order/price/image/finalize...) UND extrahiert Bestelldaten gleichzeitig
+      <br><span class="file">nodes.py → classify_and_extract()</span> <span class="llm">1 LLM-Call</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-purple">
+    <div class="num">5</div>
+    <div class="content">
+      <b>Intent-Routing</b><br>
+      graph.py routet basierend auf dem Intent zum richtigen Node (siehe Intent-Tabelle unten)
+      <br><span class="file">graph.py → CakeDreamsGraph.run()</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-blue">
+    <div class="num">6</div>
+    <div class="content">
+      <b>Node verarbeitet</b><br>
+      z.B. check_complete() → ask_next() → fragt nächste fehlende Info
+      <br><span class="file">nodes.py</span> <span class="llm">0-2 LLM-Calls</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-green">
+    <div class="num">7</div>
+    <div class="content">
+      <b>Alle 10 Felder komplett?</b><br>
+      Wenn ja: Zusammenfassung + automatisch Vorschaubild generieren
+      <br><span class="file">nodes.py → summarize_order() + generate_image()</span> <span class="llm">OpenAI Image API</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-orange">
+    <div class="num">8</div>
+    <div class="content">
+      <b>Kunde bestätigt Design</b><br>
+      "Ja, gefällt mir!" → Intent: finalize → Adressformular erscheint
+      <br><span class="file">nodes.py → finalize_order()</span> <span class="file">script.js → showAddressForm()</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-green">
+    <div class="num">9</div>
+    <div class="content">
+      <b>Bestellung abschließen</b><br>
+      Kundendaten → SQLite speichern → PDF generieren → E-Mail an Kunde + Konditor
+      <br><span class="file">order_db.py</span> <span class="file">pdf_order.py</span> <span class="file">email_service.py</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 3: VERBINDUNGEN -->
+<!-- ═══════════════════════════════════ -->
+<section id="connections">
+<h2>3. Datei-Verbindungen (Wer ruft wen?)</h2>
+
+<div class="conn-diagram">
+  <div class="conn-box" style="border-color:var(--blue)">
+    <h4>🌐 main.py (Webserver)</h4>
+    <ul>
+      <li><span class="arr">→</span> graph.py <small>(CakeDreamsGraph)</small></li>
+      <li><span class="arr">→</span> session_manager.py <small>(load/save)</small></li>
+      <li><span class="arr">→</span> order_db.py <small>(save_order)</small></li>
+      <li><span class="arr">→</span> pdf_order.py <small>(save_order_pdf)</small></li>
+      <li><span class="arr">→</span> email_service.py <small>(send_email)</small></li>
+      <li><span class="arr">→</span> nodes.py <small>(generate_image)</small></li>
+      <li><span class="arr">→</span> config.py <small>(API Keys)</small></li>
+    </ul>
+  </div>
+
+  <div class="conn-box" style="border-color:var(--braun)">
+    <h4>🧠 graph.py (Dirigent)</h4>
+    <ul>
+      <li><span class="arr">→</span> nodes.py <small>(alle 12 Nodes)</small></li>
+      <li><span class="arr">→</span> state.py <small>(get_required_fields)</small></li>
+      <li><span class="arr">←</span> main.py <small>(wird aufgerufen)</small></li>
+    </ul>
+  </div>
+
+  <div class="conn-box" style="border-color:var(--orange)">
+    <h4>⚙️ nodes.py (Gehirn)</h4>
+    <ul>
+      <li><span class="arr">→</span> config.py <small>(Modelle, Keys)</small></li>
+      <li><span class="arr">→</span> prompts_config.yaml <small>(Prompts)</small></li>
+      <li><span class="arr">→</span> error_handler.py <small>(Retry, Safe)</small></li>
+      <li><span class="arr">→</span> state.py <small>(AgentState)</small></li>
+      <li><span class="arr">→</span> OpenAI API <small>(Chat + Image)</small></li>
+      <li><span class="arr">→</span> HuggingFace API <small>(Fallback)</small></li>
+      <li><span class="arr">→</span> ChromaDB <small>(RAG-Suche)</small></li>
+      <li><span class="arr">→</span> Bilder/ <small>(Referenz-Match)</small></li>
+    </ul>
+  </div>
+</div>
+
+<div class="code">
+<span class="comment">/* Vereinfachter Datenfluss */</span><br><br>
+<span class="string">Browser</span> <span class="arr">→</span> <span class="func">main.py</span> <span class="arr">→</span> <span class="func">graph.py</span> <span class="arr">→</span> <span class="func">nodes.py</span> <span class="arr">→</span> <span class="keyword">OpenAI API</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arr">→</span> <span class="keyword">ChromaDB</span> (RAG)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arr">→</span> <span class="keyword">Bilder/</span> (Referenz)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="arr">→</span> <span class="keyword">HuggingFace</span> (Fallback)<br><br>
+<span class="string">Bestellung</span> <span class="arr">→</span> <span class="func">order_db.py</span> <span class="arr">→</span> <span class="func">pdf_order.py</span> <span class="arr">→</span> <span class="func">email_service.py</span>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 4: INTENT ROUTING -->
+<!-- ═══════════════════════════════════ -->
+<section id="intents">
+<h2>4. Intent-Routing (graph.py)</h2>
+<p>Jede Kundennachricht wird klassifiziert und an den passenden Node geroutet:</p>
+
+<table>
+<tr><th>Intent</th><th>Beispiele</th><th>Node(s)</th><th>LLM-Calls</th></tr>
+<tr><td><b>greeting</b></td><td>"Hallo", "Hi"</td><td>greet()</td><td>0</td></tr>
+<tr><td><b>order</b></td><td>"Vanille", "2 Schichten", "keine Allergien"</td><td>check_complete() → ask_next() oder summarize_order() + generate_image()</td><td>1-2</td></tr>
+<tr><td><b>price</b></td><td>"Was kostet das?"</td><td>retrieve_docs() → calculate_price()</td><td>2 (Embedding + Chat)</td></tr>
+<tr><td><b>image</b></td><td>"Vorschaubild", "zeig mir"</td><td>check_complete() → generate_image()</td><td>0 + Image API</td></tr>
+<tr><td><b>info</b></td><td>"Welche Sorten?"</td><td>retrieve_docs() → answer_question()</td><td>2</td></tr>
+<tr><td><b>change</b></td><td>"Doch lieber Schoko"</td><td>update_order()</td><td>1</td></tr>
+<tr><td><b>finalize</b></td><td>"Ja, gefällt mir!", "fertig"</td><td>finalize_order() → Adressformular</td><td>0</td></tr>
+<tr><td><b>offtopic</b></td><td>"Wie wird das Wetter?"</td><td>redirect()</td><td>0</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 5: BILDGENERIERUNG -->
+<!-- ═══════════════════════════════════ -->
+<section id="image">
+<h2>5. Bildgenerierung - Ablauf</h2>
+
+<div class="flow">
+  <div class="flow-step step-green">
+    <div class="num">1</div>
+    <div class="content">
+      <b>Referenzbild suchen</b><br>
+      _find_best_reference() scannt Bilder/ Ordner per Dateiname-Matching (0ms, kostenlos)
+      <br><span class="file">nodes.py</span> <span class="file">Bilder/</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-blue">
+    <div class="num">2</div>
+    <div class="content">
+      <b>Combined Prompt bauen</b><br>
+      Referenz-Theme + Kundenfarben + Schichten + Anschnitt + Dekoration auf alle Etagen
+      <br><span class="file">nodes.py → generate_image()</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-orange">
+    <div class="num">3</div>
+    <div class="content">
+      <b>Personennamen sanitizen</b><br>
+      "Ronaldo" → "famous soccer player figurine" (Regex, kein LLM-Call)
+      <br><span class="file">nodes.py → generate_single_image()</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-purple">
+    <div class="num">4</div>
+    <div class="content">
+      <b>OpenAI gpt-image-1-mini</b> (30-90 Sekunden)<br>
+      Timeout: 120s, 2 Retries. Bei Fehler → HuggingFace Fallback
+      <br><span class="file">nodes.py → _generate_openai()</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-green">
+    <div class="num">5</div>
+    <div class="content">
+      <b>Bild speichern + anzeigen</b><br>
+      Base64 → PNG → static/images/ → Browser zeigt Vorschau
+      <br><span class="file">nodes.py → _save_image_bytes()</span>
+    </div>
+  </div>
+</div>
+
+<h3>Zwei OpenAI-Clients</h3>
+<div class="code">
+<span class="comment"># Schnell: Chat (30s Timeout)</span><br>
+<span class="keyword">openai_client</span> = OpenAI(timeout=<span class="string">30.0</span>, max_retries=<span class="string">1</span>)<br><br>
+<span class="comment"># Langsam: Bildgenerierung (120s Timeout)</span><br>
+<span class="keyword">openai_image_client</span> = OpenAI(timeout=<span class="string">120.0</span>, max_retries=<span class="string">2</span>)
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 6: LANGGRAPH -->
+<!-- ═══════════════════════════════════ -->
+<section id="langgraph">
+<h2>6. LangGraph — Der Agent-Graph</h2>
+<p>Kidstorte nutzt das <b>LangGraph-Konzept</b>: Ein gerichteter Graph aus Nodes (Verarbeitungsknoten), die durch einen zentralen Router verbunden sind. Jeder Node hat eine klar definierte Aufgabe.</p>
+
+<h3>Graph-Architektur (graph.py)</h3>
+<div class="code">
+<span class="comment"># CakeDreamsGraph — Der zentrale Agent-Graph</span><br>
+<span class="comment"># Jeder Durchlauf: User-Input → Guardrail → Classify → Route → Node → Response</span><br><br>
+<span class="keyword">class</span> <span class="func">CakeDreamsGraph</span>:<br>
+&nbsp;&nbsp;<span class="keyword">def</span> <span class="func">run</span>(self, state, user_input):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;state = <span class="func">guardrail</span>(state) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Node 0: Sicherheit</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;state = <span class="func">classify_and_extract</span>(state) <span class="comment"># Node 1: Intent + Extraktion</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> intent == <span class="string">"order"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state = <span class="func">check_complete</span>(state) &nbsp;&nbsp;<span class="comment"># Node 4: Felder prüfen</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> complete:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state = <span class="func">summarize_order</span>(state) <span class="comment"># Node 6: Zusammenfassung</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state = <span class="func">generate_image</span>(state) &nbsp;<span class="comment"># Node 10: Vorschaubild</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">else</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state = <span class="func">ask_next</span>(state) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Node 5: Nächste Frage</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">elif</span> intent == <span class="string">"price"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state = <span class="func">retrieve_docs</span>(state) &nbsp;&nbsp;<span class="comment"># Node 7: RAG-Suche</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state = <span class="func">calculate_price</span>(state) <span class="comment"># Node 8: Preisberechnung</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">elif</span> intent == <span class="string">"finalize"</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;state = <span class="func">finalize_order</span>(state) &nbsp;<span class="comment"># Node 12: Adressformular</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> state
+</div>
+
+<h3>12 Nodes im Detail</h3>
+<table>
+<tr><th>Node</th><th>Funktion</th><th>Datei</th><th>Beschreibung</th></tr>
+<tr><td>0</td><td>guardrail()</td><td>nodes.py</td><td>Blockiert Beleidigungen, Jailbreaks, Spam</td></tr>
+<tr><td>1</td><td>classify_and_extract()</td><td>nodes.py</td><td>Erkennt Intent + extrahiert Bestelldaten in einem LLM-Call</td></tr>
+<tr><td>2</td><td>greet()</td><td>nodes.py</td><td>Begrüßung + erste Frage (Anlass)</td></tr>
+<tr><td>3</td><td>extract_info()</td><td>nodes.py</td><td>Standalone-Extraktion (wird von classify_and_extract ersetzt)</td></tr>
+<tr><td>4</td><td>check_complete()</td><td>nodes.py</td><td>Prüft welche der 10 Pflichtfelder noch fehlen</td></tr>
+<tr><td>5</td><td>ask_next()</td><td>nodes.py</td><td>Stellt die nächste fehlende Frage (LLM-generiert)</td></tr>
+<tr><td>6</td><td>summarize_order()</td><td>nodes.py</td><td>Zeigt Zusammenfassung aller Bestelldetails</td></tr>
+<tr><td>7</td><td>retrieve_docs()</td><td>nodes.py</td><td><b>RAG:</b> Sucht in ChromaDB nach relevanten Dokumenten</td></tr>
+<tr><td>8</td><td>calculate_price()</td><td>nodes.py</td><td>Berechnet Preis mit RAG-Kontext</td></tr>
+<tr><td>9</td><td>answer_question()</td><td>nodes.py</td><td>Beantwortet Info-Fragen mit RAG-Kontext</td></tr>
+<tr><td>10</td><td>generate_image()</td><td>nodes.py</td><td><b>Multimodal:</b> Referenzbild + OpenAI Image API</td></tr>
+<tr><td>11</td><td>update_order()</td><td>nodes.py</td><td>Ändert bereits gegebene Bestelldetails</td></tr>
+<tr><td>12</td><td>finalize_order()</td><td>nodes.py</td><td>Zeigt Adressformular, speichert Bild ins Portfolio</td></tr>
+</table>
+
+<h3>Warum LangGraph?</h3>
+<div class="conn-diagram">
+  <div class="conn-box" style="border-color:var(--green)">
+    <h4>Vorteile</h4>
+    <ul>
+      <li>Klare Trennung: Jeder Node = eine Aufgabe</li>
+      <li>Flexibles Routing: Intent bestimmt den Pfad</li>
+      <li>Einfach erweiterbar: Neuer Node = neue Funktion</li>
+      <li>Testbar: Jeder Node einzeln testbar</li>
+    </ul>
+  </div>
+  <div class="conn-box" style="border-color:var(--blue)">
+    <h4>State-Management</h4>
+    <ul>
+      <li>Ein zentrales AgentState-Objekt</li>
+      <li>Wird durch jeden Node weitergereicht</li>
+      <li>Enthält: order_info, messages, todo, images</li>
+      <li>Persistiert in ChromaDB (Session)</li>
+    </ul>
+  </div>
+  <div class="conn-box" style="border-color:var(--orange)">
+    <h4>Conditional Routing</h4>
+    <ul>
+      <li>order_complete? → summarize + image</li>
+      <li>missing_fields? → ask_next</li>
+      <li>has_image? → finalize</li>
+      <li>person_name? → sanitize prompt</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 7: RAG -->
+<!-- ═══════════════════════════════════ -->
+<section id="rag">
+<h2>7. RAG — Retrieval-Augmented Generation</h2>
+<p>RAG ermöglicht dem Agent, auf <b>aktuelle, firmenspezifische Informationen</b> zuzugreifen, die nicht im LLM-Training enthalten sind.</p>
+
+<h3>RAG-Architektur</h3>
+<div class="flow">
+  <div class="flow-step step-green">
+    <div class="num">1</div>
+    <div class="content">
+      <b>Dokumente importieren (einmalig)</b><br>
+      ingest.py liest Preisliste, FAQ, Allergene, Lieferbedingungen und chunked sie
+      <br><span class="file">ingest.py</span> <span class="file">docs/</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-blue">
+    <div class="num">2</div>
+    <div class="content">
+      <b>Embeddings erstellen</b><br>
+      OpenAI text-embedding-3-small wandelt Chunks in Vektoren um
+      <br><span class="file">nodes.py → _llm_embedding()</span> <span class="llm">OpenAI Embedding API</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-purple">
+    <div class="num">3</div>
+    <div class="content">
+      <b>In ChromaDB speichern</b><br>
+      Vektoren + Originaltexte werden in der Vektor-Datenbank gespeichert
+      <br><span class="file">ChromaDB Collection "cake_docs"</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-orange">
+    <div class="num">4</div>
+    <div class="content">
+      <b>Bei Kundenfrage: Semantic Search</b><br>
+      Frage → Embedding → ChromaDB findet die 5 relevantesten Chunks
+      <br><span class="file">nodes.py → retrieve_docs()</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-green">
+    <div class="num">5</div>
+    <div class="content">
+      <b>LLM antwortet mit Kontext</b><br>
+      GPT-4o-mini bekommt Frage + relevante Dokument-Chunks → präzise Antwort
+      <br><span class="file">nodes.py → calculate_price() / answer_question()</span> <span class="llm">1 LLM-Call</span>
+    </div>
+  </div>
+</div>
+
+<h3>Wo wird RAG eingesetzt?</h3>
+<table>
+<tr><th>Anwendung</th><th>Node</th><th>Dokumente</th><th>Beispiel</th></tr>
+<tr><td><b>Preisberechnung</b></td><td>calculate_price()</td><td>Preisliste mit Größen, Zuschlägen</td><td>"Was kostet eine 3-Schicht Schoko-Torte für 30 Gäste?"</td></tr>
+<tr><td><b>Info-Fragen</b></td><td>answer_question()</td><td>FAQ, Allergene, Lieferbedingungen</td><td>"Habt ihr glutenfreie Optionen?"</td></tr>
+<tr><td><b>Allergie-Info</b></td><td>answer_question()</td><td>Zutatenlisten, Allergene-Tabelle</td><td>"Ist die Vanille-Torte laktosefrei?"</td></tr>
+</table>
+
+<h3>Code-Beispiel: retrieve_docs()</h3>
+<div class="code">
+<span class="keyword">def</span> <span class="func">retrieve_docs</span>(state):<br>
+&nbsp;&nbsp;<span class="comment"># 1. Query aus Bestelldaten bauen</span><br>
+&nbsp;&nbsp;query = <span class="string">"Preis Kuchen Vanille, 30 Gäste, 2 Schichten"</span><br><br>
+&nbsp;&nbsp;<span class="comment"># 2. Embedding erstellen</span><br>
+&nbsp;&nbsp;query_embedding = <span class="func">_llm_embedding</span>(query)<br><br>
+&nbsp;&nbsp;<span class="comment"># 3. ChromaDB: Top-5 relevante Chunks finden</span><br>
+&nbsp;&nbsp;results = collection.<span class="func">query</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;query_embeddings=[query_embedding],<br>
+&nbsp;&nbsp;&nbsp;&nbsp;n_results=<span class="string">5</span><br>
+&nbsp;&nbsp;)<br><br>
+&nbsp;&nbsp;<span class="comment"># 4. Kontext in State speichern für LLM</span><br>
+&nbsp;&nbsp;state[<span class="string">"rag_context"</span>] = results[<span class="string">"documents"</span>]<br>
+&nbsp;&nbsp;<span class="keyword">return</span> state
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 8: MEMORY -->
+<!-- ═══════════════════════════════════ -->
+<section id="memory">
+<h2>8. Memory — Gesprächs-Gedächtnis</h2>
+<p>Der Agent hat ein <b>mehrstufiges Gedächtnis</b>, das den Gesprächsverlauf und Bestellfortschritt über die gesamte Session hinweg speichert.</p>
+
+<h3>3 Ebenen des Memory</h3>
+<div class="conn-diagram">
+  <div class="conn-box" style="border-color:var(--green)">
+    <h4>1. Short-Term Memory<br><small>Messages-Array</small></h4>
+    <ul>
+      <li>Letzte 20 Nachrichten (user + assistant)</li>
+      <li>Wird bei jedem LLM-Call als Kontext mitgegeben</li>
+      <li>Ermöglicht: "Ja" → Agent weiß, worauf sich "Ja" bezieht</li>
+      <li><b>Datei:</b> state["messages"]</li>
+    </ul>
+  </div>
+  <div class="conn-box" style="border-color:var(--blue)">
+    <h4>2. Working Memory<br><small>Order Info + TODO</small></h4>
+    <ul>
+      <li>order_info: Alle extrahierten Bestelldaten</li>
+      <li>question_todo: Status jedes Feldes (pending/asked/answered)</li>
+      <li>Überlebt die gesamte Session</li>
+      <li><b>Datei:</b> state["order_info"], state["question_todo"]</li>
+    </ul>
+  </div>
+  <div class="conn-box" style="border-color:var(--purple)">
+    <h4>3. Long-Term Memory<br><small>ChromaDB Session</small></h4>
+    <ul>
+      <li>Gesamter State wird in ChromaDB persistiert</li>
+      <li>Überlebt Server-Neustarts</li>
+      <li>Session-ID via Cookie</li>
+      <li><b>Datei:</b> session_manager.py</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Memory-Fluss</h3>
+<div class="code">
+<span class="comment"># Jeder Request:</span><br>
+<span class="comment">1.</span> <span class="func">session_mgr.load_session</span>(session_id) &nbsp;&nbsp;<span class="comment">← ChromaDB → State laden</span><br>
+<span class="comment">2.</span> state[<span class="string">"messages"</span>].append(user_input) &nbsp;&nbsp;&nbsp;<span class="comment">← Nachricht merken</span><br>
+<span class="comment">3.</span> <span class="func">classify_and_extract</span>(state) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">← order_info aktualisieren</span><br>
+<span class="comment">4.</span> <span class="func">check_complete</span>(state) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">← question_todo sync</span><br>
+<span class="comment">5.</span> state[<span class="string">"messages"</span>].append(response) &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">← Antwort merken</span><br>
+<span class="comment">6.</span> <span class="func">session_mgr.save_session</span>(session_id, state) <span class="comment">← In ChromaDB speichern</span>
+</div>
+
+<h3>question_todo — Fortschritts-Tracking</h3>
+<div class="code">
+<span class="comment"># Jedes Pflichtfeld hat einen Status:</span><br>
+question_todo = {<br>
+&nbsp;&nbsp;<span class="string">"anlass"</span>: &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"answered"</span>, &nbsp;<span class="comment"># ✅ Beantwortet</span><br>
+&nbsp;&nbsp;<span class="string">"gaeste"</span>: &nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"answered"</span>, &nbsp;<span class="comment"># ✅ Beantwortet</span><br>
+&nbsp;&nbsp;<span class="string">"geschmack"</span>: &nbsp;<span class="string">"answered"</span>, &nbsp;<span class="comment"># ✅ Beantwortet</span><br>
+&nbsp;&nbsp;<span class="string">"dekoration"</span>: <span class="string">"asked"</span>, &nbsp;&nbsp;&nbsp;<span class="comment"># ⏳ Gefragt, noch offen</span><br>
+&nbsp;&nbsp;<span class="string">"allergien"</span>: &nbsp;<span class="string">"pending"</span>, &nbsp;&nbsp;<span class="comment"># ○  Noch nicht gefragt</span><br>
+&nbsp;&nbsp;...<br>
+}<br><br>
+<span class="comment"># Frontend zeigt Fortschrittsbalken: 7/10 ✅</span>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 9: MULTIMODAL RAG -->
+<!-- ═══════════════════════════════════ -->
+<section id="multimodal">
+<h2>9. Multimodal RAG — Bild-Referenzsystem</h2>
+<p>Kidstorte nutzt ein <b>multimodales Referenzsystem</b>: Der Agent sucht im Portfolio-Ordner (Bilder/) nach passenden Tortenbildern und nutzt sie als Design-Vorlage für die Bildgenerierung.</p>
+
+<h3>Funktionsweise</h3>
+<div class="flow">
+  <div class="flow-step step-green">
+    <div class="num">1</div>
+    <div class="content">
+      <b>Ordner scannen (0ms, kostenlos)</b><br>
+      _scan_reference_files() liest alle Dateinamen aus Bilder/ und cached sie
+      <br><span class="file">nodes.py</span> <span class="file">Bilder/ (62+ Dateien)</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-blue">
+    <div class="num">2</div>
+    <div class="content">
+      <b>Dateiname-Matching</b><br>
+      Vergleicht Kundenwunsch ("Elsa, 3 Etagen") mit Dateinamen ("elsa_3_etagen.png") per Keyword-Score
+      <br><span class="file">nodes.py → _find_best_reference()</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-orange">
+    <div class="num">3</div>
+    <div class="content">
+      <b>Design-Theme extrahieren (nur Motiv, NICHT Farbe)</b><br>
+      "elsa_3_etagen_blau.png" → Theme: "elsa 3 etagen" (Farbe wird ignoriert!)
+      <br><span class="file">nodes.py → ref_description</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-purple">
+    <div class="num">4</div>
+    <div class="content">
+      <b>Prompt-Erweiterung</b><br>
+      "DESIGN THEME: elsa 3 etagen. CUSTOMER REQUIREMENTS: fondant MUST be pink and red!"
+      <br><span class="file">nodes.py → combined_prompt</span>
+    </div>
+  </div>
+  <div class="flow-arrow">&#8595;</div>
+
+  <div class="flow-step step-green">
+    <div class="num">5</div>
+    <div class="content">
+      <b>Neues Bild generieren</b><br>
+      gpt-image-1-mini erzeugt ein neues Bild basierend auf Referenz-Theme + Kundenwünschen
+      <br><span class="file">nodes.py → generate_single_image()</span> <span class="llm">OpenAI Image API</span>
+    </div>
+  </div>
+</div>
+
+<h3>Dateiname-Konvention</h3>
+<div class="code">
+<span class="comment"># Format: motiv_N_etagen_farbe.png</span><br><br>
+elsa_3_etagen.png &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Elsa-Torte, 3 Etagen</span><br>
+ronaldo_2_etagen_rot.png &nbsp;&nbsp;<span class="comment"># Ronaldo-Torte, 2 Etagen, rot</span><br>
+hochzeit_beige_3_etagen.png <span class="comment"># Hochzeitstorte, beige, 3 Etagen</span><br>
+paw_patrol_2_etagen.png &nbsp;&nbsp;&nbsp;<span class="comment"># Paw Patrol, 2 Etagen</span><br>
+fussball_blau.png &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Fußball-Torte, blau</span><br>
+spiderman.png &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Spiderman-Torte</span>
+</div>
+
+<h3>Matching-Score Algorithmus</h3>
+<table>
+<tr><th>Kriterium</th><th>Score</th><th>Beispiel</th></tr>
+<tr><td>Figur/Motiv im Dateinamen</td><td><b>+2</b> pro Wort</td><td>"elsa" in "elsa_3_etagen.png" → +2</td></tr>
+<tr><td>Etagen-Match</td><td><b>+1</b></td><td>"3_etagen" in Dateiname und Bestellung → +1</td></tr>
+<tr><td>Farb-Match</td><td><b>+1</b></td><td>"blau" in Dateiname und Bestellung → +1</td></tr>
+<tr><td>Anlass-Match (Hochzeit)</td><td><b>+2</b></td><td>"hochzeit" in Dateiname → +2</td></tr>
+<tr><td><b>Minimum-Score</b></td><td><b>≥ 2</b></td><td>Unter 2 = kein Match → normale Generierung</td></tr>
+</table>
+
+<h3>Warum Dateiname-Matching statt Vision API?</h3>
+<table>
+<tr><th></th><th>Vision API (GPT-4o-mini)</th><th>Dateiname-Matching</th></tr>
+<tr><td><b>Kosten</b></td><td>~$0.03 pro Suche (62 Bilder)</td><td><b>$0.00</b></td></tr>
+<tr><td><b>Geschwindigkeit</b></td><td>5-10 Sekunden</td><td><b>0ms</b></td></tr>
+<tr><td><b>Genauigkeit</b></td><td>Hoch (visuell)</td><td>Hoch (beschreibende Namen)</td></tr>
+<tr><td><b>Skalierbarkeit</b></td><td>Teurer bei mehr Bildern</td><td><b>Unbegrenzt kostenlos</b></td></tr>
+</table>
+
+<h3>Auto-Save bei Bestellabschluss</h3>
+<div class="code">
+<span class="comment"># Wenn der Kunde die Bestellung bestätigt (finalize_order),</span><br>
+<span class="comment"># wird das generierte Bild automatisch ins Portfolio gespeichert:</span><br><br>
+<span class="keyword">def</span> <span class="func">finalize_order</span>(state):<br>
+&nbsp;&nbsp;image_url = state[<span class="string">"image_url"</span>]<br>
+&nbsp;&nbsp;<span class="func">_auto_save_to_reference</span>(image_url, order_info)<br>
+&nbsp;&nbsp;<span class="comment"># → Speichert als "elsa_3_etagen.png" in Bilder/</span><br>
+&nbsp;&nbsp;<span class="comment"># → Portfolio wächst automatisch mit jeder Bestellung!</span>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION 10: DATENFLUSS -->
+<!-- ═══════════════════════════════════ -->
+<section id="data">
+<h2>10. Datenfluss durch das System</h2>
+
+<h3>AgentState (state.py) — Das zentrale Datenobjekt</h3>
+<div class="code">
+AgentState = {<br>
+&nbsp;&nbsp;<span class="string">"user_input"</span>: <span class="comment">"Vanille, 2 Schichten"</span>,<br>
+&nbsp;&nbsp;<span class="string">"messages"</span>: [{role, content}, ...], <span class="comment"># Gesprächsverlauf</span><br>
+&nbsp;&nbsp;<span class="string">"intent"</span>: <span class="comment">"order"</span>,<br>
+&nbsp;&nbsp;<span class="string">"order_info"</span>: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"anlass"</span>: <span class="comment">"Geburtstag"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"gaeste"</span>: <span class="comment">"30"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"geschmack"</span>: <span class="comment">"Vanille"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"dekoration"</span>: <span class="comment">"Elsa auf Eislandschaft"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;<span class="string">"question_todo"</span>: {<span class="comment">"anlass": "answered", "gaeste": "asked", ...</span>},<br>
+&nbsp;&nbsp;<span class="string">"order_complete"</span>: <span class="keyword">false</span>,<br>
+&nbsp;&nbsp;<span class="string">"image_url"</span>: <span class="comment">"/static/images/abc.png"</span>,<br>
+&nbsp;&nbsp;<span class="string">"calculated_price"</span>: <span class="comment">"105 €"</span>,<br>
+&nbsp;&nbsp;<span class="string">"response"</span>: <span class="comment">"Hier ist Ihr Vorschaubild..."</span>,<br>
+}
+</div>
+
+<h3>Datenfluss: Session → Bestellung → PDF</h3>
+<div class="code">
+<span class="comment">1.</span> <span class="keyword">ChromaDB</span> speichert Session (Gespräch läuft)<br>
+<span class="comment">2.</span> <span class="keyword">SQLite</span> speichert Bestellung (Kunde bestätigt)<br>
+<span class="comment">3.</span> <span class="keyword">ReportLab</span> generiert PDF aus DB-Daten<br>
+<span class="comment">4.</span> <span class="keyword">SMTP</span> sendet PDF per E-Mail
+</div>
+
+<h3>10 Pflichtfelder (prompts_config.yaml)</h3>
+<table>
+<tr><th>#</th><th>Feld</th><th>Beispiel</th></tr>
+<tr><td>1</td><td>anlass</td><td>Geburtstag, Hochzeit</td></tr>
+<tr><td>2</td><td>gaeste</td><td>30 Personen</td></tr>
+<tr><td>3</td><td>geschmack</td><td>Vanille, Schokolade</td></tr>
+<tr><td>4</td><td>form</td><td>rund, eckig, Herz</td></tr>
+<tr><td>5</td><td>schichten</td><td>2, 3</td></tr>
+<tr><td>6</td><td>fuellung</td><td>1:Erdbeer 2:Schoko</td></tr>
+<tr><td>7</td><td>dekoration</td><td>Elsa auf Eislandschaft</td></tr>
+<tr><td>8</td><td>allergien</td><td>Keine, Glutenfrei</td></tr>
+<tr><td>9</td><td>beschriftung</td><td>Happy Birthday Laila</td></tr>
+<tr><td>10</td><td>abholung</td><td>Selbstabholung, Lieferung</td></tr>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION: KALENDER (cal.com) -->
+<!-- ═══════════════════════════════════ -->
+<section id="calendar">
+<h2>11. Kalender-Integration (cal.com)</h2>
+
+<p>Die Kalender-Integration prüft automatisch ob der gewünschte Abhol-/Liefertermin verfügbar ist.
+Nutzt die <b>cal.com API v2</b> wenn konfiguriert, sonst die lokale SQLite-Datenbank als Fallback.</p>
+
+<h3>Ablauf</h3>
+<div class="flow-diagram">
+<pre style="background:#1e293b;color:#e2e8f0;padding:20px;border-radius:10px;overflow-x:auto;font-size:0.95em">
+Kunde sagt: "Lieferung am 25. März"
+         │
+         ▼
+┌─────────────────────┐
+│  extract_info()     │  → liefertermin: "25.03.2026"
+└────────┬────────────┘
+         ▼
+┌─────────────────────┐
+│  check_calendar()   │  → _parse_german_date() → datetime
+└────────┬────────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+ cal.com    Lokale DB
+ API v2    (Fallback)
+    │         │
+    ▼         ▼
+┌─────────────────────┐
+│ Verfügbar?          │
+├──────┬──────────────┤
+│ JA   │ "Am 25.03.   │
+│      │  haben wir   │
+│      │  noch Plätze  │
+│      │  frei! 🗓️"   │
+├──────┼──────────────┤
+│ NEIN │ Alternativen │
+│      │ vorschlagen  │
+│      │ (±7 Tage)    │
+└──────┴──────────────┘
+</pre>
+</div>
+
+<h3>Dateien</h3>
+<table>
+<tr><th>Datei</th><th>Rolle</th></tr>
+<tr><td><b>cal_service.py</b></td><td>Cal.com API Client — Slots abfragen, Termine buchen, Alternativen suchen</td></tr>
+<tr><td><b>nodes.py</b></td><td><code>check_calendar()</code> Node — validiert Datum, prüft Verfügbarkeit</td></tr>
+<tr><td><b>graph.py</b></td><td>Routing: Kalender-Check nach <code>extract_info</code> wenn <code>liefertermin</code> vorhanden</td></tr>
+<tr><td><b>main.py</b></td><td>API-Endpoints: <code>/api/calendar/check</code>, <code>/api/calendar/alternatives</code>, <code>/api/calendar/status</code></td></tr>
+<tr><td><b>config.py</b></td><td>Umgebungsvariablen: <code>CAL_API_KEY</code>, <code>CAL_EVENT_TYPE_ID</code>, <code>CAL_USERNAME</code></td></tr>
+<tr><td><b>state.py</b></td><td>Neue Felder: <code>calendar_available</code>, <code>calendar_message</code></td></tr>
+</table>
+
+<h3>Dual-Modus: cal.com + Lokaler Fallback</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0">
+<div style="border:2px solid var(--blue);border-radius:10px;padding:15px">
+<h4 style="color:var(--blue)">🌐 cal.com API (wenn konfiguriert)</h4>
+<ul>
+<li><code>GET /v2/slots</code> — Freie Zeitfenster abfragen</li>
+<li><code>POST /v2/bookings</code> — Termin buchen bei Finalize</li>
+<li>Echtzeit-Synchronisation mit externem Kalender</li>
+<li>Unterstützt Event-Types und Team-Kalender</li>
+</ul>
+</div>
+<div style="border:2px solid var(--green);border-radius:10px;padding:15px">
+<h4 style="color:var(--green)">🗄️ Lokaler Fallback (SQLite)</h4>
+<ul>
+<li><code>count_orders_on_date()</code> aus order_db.py</li>
+<li>Max. Bestellungen/Tag aus <code>prompts_config.yaml</code></li>
+<li>Öffnungszeiten + Ruhetage konfigurierbar</li>
+<li>Kein externer Service nötig</li>
+</ul>
+</div>
+</div>
+
+<h3>Datum-Parsing (Deutsch)</h3>
+<p><code>_parse_german_date()</code> versteht viele Formate:</p>
+<table>
+<tr><th>Eingabe</th><th>Ergebnis</th></tr>
+<tr><td>"25.03.2026"</td><td>2026-03-25</td></tr>
+<tr><td>"25. März 2026"</td><td>2026-03-25</td></tr>
+<tr><td>"nächsten Samstag"</td><td>Berechnet</td></tr>
+<tr><td>"in 2 Wochen"</td><td>Berechnet</td></tr>
+<tr><td>"übermorgen"</td><td>Berechnet</td></tr>
+<tr><td>"2026-03-25" (ISO)</td><td>2026-03-25</td></tr>
+</table>
+
+<h3>Validierungsregeln</h3>
+<ul>
+<li>⏰ Mindestens <b>2 Tage Vorlauf</b> (Zubereitung braucht Zeit)</li>
+<li>🚫 Ruhetage werden automatisch abgelehnt (Standard: Sonntag)</li>
+<li>📊 Kapazitätsgrenze pro Tag (konfigurierbar in Admin)</li>
+<li>🔄 Bei Ablehnung: 5 Alternative Termine werden vorgeschlagen</li>
+</ul>
+</section>
+
+<!-- ═══════════════════════════════════ -->
+<!-- SECTION: TECHNOLOGIEN -->
+<!-- ═══════════════════════════════════ -->
+<section id="tech">
+<h2>12. Verwendete Technologien</h2>
+
+<div class="tech-badges">
+  <span class="badge badge-python">🐍 Python 3.13</span>
+  <span class="badge badge-fastapi">⚡ FastAPI</span>
+  <span class="badge badge-openai">🤖 OpenAI GPT-4o-mini (Chat)</span>
+  <span class="badge badge-openai">🎨 gpt-image-1-mini (Bild)</span>
+  <span class="badge badge-openai">📐 text-embedding-3-small (RAG)</span>
+  <span class="badge badge-chromadb">🔍 ChromaDB (Vektor-DB)</span>
+  <span class="badge badge-sqlite">🗄️ SQLite (Bestellungen)</span>
+  <span class="badge badge-html">📄 ReportLab (PDF)</span>
+  <span class="badge badge-js">💻 JavaScript (Frontend)</span>
+  <span class="badge" style="background:#10b981;color:white">🧠 LangGraph (Agent)</span>
+  <span class="badge" style="background:#6366f1;color:white">💾 Memory (3-stufig)</span>
+  <span class="badge" style="background:#ec4899;color:white">🖼️ Multimodal RAG</span>
+  <span class="badge" style="background:#f97316;color:white">📅 Cal.com (Kalender)</span>
+</div>
+
+<h3>API-Aufrufe pro Bestellung (optimiert)</h3>
+<table>
+<tr><th>Schritt</th><th>API</th><th>Kosten</th><th>Dauer</th></tr>
+<tr><td>Guardrail (pro Nachricht)</td><td>GPT-4o-mini</td><td>~$0.001</td><td>~1s</td></tr>
+<tr><td>Classify + Extract (pro Nachricht)</td><td>GPT-4o-mini</td><td>~$0.001</td><td>~1s</td></tr>
+<tr><td>Ask Next (pro fehlende Frage)</td><td>GPT-4o-mini</td><td>~$0.001</td><td>~1s</td></tr>
+<tr><td>Referenzbild suchen</td><td>Bilder/ Ordner</td><td><b>$0.00</b></td><td><b>0ms</b></td></tr>
+<tr><td>Bildgenerierung</td><td>gpt-image-1-mini</td><td>~$0.02</td><td>30-90s</td></tr>
+<tr><td>Preis (RAG)</td><td>Embedding + Chat</td><td>~$0.002</td><td>~2s</td></tr>
+<tr><td>Kalender-Check</td><td>cal.com API / SQLite</td><td><b>$0.00</b></td><td>~0.5s</td></tr>
+<tr><td><b>Gesamt pro Bestellung</b></td><td></td><td><b>~$0.04</b></td><td><b>~2-3 Min</b></td></tr>
+</table>
+</section>
+
+</div>
+</body>
+</html>

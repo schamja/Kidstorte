@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockinterview — Kidstorte &amp; Generative AI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --primary: #5b8c7b;
+      --primary-dark: #3d6b5a;
+      --primary-light: #e8f0ec;
+      --accent: #d4956a;
+      --accent-light: #fdf1e8;
+      --text: #2c3e50;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --code-bg: #1e293b;
+      --code-text: #e2e8f0;
+      --question-bg: linear-gradient(135deg, #5b8c7b 0%, #3d6b5a 100%);
+      --answer-bg: #ffffff;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── Hero Header ── */
+    .hero {
+      background: linear-gradient(135deg, #5b8c7b 0%, #2d5a4a 50%, #1a3a2e 100%);
+      color: white;
+      padding: 60px 24px 50px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.05) 0%, transparent 50%);
+    }
+    .hero h1 {
+      font-size: 2.4em;
+      font-weight: 700;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .hero .subtitle {
+      font-size: 1.15em;
+      opacity: 0.85;
+      font-weight: 300;
+      position: relative;
+    }
+    .hero .badge-row {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      position: relative;
+    }
+    .hero .badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.82em;
+      font-weight: 500;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ── Navigation ── */
+    .nav {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .nav-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav-inner::-webkit-scrollbar { display: none; }
+    .nav-tab {
+      padding: 14px 18px;
+      font-size: 0.85em;
+      font-weight: 500;
+      color: var(--text-light);
+      text-decoration: none;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .nav-tab:hover { color: var(--primary); }
+    .nav-tab.active {
+      color: var(--primary-dark);
+      border-bottom-color: var(--primary);
+    }
+
+    /* ── Main Container ── */
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 30px 20px 80px;
+    }
+
+    /* ── Part Header ── */
+    .part-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      padding: 30px 28px;
+      border-radius: 16px;
+      margin: 40px 0 24px;
+      box-shadow: var(--shadow-lg);
+    }
+    .part-header .part-label {
+      font-size: 0.78em;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0.7;
+      margin-bottom: 6px;
+    }
+    .part-header h2 {
+      font-size: 1.6em;
+      font-weight: 700;
+    }
+    .part-header p {
+      margin-top: 8px;
+      opacity: 0.85;
+      font-size: 0.95em;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 36px;
+      scroll-margin-top: 70px;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2em;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary-light);
+    }
+    .section-title .num {
+      background: var(--primary);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8em;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── Q&A Card ── */
+    .qa {
+      background: var(--card);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: box-shadow 0.2s;
+    }
+    .qa:hover {
+      box-shadow: var(--shadow-lg);
+    }
+    .qa-question {
+      background: var(--question-bg);
+      color: white;
+      padding: 16px 20px;
+      font-weight: 600;
+      font-size: 0.95em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      user-select: none;
+      transition: opacity 0.2s;
+    }
+    .qa-question:hover { opacity: 0.92; }
+    .qa-question .q-icon {
+      background: rgba(255,255,255,0.2);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85em;
+      flex-shrink: 0;
+    }
+    .qa-question .toggle-icon {
+      margin-left: auto;
+      font-size: 1.2em;
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+    .qa.open .qa-question .toggle-icon {
+      transform: rotate(180deg);
+    }
+    .qa-answer {
+      padding: 0 20px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease, padding 0.3s ease;
+    }
+    .qa.open .qa-answer {
+      padding: 18px 20px;
+      max-height: 3000px;
+    }
+    .qa-answer p {
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+    .qa-answer strong {
+      color: var(--primary-dark);
+    }
+
+    /* ── Code Block ── */
+    .code-block {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.82em;
+      line-height: 1.6;
+      overflow-x: auto;
+      margin: 12px 0;
+      white-space: pre;
+    }
+    .code-inline {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.88em;
+    }
+
+    /* ── Table ── */
+    .qa-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 0.9em;
+    }
+    .qa-table th {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      border: 1px solid var(--border);
+    }
+    .qa-table td {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+    }
+    .qa-table tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* ── Lists ── */
+    .qa-answer ul, .qa-answer ol {
+      padding-left: 22px;
+      margin: 8px 0;
+    }
+    .qa-answer li {
+      margin-bottom: 5px;
+    }
+
+    /* ── Stats Bar ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .stat-num {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .stat-card .stat-label {
+      font-size: 0.8em;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    /* ── Expand All Button ── */
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text);
+    }
+    .btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+    .btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* ── Search ── */
+    .search-box {
+      width: 100%;
+      padding: 12px 18px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95em;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+      background: var(--card);
+    }
+    .search-box:focus {
+      border-color: var(--primary);
+    }
+
+    /* ── Highlight ── */
+    mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+
+    /* ── Progress ── */
+    .progress-bar {
+      background: var(--border);
+      height: 4px;
+      border-radius: 2px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: var(--primary);
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s;
+      width: 0%;
+    }
+
+    /* ── Print ── */
+    @media print {
+      .nav, .controls, .search-box, .hero { display: none; }
+      .qa-answer { max-height: none !important; padding: 18px 20px !important; }
+      .qa { break-inside: avoid; }
+      body { font-size: 11px; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 1.6em; }
+      .container { padding: 16px 12px 60px; }
+      .part-header { padding: 20px 18px; }
+      .qa-question { font-size: 0.88em; padding: 14px 16px; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════ HERO ════════════════ -->
+<div class="hero">
+  <h1>Mockinterview-Vorbereitung</h1>
+  <div class="subtitle">Kidstorte — KI-gest&uuml;tzter Bestellassistent &amp; Generative AI Allgemeinwissen</div>
+  <div class="badge-row">
+    <span class="badge">RAG</span>
+    <span class="badge">LangGraph</span>
+    <span class="badge">LangChain</span>
+    <span class="badge">LangSmith</span>
+    <span class="badge">ChromaDB</span>
+    <span class="badge">LLM</span>
+    <span class="badge">AI Agents</span>
+    <span class="badge">Prompt Engineering</span>
+  </div>
+</div>
+
+<!-- ════════════════ NAV ════════════════ -->
+<div class="nav">
+  <div class="nav-inner">
+    <a class="nav-tab active" data-target="part-project">Projekt</a>
+    <a class="nav-tab" data-target="part-general">Allgemeinwissen</a>
+    <a class="nav-tab" data-target="sec-rag-p">RAG</a>
+    <a class="nav-tab" data-target="sec-langgraph-p">LangGraph</a>
+    <a class="nav-tab" data-target="sec-llm-p">LLM</a>
+    <a class="nav-tab" data-target="sec-langchain-g">LangChain</a>
+    <a class="nav-tab" data-target="sec-agents-g">Agenten</a>
+    <a class="nav-tab" data-target="sec-genai-g">Generative AI</a>
+  </div>
+</div>
+
+<!-- ════════════════ MAIN ════════════════ -->
+<div class="container">
+
+  <input type="text" class="search-box" placeholder="Fragen durchsuchen... (z.B. RAG, Temperature, Kosten)" id="searchBox">
+
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-num" id="totalQ">0</div><div class="stat-label">Fragen gesamt</div></div>
+    <div class="stat-card"><div class="stat-num" id="openQ">0</div><div class="stat-label">Ge&ouml;ffnet</div></div>
+    <div class="stat-card"><div class="stat-num" id="partProject">0</div><div class="stat-label">Projekt-Fragen</div></div>
+    <div class="stat-card"><div class="stat-num" id="partGeneral">0</div><div class="stat-label">Allgemein-Fragen</div></div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="btnExpandAll">Alle &ouml;ffnen</button>
+    <button class="btn" id="btnCollapseAll">Alle schlie&szlig;en</button>
+    <button class="btn" id="btnPrint" onclick="window.print()">Drucken / PDF</button>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <!-- ╔══════════════════════════════════════════╗ -->
+  <!-- ║   TEIL 1: PROJEKT-SPEZIFISCHE FRAGEN     ║ -->
+  <!-- ╚══════════════════════════════════════════╝ -->
+
+  <div id="part-project">
+    <div class="part-header">
+      <div class="part-label">Teil 1</div>
+      <h2>Kidstorte &mdash; Projekt-spezifische Fragen</h2>
+      <p>Fragen &uuml;ber Architektur, Implementierung und Entscheidungen in deinem Projekt</p>
+    </div>
+
+    <!-- ── 1. RAG im Projekt ── -->
+    <div class="section" id="sec-rag-p">
+      <div class="section-title"><span class="num">1</span> RAG im Projekt</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist RAG und warum verwenden Sie es in Ihrem Projekt?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>RAG steht f&uuml;r <strong>Retrieval Augmented Generation</strong>. Statt das LLM alle Informationen &quot;auswendig&quot; wissen zu lassen, holen wir relevante Dokumente aus einer Wissensdatenbank und geben sie dem LLM als Kontext mit.</p>
+          <p>In Kidstorte nutzen wir RAG f&uuml;r <strong>Preisberechnungen</strong> und <strong>Produktinfo-Fragen</strong>. Die Preise, Allergieinfos und Produktbeschreibungen liegen als Chunks in einer ChromaDB-Collection namens <span class="code-inline">cake_chunks</span>. Bei einer Preisfrage wird die Bestellung als Query embeddet, die Top-5-relevantesten Chunks geholt und dem LLM mitgegeben &mdash; statt zu halluzinieren.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Welches Embedding-Modell nutzen Sie und warum?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p><span class="code-inline">text-embedding-3-small</span> von OpenAI. Es kostet nur ~$0.02 pro 1 Million Tokens und reicht f&uuml;r unseren deutschen Tortenkontext v&ouml;llig aus. Wir brauchen keine semantische Suche &uuml;ber riesige Korpora, sondern matchen Bestelldetails gegen Produktdaten.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wann wird RAG ausgel&ouml;st und wann nicht?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>RAG wird <strong>nur</strong> bei <span class="code-inline">price</span>- und <span class="code-inline">info</span>-Intents ausgel&ouml;st &mdash; also wenn der Kunde nach Preisen oder allgemeinen Infos fragt. Bei normalen Bestellschritten (<span class="code-inline">order</span>, <span class="code-inline">change</span>, <span class="code-inline">greeting</span>) wird <strong>kein</strong> RAG gemacht.</p>
+          <p>Das spart Kosten, weil Embedding-Calls und DB-Queries nur stattfinden, wenn wir tats&auml;chlich Produktwissen brauchen.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>ChromaDB &mdash; warum nicht Pinecone oder FAISS?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>ChromaDB ist <strong>Open Source, lokal, serverless</strong> und braucht keinen externen Service. F&uuml;r ein Einzelprojekt mit ~100-200 Dokumenten ist es perfekt.</p>
+          <ul>
+            <li><strong>Pinecone</strong>: Overkill &mdash; Cloud-hosted, kostenpflichtig, Vendor Lock-in</li>
+            <li><strong>FAISS</strong>: Kein Persistence-Layer built-in</li>
+            <li><strong>ChromaDB</strong>: Embeddings + Persistence + Metadaten in einer Library</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2. LangGraph / State Machine ── -->
+    <div class="section" id="sec-langgraph-p">
+      <div class="section-title"><span class="num">2</span> LangGraph / State Machine</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Verwenden Sie LangGraph als Library?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Nein, wir haben einen <strong>eigenen LangGraph-&auml;hnlichen Graphen</strong> implementiert. In <span class="code-inline">graph.py</span> gibt es eine <span class="code-inline">run()</span>-Methode, die den State durch verschiedene Nodes routet, je nach erkanntem Intent.</p>
+          <p>Das Prinzip ist identisch zu LangGraph: <strong>stateless Nodes</strong>, die einen <span class="code-inline">AgentState</span>-Dict empfangen, verarbeiten und zur&uuml;ckgeben. Vorteil: volle Kontrolle, keine Library-Abh&auml;ngigkeit, jede Zeile verst&auml;ndlich.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie sieht der Graph-Flow aus?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <div class="code-block">User Input → Guardrail → classify_and_extract → ROUTING:
+  ├─ greeting  → greet()
+  ├─ order     → check_complete() → ask_next() ODER summarize_order() → generate_image()
+  ├─ price     → retrieve_docs() → calculate_price()
+  ├─ image     → generate_image()
+  ├─ info      → retrieve_docs() → answer_question()
+  ├─ change    → update_order()
+  ├─ finalize  → finalize_order() → show_address_form
+  └─ offtopic  → redirect()</div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist der AgentState?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Ein <span class="code-inline">TypedDict</span> mit allen Feldern, die durch den Graphen flie&szlig;en:</p>
+          <ul>
+            <li><span class="code-inline">user_input</span>, <span class="code-inline">messages</span> (Chatverlauf), <span class="code-inline">intent</span></li>
+            <li><span class="code-inline">order_info</span> &mdash; Dict mit 13 Feldern (anlass, geschmack, form, schichten, ...)</li>
+            <li><span class="code-inline">missing_fields</span>, <span class="code-inline">order_complete</span>, <span class="code-inline">question_todo</span></li>
+            <li><span class="code-inline">context</span> (RAG), <span class="code-inline">image_url</span>, <span class="code-inline">calendar_available</span></li>
+          </ul>
+          <p>Jeder Node liest und schreibt auf diesem State.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist das question_todo-System?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Unser <strong>Fortschrittstracker</strong>. F&uuml;r jedes Pflichtfeld gibt es einen Status:</p>
+          <div class="code-block">pending → asked → answered</div>
+          <p>So vermeiden wir, dass der Bot zweimal nach der gleichen Info fragt. Der <span class="code-inline">ask_next</span>-Node w&auml;hlt immer ein Feld mit Status <span class="code-inline">pending</span> oder <span class="code-inline">asked</span>.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Warum stateless Nodes?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Stateless Nodes sind <strong>einfach zu testen, debuggen und replizieren</strong>. Der gesamte State wird zwischen Requests in ChromaDB persistiert. Man kann einen fehlerhaften Durchlauf reproduzieren, indem man den State kopiert und den Node erneut aufruft. Au&szlig;erdem erm&ouml;glicht es theoretisch horizontale Skalierung.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3. LLM-Strategie ── -->
+    <div class="section" id="sec-llm-p">
+      <div class="section-title"><span class="num">3</span> LLM-Strategie</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Welches Modell nutzen Sie und warum?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p><span class="code-inline">gpt-4o-mini</span> f&uuml;r <strong>alle</strong> Aufgaben. Es ist 33x g&uuml;nstiger als gpt-4o ($0.15 vs $5 pro 1M Input-Tokens) und reicht f&uuml;r unseren Anwendungsfall v&ouml;llig aus. Pro Request zahlen wir ca. <strong>$0.0003 USD</strong>.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie viele LLM-Calls pro Bestellschritt?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Typisch <strong>2 Calls pro Nachricht</strong>:</p>
+          <ol>
+            <li><span class="code-inline">classify_and_extract</span> &mdash; Intent + Datenextraktion in <strong>einem</strong> Call</li>
+            <li><span class="code-inline">ask_next</span> &mdash; N&auml;chste Frage generieren</li>
+          </ol>
+          <p>Urspr&uuml;nglich waren Intent-Klassifikation und Extraktion getrennt (2 Calls). Durch die Kombination sparen wir <strong>50% der LLM-Kosten</strong> pro Nachricht.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie steuern Sie die Temperature?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th>Temperature</th><th>Einsatz</th><th>Grund</th></tr>
+            <tr><td>0</td><td>Klassifikation, Extraktion, Preis</td><td>Deterministisch, kein Halluzinieren</td></tr>
+            <tr><td>0.3</td><td>Informationsantworten</td><td>Leichte Variation</td></tr>
+            <tr><td>0.6</td><td>ask_next (Fragengenerierung)</td><td>Nat&uuml;rlich, freundlich, abwechslungsreich</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie handhaben Sie Retry-Logik bei API-Fehlern?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p><span class="code-inline">@retry_on_transient(max_retries=3, base_delay=5.0)</span> mit exponentiellem Backoff: 5s → 10s → 20s. Das f&auml;ngt Rate-Limits und transiente Fehler ab, ohne die API zu &uuml;berfluten.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. Prompt Engineering ── -->
+    <div class="section" id="sec-prompts-p">
+      <div class="section-title"><span class="num">4</span> Prompt Engineering</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wo werden Ihre Prompts verwaltet?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>In <span class="code-inline">prompts_config.yaml</span> &mdash; einer YAML-Datei, die <strong>hot-reloadable</strong> ist. Der Admin kann Prompts live bearbeiten, ohne den Server neu zu starten. Bei jedem Zugriff wird die Datei-&Auml;nderungszeit gepr&uuml;ft und bei Bedarf neu geladen.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie verhindern Sie Halluzinationen?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ul>
+            <li><strong>Explizite Verbote</strong>: &quot;ERFINDE NIEMALS Werte die der Kunde nicht gesagt hat&quot;</li>
+            <li><strong>RAG-Kontext</strong> f&uuml;r Preise &mdash; LLM berechnet nur aus gegebenen Daten</li>
+            <li><strong>Strukturierte JSON-Ausgabe</strong> &mdash; nur erwartete Felder</li>
+            <li><strong>JSON-Repair</strong>: <span class="code-inline">parse_llm_json()</span> sendet bei Parse-Fehlern den Output zur&uuml;ck ans LLM zur Selbstkorrektur</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie behandeln Sie Tippfehler?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Im Prompt steht explizit: &quot;Schokolde → Schokolade, Vanile → Vanille&quot;. Das LLM korrigiert Tippfehler automatisch. Bei <strong>Namen</strong> (z.B. &quot;Aron&quot;) wird aber <strong>nicht</strong> korrigiert &mdash; die bleiben wie eingegeben.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was passiert bei mehrdeutigen Eingaben wie &quot;ja&quot; oder &quot;3&quot;?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Der Prompt definiert kontextabh&auml;ngige Regeln:</p>
+          <ul>
+            <li><strong>&quot;ja&quot;</strong> → Kontext der letzten Bot-Frage entscheidet</li>
+            <li><strong>&quot;3&quot;</strong> → wenn Bot nach Schichten fragte: <span class="code-inline">{schichten: "3"}</span></li>
+            <li><strong>Emojis</strong> → werden ignoriert</li>
+            <li><strong>&quot;Ronaldo&quot;, &quot;Elsa&quot;</strong> als Deko → Intent <span class="code-inline">order</span> (nicht offtopic!)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. Session & Persistenz ── -->
+    <div class="section" id="sec-session-p">
+      <div class="section-title"><span class="num">5</span> Session Management &amp; Persistenz</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie werden Sessions gespeichert?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>In ChromaDB, Collection <span class="code-inline">sessions</span>. Pro Session wird der gesamte <span class="code-inline">AgentState</span> als JSON gespeichert mit Metadaten: <span class="code-inline">created</span>, <span class="code-inline">last_accessed</span>, <span class="code-inline">message_count</span>, <span class="code-inline">has_order</span>, <span class="code-inline">order_complete</span>.</p>
+          <p>Die Session-ID kommt aus einem HTTPOnly-Cookie (<span class="code-inline">cake_session_id</span>), g&uuml;ltig f&uuml;r 24 Stunden.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was passiert bei Session-Timeout?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p><span class="code-inline">cleanup_old_sessions()</span> l&ouml;scht Sessions, die l&auml;nger als <span class="code-inline">SESSION_TTL_HOURS</span> (24h) nicht zugegriffen wurden. Der Chatverlauf ist auf max 20 Nachrichten begrenzt, um Context-Window-Overflow zu vermeiden.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6. Bildgenerierung ── -->
+    <div class="section" id="sec-image-p">
+      <div class="section-title"><span class="num">6</span> Bildgenerierung</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie generieren Sie Tortenvorschau-Bilder?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Eine <strong>Provider-Chain</strong>: Erst OpenAI <span class="code-inline">gpt-image-1</span>, bei Fehler Fallback auf HuggingFace FLUX.1-schnell oder SDXL. Der Bild-Prompt wird vom LLM generiert basierend auf den Bestelldaten (Form, Farbe, Geschmack, Dekoration, Schichten).</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie l&ouml;sen Sie das Moderationsproblem bei Personennamen?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Namen werden in <strong>fig&uuml;rliche Beschreibungen</strong> umgewandelt:</p>
+          <ul>
+            <li>Ronaldo → &quot;famous soccer player figurine made of fondant&quot;</li>
+            <li>Elsa → &quot;ice queen princess figurine&quot;</li>
+          </ul>
+          <p>Das Wort &quot;figurine&quot; signalisiert: keine echte Person, sondern eine Tortenfigur.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Gibt es ein Portfolio-System?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Ja! <span class="code-inline">_find_best_reference()</span> scannt den <span class="code-inline">Bilder/</span>-Ordner nach &auml;hnlichen Torten per <strong>Dateinamen-Matching</strong> (kein LLM n&ouml;tig!). Score: +2 f&uuml;r Figurname, +1 f&uuml;r Etagenzahl, +1 f&uuml;r Farbe. Ab Score &ge;2 wird ein Referenzbild vorgeschlagen.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7. Kostenoptimierung ── -->
+    <div class="section" id="sec-cost-p">
+      <div class="section-title"><span class="num">7</span> Kostenoptimierung</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Welche Strategien nutzen Sie zur Kostenoptimierung?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>F&uuml;nf Strategien:</p>
+          <ol>
+            <li><strong>Modellwahl</strong>: gpt-4o-mini f&uuml;r alles (~$0.0003 pro Request)</li>
+            <li><strong>Combined classify+extract</strong>: 1 statt 2 LLM-Calls pro Nachricht</li>
+            <li><strong>Response Cache</strong>: SHA256-basierter LRU-Cache (200 Eintr&auml;ge, 1h TTL)</li>
+            <li><strong>Selektives RAG</strong>: Nur bei price/info-Intent</li>
+            <li><strong>Message Truncation</strong>: Max 3000 Tokens Kontext</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was kostet eine komplette Bestellung?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Ca. 8-12 Nachrichten &times; ~$0.0003 = <strong>unter $0.004 USD</strong> f&uuml;r eine vollst&auml;ndige Bestellung. Bildgenerierung zus&auml;tzlich ~$0.04 bei OpenAI.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 8. LangSmith Monitoring ── -->
+    <div class="section" id="sec-langsmith-p">
+      <div class="section-title"><span class="num">8</span> LangSmith Monitoring</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was tracen Sie mit LangSmith?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Drei Ebenen:</p>
+          <ol>
+            <li><strong>Node-Level</strong>: <span class="code-inline">@trace_node</span> Decorator &mdash; Input, Output, Duration</li>
+            <li><strong>LLM-Level</strong>: <span class="code-inline">trace_llm_call()</span> &mdash; Prompt, Response, Modell, Dauer</li>
+            <li><strong>Graph-Level</strong>: Gesamter Flow von Input bis Response</li>
+          </ol>
+          <p>Alles im Projekt &quot;Kidstorte&quot; auf smith.langchain.com sichtbar.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was passiert wenn LangSmith nicht erreichbar ist?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p><strong>Graceful Degradation</strong>: <span class="code-inline">if not is_enabled(): yield _DummyRun()</span>. Der Bot funktioniert normal weiter, nur ohne Tracing. Kein Single Point of Failure.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 9. Fehlerbehandlung ── -->
+    <div class="section" id="sec-error-p">
+      <div class="section-title"><span class="num">9</span> Fehlerbehandlung &amp; Sicherheit</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was passiert bei einem LLM-Timeout?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ol>
+            <li><strong>Retry</strong>: 3 Versuche mit exponentiellem Backoff (5s, 10s, 20s)</li>
+            <li><strong>@safe_node</strong>: F&auml;ngt alle Exceptions, gibt freundliche Fehlermeldung</li>
+            <li><strong>Guardrail</strong>: Blockt Spam (&gt;800 Zeichen) bevor der LLM-Call stattfindet</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie sch&uuml;tzen Sie vor Prompt Injection?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Der <span class="code-inline">guardrail()</span>-Node ist der <strong>erste Node</strong> im Graphen. Er pr&uuml;ft per LLM-Call ob der Input ein Jailbreak-Versuch, Spam oder missbr&auml;uchlich ist. Wenn ja, wird <span class="code-inline">guardrail_blocked = True</span> gesetzt &mdash; der Rest des Graphen wird nicht durchlaufen.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 10. Architektur ── -->
+    <div class="section" id="sec-arch-p">
+      <div class="section-title"><span class="num">10</span> Architektur-Entscheidungen</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Warum kein LangChain Framework?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>LangChain bringt Overhead und Abstraktion. Unser Graph hat ~300 Zeilen, ist vollst&auml;ndig verst&auml;ndlich und debuggbar. Wir nutzen das <strong>Prinzip</strong> von LangGraph (stateless Nodes, conditional Routing), aber ohne die Library-Abh&auml;ngigkeit.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Warum FastAPI statt Flask?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ul>
+            <li><strong>Async nativ</strong>: F&uuml;r LLM-Calls die 1-3s dauern</li>
+            <li><strong>OpenAPI-Dokumentation</strong>: Automatisch generiert</li>
+            <li><strong>Streaming (SSE)</strong>: F&uuml;r Wort-f&uuml;r-Wort-Antworten einfach umzusetzen</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was sind die 5 S&auml;ulen Ihres Projekts?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ol>
+            <li><strong>RAG</strong> &mdash; Wissensdatenbank f&uuml;r Preise und Produktinfos</li>
+            <li><strong>LangGraph</strong> &mdash; State-Machine f&uuml;r den Bestellfluss</li>
+            <li><strong>ChromaDB</strong> &mdash; Vektordatenbank f&uuml;r RAG + Sessionpersistenz</li>
+            <li><strong>Vision/Bildgenerierung</strong> &mdash; Tortenvorschau mit OpenAI/HuggingFace</li>
+            <li><strong>LangSmith</strong> &mdash; Monitoring, Tracing und Evaluation</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie w&uuml;rden Sie das System skalieren?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Da Nodes stateless sind und State in ChromaDB liegt, k&ouml;nnten wir <strong>mehrere FastAPI-Worker</strong> starten (Uvicorn workers). ChromaDB m&uuml;sste durch einen externen Service ersetzt werden (z.B. ChromaDB Server-Modus oder Pinecone). Der Cookie-basierte Session-Ansatz funktioniert auch mit Load Balancing.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was w&uuml;rden Sie verbessern?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ul>
+            <li><strong>Evaluations</strong>: Systematische Testdatens&auml;tze mit erwarteten Outputs</li>
+            <li><strong>Multi-Agent</strong>: Spezialisierte Agenten f&uuml;r Preis, Bild, Beratung</li>
+            <li><strong>Streaming &uuml;berall</strong>: Aktuell nur f&uuml;r Chat, nicht f&uuml;r Bildgenerierung</li>
+            <li><strong>Mehrsprachigkeit</strong>: Prompts parametrisieren f&uuml;r EN/TR/AR</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════════════════════════╗ -->
+  <!-- ║   TEIL 2: ALLGEMEINWISSEN                 ║ -->
+  <!-- ╚══════════════════════════════════════════╝ -->
+
+  <div id="part-general">
+    <div class="part-header" style="background: linear-gradient(135deg, #d4956a 0%, #b87a4e 100%);">
+      <div class="part-label">Teil 2</div>
+      <h2>Allgemeinwissen &mdash; Generative AI</h2>
+      <p>Theoretische Fragen &uuml;ber LLMs, LangChain, LangGraph, LangSmith, RAG, Agenten</p>
+    </div>
+
+    <!-- ── 1. LLM Grundlagen ── -->
+    <div class="section" id="sec-llm-g">
+      <div class="section-title"><span class="num">1</span> LLM &mdash; Grundlagen</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist ein LLM und wie funktioniert es?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Ein Large Language Model ist ein neuronales Netz (<strong>Transformer-Architektur</strong>), das auf riesigen Textmengen trainiert wurde. Es lernt statistische Muster der Sprache und kann Text generieren, indem es Token f&uuml;r Token vorhersagt: &quot;Was ist das wahrscheinlichste n&auml;chste Wort?&quot;</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Vergleich: GPT-4o vs. GPT-4o-mini vs. GPT-3.5<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th>Modell</th><th>St&auml;rke</th><th>Kosten (Input/1M)</th><th>Einsatz</th></tr>
+            <tr><td>GPT-3.5</td><td>Schnell, g&uuml;nstig</td><td>$0.50</td><td>Einfache Tasks</td></tr>
+            <tr><td>GPT-4o-mini</td><td>Gute Qualit&auml;t, sehr g&uuml;nstig</td><td>$0.15</td><td>Best Value &mdash; 90% der Aufgaben</td></tr>
+            <tr><td>GPT-4o</td><td>Beste Qualit&auml;t</td><td>$5.00</td><td>Komplexe Reasoning-Tasks</td></tr>
+            <tr><td>GPT-4.1</td><td>Neuestes, best coding</td><td>$2.00</td><td>Coding, lange Kontexte</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist ein Token?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Die kleinste Einheit, die ein LLM verarbeitet. &quot;Schokoladentorte&quot; wird z.B. in 3-4 Tokens zerlegt. Faustregel: <strong>1 Token &asymp; 4 Zeichen</strong> (Englisch) bzw. <strong>1 Token &asymp; 3 Zeichen</strong> (Deutsch). Tokens bestimmen den Preis und das Context Window.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist das Context Window?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Die maximale Anzahl Tokens, die ein LLM gleichzeitig &quot;sehen&quot; kann &mdash; Input + Output zusammen. GPT-4o-mini hat <strong>128K Tokens</strong>. Wenn man es &uuml;berschreitet, &quot;vergisst&quot; das Modell &auml;ltere Inhalte.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist Temperature?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ul>
+            <li><strong>Temperature 0</strong>: Deterministisch &mdash; immer die wahrscheinlichste Antwort</li>
+            <li><strong>Temperature 0.3-0.7</strong>: Leichte Variation &mdash; nat&uuml;rlicher Text</li>
+            <li><strong>Temperature &gt;1</strong>: Sehr kreativ, aber unvorhersagbar</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was sind Halluzinationen und wie vermeidet man sie?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Halluzinationen sind Fälle, in denen das LLM <strong>Fakten erfindet</strong>. Vermeidung:</p>
+          <ol>
+            <li><strong>RAG</strong> &mdash; Fakten aus Datenbank liefern</li>
+            <li><strong>Strukturierte Outputs</strong> &mdash; JSON-Format erzwingen</li>
+            <li><strong>Explizite Prompts</strong> &mdash; &quot;Antworte nur basierend auf dem Kontext&quot;</li>
+            <li><strong>Temperature 0</strong> f&uuml;r Fakten-Tasks</li>
+            <li><strong>Grounding</strong> &mdash; Quellen mitliefern</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Fine-Tuning vs. Prompting &mdash; Unterschied?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th></th><th>Prompting</th><th>Fine-Tuning</th></tr>
+            <tr><td>Aufwand</td><td>Sofort einsetzbar</td><td>100-1000+ Beispiele, Stunden Training</td></tr>
+            <tr><td>Kosten</td><td>G&uuml;nstig</td><td>Teuer</td></tr>
+            <tr><td>Flexibilit&auml;t</td><td>Prompt jederzeit &auml;nderbar</td><td>Neues Training bei &Auml;nderungen</td></tr>
+            <tr><td>Wann nutzen</td><td>95% der F&auml;lle</td><td>Spezifische Sprache/Format n&ouml;tig</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>System-Prompt, User-Prompt, Assistant-Prompt &mdash; Unterschied?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ul>
+            <li><strong>System-Prompt</strong>: Definiert Rolle und Regeln (&quot;Du bist ein Tortenberater...&quot;)</li>
+            <li><strong>User-Prompt</strong>: Die Eingabe des Nutzers</li>
+            <li><strong>Assistant-Prompt</strong>: Vorherige Antworten des Bots (f&uuml;r Konversationskontext)</li>
+          </ul>
+          <p>Das LLM bekommt alle drei als <span class="code-inline">messages</span>-Array und antwortet basierend auf dem Gesamtkontext.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2. RAG Theorie ── -->
+    <div class="section" id="sec-rag-g">
+      <div class="section-title"><span class="num">2</span> RAG &mdash; Theorie</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Erkl&auml;ren Sie RAG im Detail.<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>RAG besteht aus 3 Schritten:</p>
+          <ol>
+            <li><strong>Indexing</strong>: Dokumente → Chunks → Embeddings → Vektordatenbank</li>
+            <li><strong>Retrieval</strong>: User-Frage → Embedding → Cosine Similarity → Top-K Chunks</li>
+            <li><strong>Generation</strong>: Chunks als Kontext + LLM → Antwort</li>
+          </ol>
+          <div class="code-block">User-Frage → Embedding → Vektorsuche → Top-K Chunks → LLM + Kontext → Antwort</div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist ein Embedding?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Eine Vektordarstellung (z.B. 1536 Dimensionen) von Text. Semantisch &auml;hnliche Texte haben &auml;hnliche Vektoren. &quot;Schokoladentorte&quot; und &quot;Chocolate Cake&quot; h&auml;tten Vektoren die nahe beieinander liegen &mdash; <strong>semantische Suche</strong> statt Keyword-Matching.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist Cosine Similarity?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Ein Ma&szlig; f&uuml;r die &Auml;hnlichkeit zweier Vektoren (Winkel zwischen ihnen):</p>
+          <ul>
+            <li><strong>1.0</strong> = identisch</li>
+            <li><strong>0.0</strong> = keine &Auml;hnlichkeit</li>
+            <li><strong>-1.0</strong> = gegens&auml;tzlich</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist Chunking und warum ist es wichtig?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Chunking teilt gro&szlig;e Dokumente in kleinere St&uuml;cke (z.B. 500 Tokens):</p>
+          <ul>
+            <li><strong>Pr&auml;zision</strong>: Kleine Chunks sind gezielter als ganze Dokumente</li>
+            <li><strong>Token-Limit</strong>: Context Windows sind begrenzt</li>
+            <li><strong>Kosten</strong>: Weniger Kontext = g&uuml;nstiger</li>
+          </ul>
+          <p>Strategien: Fixed-Size, Sentence-Based, Semantic Chunking, Recursive Character Splitting.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Naive RAG vs. Advanced RAG?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th>Naive RAG</th><th>Advanced RAG</th></tr>
+            <tr><td>Query → Embed → Top-K → LLM</td><td>+ Query Rewriting</td></tr>
+            <tr><td>Einfach, manchmal ungenau</td><td>+ HyDE (Hypothetical Document Embedding)</td></tr>
+            <tr><td></td><td>+ Re-Ranking (Cross-Encoder)</td></tr>
+            <tr><td></td><td>+ Multi-Query (parallele Varianten)</td></tr>
+            <tr><td></td><td>+ Contextual Compression</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Welche Vektordatenbanken gibt es?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th>DB</th><th>Typ</th><th>St&auml;rke</th><th>Schw&auml;che</th></tr>
+            <tr><td>ChromaDB</td><td>Lokal/Open Source</td><td>Einfach, kostenlos</td><td>Nicht f&uuml;r Millionen Docs</td></tr>
+            <tr><td>Pinecone</td><td>Cloud SaaS</td><td>Skalierbar, managed</td><td>Kostenpflichtig</td></tr>
+            <tr><td>FAISS</td><td>Library (Meta)</td><td>Extrem schnell</td><td>Kein Persistence</td></tr>
+            <tr><td>Weaviate</td><td>Self-hosted/Cloud</td><td>Hybrid Search</td><td>Komplexes Setup</td></tr>
+            <tr><td>Qdrant</td><td>Self-hosted/Cloud</td><td>Filtering, Performance</td><td>Weniger &Ouml;kosystem</td></tr>
+            <tr><td>pgvector</td><td>PostgreSQL Extension</td><td>In bestehende DB integriert</td><td>Weniger Features</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3. LangChain ── -->
+    <div class="section" id="sec-langchain-g">
+      <div class="section-title"><span class="num">3</span> LangChain</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist LangChain?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Ein <strong>Framework</strong> f&uuml;r LLM-Anwendungen mit Abstraktionen f&uuml;r:</p>
+          <ul>
+            <li><strong>Models</strong>: Einheitliche Schnittstelle (OpenAI, Anthropic, Cohere, ...)</li>
+            <li><strong>Prompts</strong>: Templates, Few-Shot, Output Parser</li>
+            <li><strong>Chains</strong>: Verkettung mehrerer LLM-Calls</li>
+            <li><strong>Memory</strong>: Konversationsged&auml;chtnis</li>
+            <li><strong>Tools/Agents</strong>: LLM kann externe APIs aufrufen</li>
+            <li><strong>Retrievers</strong>: RAG-Integration</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist eine Chain in LangChain?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Eine Pipeline die mehrere Schritte verbindet:</p>
+          <div class="code-block">chain = prompt_template | llm | output_parser
+
+# Beispiel:
+chain = (
+    ChatPromptTemplate.from_template("Klassifiziere: {input}")
+    | ChatOpenAI(model="gpt-4o-mini")
+    | JsonOutputParser()
+)
+result = chain.invoke({"input": "Ich will eine Torte"})</div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist LCEL (LangChain Expression Language)?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Die deklarative Syntax von LangChain v0.2+ f&uuml;r Chains:</p>
+          <div class="code-block">chain = prompt | model | parser  # Der "|" Operator</div>
+          <p><strong>Vorteile</strong>: Streaming, Batch, Async, Parallelisierung &quot;gratis&quot;.</p>
+          <p><strong>Nachteil</strong>: Abstrakt, schwer zu debuggen, magisches Verhalten.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist LangChain Memory?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th>Memory-Typ</th><th>Beschreibung</th></tr>
+            <tr><td>ConversationBufferMemory</td><td>Speichert alles (wird gro&szlig;)</td></tr>
+            <tr><td>ConversationBufferWindowMemory</td><td>Nur die letzten K Nachrichten</td></tr>
+            <tr><td>ConversationSummaryMemory</td><td>LLM fasst alte Nachrichten zusammen</td></tr>
+            <tr><td>ConversationTokenBufferMemory</td><td>Beschr&auml;nkt auf N Tokens</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>LangChain vs. eigene Implementierung &mdash; Vor- und Nachteile?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th></th><th>LangChain</th><th>Eigene Implementierung</th></tr>
+            <tr><td>Pro</td><td>Schneller Start, viele Integrationen</td><td>Volle Kontrolle, debuggbar</td></tr>
+            <tr><td>Contra</td><td>Overhead, Breaking Changes</td><td>Mehr Code, selbst bauen</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. LangGraph Theorie ── -->
+    <div class="section" id="sec-langgraph-g">
+      <div class="section-title"><span class="num">4</span> LangGraph</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>LangGraph vs. LangChain &mdash; Unterschied?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <div class="code-block">LangChain Chain:  A → B → C → D           (linear)
+LangGraph:        A → B → [C oder D] → zurück zu B?  (zyklisch)</div>
+          <p>LangGraph erlaubt <strong>Schleifen, Bedingungen und parallele Pfade</strong> &mdash; ideal f&uuml;r Agenten, die Entscheidungen treffen und Schritte wiederholen m&uuml;ssen.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was sind die Kernkonzepte von LangGraph?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ol>
+            <li><strong>StateGraph</strong>: Der Graph selbst</li>
+            <li><strong>Nodes</strong>: Funktionen die den State transformieren</li>
+            <li><strong>Edges</strong>: Verbindungen zwischen Nodes</li>
+            <li><strong>Conditional Edges</strong>: Routing basierend auf State-Werten</li>
+            <li><strong>State</strong>: TypedDict/Pydantic-Modell das durch den Graphen flie&szlig;t</li>
+            <li><strong>Checkpointer</strong>: Persistiert State zwischen Aufrufen</li>
+          </ol>
+          <div class="code-block">from langgraph.graph import StateGraph, END
+
+graph = StateGraph(AgentState)
+graph.add_node("classify", classify_node)
+graph.add_node("ask", ask_node)
+graph.add_conditional_edges("classify", route_by_intent, {
+    "order": "ask",
+    "complete": "summarize",
+    "end": END
+})
+graph.add_edge("ask", "classify")  # Schleife!</div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist ein Checkpointer in LangGraph?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Speichert den Graph-State nach jedem Node-Durchlauf. Erm&ouml;glicht:</p>
+          <ul>
+            <li><strong>Pausieren und fortsetzen</strong> (auf User-Input warten)</li>
+            <li><strong>Time-Travel</strong>: Zu fr&uuml;heren States zur&uuml;ckspringen</li>
+            <li><strong>Multi-Turn-Conversations</strong>: State &uuml;ber Requests hinweg behalten</li>
+          </ul>
+          <p>Verf&uuml;gbar: <span class="code-inline">MemorySaver</span>, <span class="code-inline">SqliteSaver</span>, <span class="code-inline">PostgresSaver</span>.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist ein Multi-Agent-Graph?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <div class="code-block">Orchestrator-Agent
+  ├─ Beratungs-Agent (Empfehlungen, Smalltalk)
+  ├─ Preis-Agent (RAG + Kalkulation)
+  ├─ Bild-Agent (Prompt-Engineering + Generierung)
+  └─ Termin-Agent (Kalender-Integration)</div>
+          <p>Jeder Agent hat eigene Prompts, Tools und Expertise. Der Orchestrator routet die Anfrage an den passenden Spezialisten.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. LangSmith ── -->
+    <div class="section" id="sec-langsmith-g">
+      <div class="section-title"><span class="num">5</span> LangSmith</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist LangSmith?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Die <strong>Observability-Plattform</strong> von LangChain f&uuml;r LLM-Anwendungen. Drei S&auml;ulen:</p>
+          <ol>
+            <li><strong>Tracing</strong>: Jeder LLM-Call aufgezeichnet &mdash; Input, Output, Dauer, Kosten, Fehler</li>
+            <li><strong>Monitoring</strong>: Dashboards mit Metriken &mdash; Latenz, Fehlerrate, Token-Verbrauch</li>
+            <li><strong>Evaluations</strong>: Automatische Qualit&auml;tsbewertung der LLM-Outputs</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was sind LangSmith Evaluations?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Testdatens&auml;tze mit erwarteten Outputs:</p>
+          <div class="code-block">{"input": "Ich will eine Schokotorte", "expected_intent": "order"}
+{"input": "Was kostet das?",          "expected_intent": "price"}
+{"input": "Hallo!",                   "expected_intent": "greeting"}</div>
+          <p><strong>Evaluatoren</strong>: Exact Match, LLM-as-Judge, Custom-Metriken.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>LangSmith vs. LangFuse &mdash; Unterschiede?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th></th><th>LangSmith</th><th>LangFuse</th></tr>
+            <tr><td>Anbieter</td><td>LangChain (kommerziell)</td><td>Open Source</td></tr>
+            <tr><td>Self-Hosting</td><td>Nein (nur Cloud)</td><td>Ja (Docker)</td></tr>
+            <tr><td>Kosten</td><td>Free Tier (5000 Traces/Mo)</td><td>Kostenlos (self-hosted)</td></tr>
+            <tr><td>Integration</td><td>Perfekt mit LangChain</td><td>Framework-agnostisch</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6. AI Agents ── -->
+    <div class="section" id="sec-agents-g">
+      <div class="section-title"><span class="num">6</span> AI Agents</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist ein AI Agent?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Ein LLM, das <strong>autonom Entscheidungen trifft und Aktionen ausf&uuml;hrt</strong>:</p>
+          <ol>
+            <li><strong>Planen</strong>: Aufgabe in Schritte zerlegen</li>
+            <li><strong>Tools nutzen</strong>: APIs aufrufen, Datenbanken abfragen</li>
+            <li><strong>Beobachten</strong>: Ergebnisse auswerten</li>
+            <li><strong>Iterieren</strong>: N&auml;chsten Schritt basierend auf Ergebnissen w&auml;hlen</li>
+          </ol>
+          <div class="code-block">Schleife: Think → Act → Observe → Think → Act → ...</div>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Agent vs. Chain &mdash; Unterschied?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ul>
+            <li><strong>Chain</strong>: Feste Abfolge A → B → C. Immer gleich.</li>
+            <li><strong>Agent</strong>: Dynamische Abfolge. LLM entscheidet bei jedem Schritt. Kann Schleifen machen, Tools w&auml;hlen, abbrechen.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist ReAct (Reasoning + Acting)?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <div class="code-block">Thought:      Ich muss den Preis nachschlagen.
+Action:       search_knowledge_base("Schokoladentorte Preis")
+Observation:  Schokoladentorte M: 45€, L: 55€, XL: 65€
+Thought:      10 Gäste = Größe L.
+Action:       respond("Der Preis für Größe L beträgt 55€.")</div>
+          <p>Das LLM &quot;denkt laut nach&quot; (Reasoning), f&uuml;hrt Aktionen aus (Acting) und nutzt die Ergebnisse f&uuml;r den n&auml;chsten Schritt.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was sind Tools in Agenten?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Funktionen, die das LLM aufrufen kann:</p>
+          <div class="code-block">tools = [
+    {"name": "check_calendar",   "desc": "Prüft Verfügbarkeit"},
+    {"name": "calculate_price",  "desc": "Berechnet Tortenpreis"},
+    {"name": "search_products",  "desc": "Sucht in Wissensdatenbank"},
+    {"name": "generate_image",   "desc": "Erstellt Tortenbild"},
+]</div>
+          <p>Das LLM w&auml;hlt basierend auf der Nutzeranfrage das passende Tool.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist Function Calling / Tool Use?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Modernes LLM-Feature: Das Modell gibt <strong>strukturiert</strong> einen Tool-Aufruf zur&uuml;ck:</p>
+          <div class="code-block">// LLM Output:
+{
+  "function_call": {
+    "name": "check_calendar",
+    "arguments": {"date": "2026-03-27"}
+  }
+}</div>
+          <p>Der Code f&uuml;hrt die Funktion aus und gibt das Ergebnis zur&uuml;ck ans LLM.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Single Agent vs. Multi-Agent &mdash; wann was?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <div class="code-block">Single Agent:  LLM → [Tool1, ..., Tool15]  ← wird unzuverlässig
+
+Multi-Agent:   Orchestrator-LLM
+                  ├─ Agent A → [Tool1, Tool2]
+                  ├─ Agent B → [Tool3, Tool4]
+                  └─ Agent C → [Tool5, Tool6]</div>
+          <p><strong>Single</strong>: Einfach, aber &gt;10 Tools problematisch.<br>
+          <strong>Multi</strong>: Jeder Agent hat nur 2-3 Tools, zuverl&auml;ssiger.</p>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist Human-in-the-Loop?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Der Agent pausiert und wartet auf menschliche Best&auml;tigung:</p>
+          <ul>
+            <li>Vor Bestellung: &quot;Soll ich abschicken?&quot;</li>
+            <li>Bei Unsicherheit: &quot;Meinen Sie X oder Y?&quot;</li>
+            <li>Bei kritischen Aktionen: &quot;Termin am 27.03. buchen?&quot;</li>
+          </ul>
+          <p>In Kidstorte: Das Adressformular und die Best&auml;tigungsvorschau sind Human-in-the-Loop.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7. Generative AI ── -->
+    <div class="section" id="sec-genai-g">
+      <div class="section-title"><span class="num">7</span> Generative AI</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Generative AI vs. klassisches ML?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th></th><th>Klassisches ML</th><th>Generative AI</th></tr>
+            <tr><td>Aufgabe</td><td>Klassifikation, Regression</td><td>Neue Inhalte erstellen</td></tr>
+            <tr><td>Output</td><td>Label / Zahl</td><td>Text, Bild, Code, Musik</td></tr>
+            <tr><td>Beispiel</td><td>&quot;Spam oder nicht?&quot;</td><td>&quot;Schreibe eine Beschreibung&quot;</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist Prompt Engineering?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ol>
+            <li><strong>Zero-Shot</strong>: Nur Anweisung, keine Beispiele</li>
+            <li><strong>Few-Shot</strong>: 2-5 Beispiele im Prompt</li>
+            <li><strong>Chain-of-Thought</strong>: &quot;Denke Schritt f&uuml;r Schritt&quot;</li>
+            <li><strong>Role-Playing</strong>: &quot;Du bist ein erfahrener Tortenberater...&quot;</li>
+            <li><strong>Output-Format</strong>: &quot;Antworte als JSON: {intent, extracted}&quot;</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist Grounding?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Sicherstellen, dass LLM-Antworten auf <strong>echten Fakten</strong> basieren:</p>
+          <ul>
+            <li><strong>RAG</strong>: Fakten aus Datenbank</li>
+            <li><strong>Zitate</strong>: LLM muss Quellen angeben</li>
+            <li><strong>Faktencheck</strong>: Zweites LLM pr&uuml;ft die Antwort</li>
+            <li><strong>Structured Output</strong>: Nur erlaubte Werte</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Embedding-Modelle vs. generative Modelle?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <table class="qa-table">
+            <tr><th></th><th>Embedding-Modelle</th><th>Generative Modelle</th></tr>
+            <tr><td>Aufgabe</td><td>Text → Vektor</td><td>Text generieren</td></tr>
+            <tr><td>Output</td><td>Zahlenvektor (1536 Dim.)</td><td>Neuer Text</td></tr>
+            <tr><td>Kosten</td><td>$0.02/1M Tokens</td><td>$0.15-5/1M Tokens</td></tr>
+            <tr><td>Einsatz</td><td>Suche, &Auml;hnlichkeit</td><td>Chat, Zusammenfassung</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist Multimodalit&auml;t?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Ein Modell, das <strong>mehrere Datentypen</strong> versteht &mdash; Text, Bilder, Audio, Video. In Kidstorte:</p>
+          <ul>
+            <li><strong>Text → Text</strong>: Chat-Antworten</li>
+            <li><strong>Text → Bild</strong>: Tortenvorschau generieren</li>
+            <li><strong>Bild → Text</strong>: Potenziell Kundenbild analysieren</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist ein Guardrail?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ul>
+            <li><strong>Input Guardrail</strong>: Pr&uuml;ft Nutzereingabe (Jailbreak, Spam, toxisch)</li>
+            <li><strong>Output Guardrail</strong>: Pr&uuml;ft LLM-Antwort (keine pers&ouml;nlichen Daten, keine falschen Versprechen)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist Streaming und warum ist es wichtig?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Antwort wird <strong>Token f&uuml;r Token</strong> gestreamt statt auf einmal. Der Nutzer sieht sofort erste W&ouml;rter, statt 3-5 Sekunden zu warten. Technisch: <strong>Server-Sent Events (SSE)</strong>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 8. Evaluations & Testing ── -->
+    <div class="section" id="sec-eval-g">
+      <div class="section-title"><span class="num">8</span> Evaluations &amp; Testing</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Wie testet man LLM-Anwendungen?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ol>
+            <li><strong>Unit Tests</strong>: Einzelne Nodes testen</li>
+            <li><strong>Integration Tests</strong>: Ganzer Graph-Flow</li>
+            <li><strong>LLM Evaluations</strong>: Datens&auml;tze mit erwarteten Ergebnissen</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Was ist LLM-as-a-Judge?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <p>Ein (st&auml;rkeres) LLM bewertet die Outputs eines anderen LLMs:</p>
+          <div class="code-block">Frage:    "Wie viel kostet eine Schokoladentorte?"
+Antwort:  "Eine Schokoladentorte kostet 45€ in Größe M."
+Judge:    "Bewerte 1-5: Korrektheit, Vollständigkeit, Höflichkeit"
+Ergebnis: 4/5</div>
+          <p><strong>Vorteil</strong>: Skaliert besser als menschliche Bewertung.<br>
+          <strong>Nachteil</strong>: Der Judge kann auch falsch liegen.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 9. Architektur ── -->
+    <div class="section" id="sec-arch-g">
+      <div class="section-title"><span class="num">9</span> Architektur-Fragen</div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>RAG-System f&uuml;r 1 Million Dokumente &mdash; wie aufbauen?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ol>
+            <li><strong>Chunking</strong>: Semantic Chunking (nicht fixed-size)</li>
+            <li><strong>Vektordatenbank</strong>: Pinecone oder Qdrant (skalierbar)</li>
+            <li><strong>Hybrid Search</strong>: Vektor + BM25 Keyword kombiniert</li>
+            <li><strong>Re-Ranking</strong>: Cross-Encoder f&uuml;r Top-50 → Top-5</li>
+            <li><strong>Caching</strong>: H&auml;ufige Queries cachen</li>
+            <li><strong>Metadata Filtering</strong>: Vor Vektorsuche filtern</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>LLM-Kosten um 80% senken &mdash; wie?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ol>
+            <li><strong>Kleineres Modell</strong>: GPT-4 → GPT-4o-mini (33x g&uuml;nstiger)</li>
+            <li><strong>Caching</strong>: Gleiche Fragen nicht doppelt berechnen</li>
+            <li><strong>Prompts k&uuml;rzen</strong>: Unn&ouml;tige Beispiele entfernen</li>
+            <li><strong>Calls reduzieren</strong>: Classify + Extract in einem Call</li>
+            <li><strong>Kontext beschr&auml;nken</strong>: Nur relevante Nachrichten</li>
+            <li><strong>Open-Source-Modelle</strong>: Llama 3, Mistral f&uuml;r einfache Tasks</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-question"><span class="q-icon">F</span>Sicherheitsrisiken bei LLM-Anwendungen?<span class="toggle-icon">&#9662;</span></div>
+        <div class="qa-answer">
+          <ol>
+            <li><strong>Prompt Injection</strong>: Nutzer manipuliert Systemverhalten</li>
+            <li><strong>Data Leakage</strong>: Sensible Trainingsdaten preisgegeben</li>
+            <li><strong>Halluzinationen</strong>: Falsche Fakten als wahr dargestellt</li>
+            <li><strong>Jailbreaking</strong>: Sicherheitsregeln umgehen</li>
+            <li><strong>PII-Exposure</strong>: Pers&ouml;nliche Daten in Logs</li>
+          </ol>
+          <p><strong>Gegenma&szlig;nahmen</strong>: Guardrails, Input-Sanitization, Output-Filtering, RAG, Log-Anonymisierung.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════ JavaScript ════════════════ -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const allQA = document.querySelectorAll('.qa');
+  const searchBox = document.getElementById('searchBox');
+  const totalQ = document.getElementById('totalQ');
+  const openQ = document.getElementById('openQ');
+  const partProject = document.getElementById('partProject');
+  const partGeneral = document.getElementById('partGeneral');
+  const progressFill = document.getElementById('progressFill');
+
+  // Count questions
+  const projectQs = document.querySelectorAll('#part-project .qa').length;
+  const generalQs = document.querySelectorAll('#part-general .qa').length;
+  totalQ.textContent = allQA.length;
+  partProject.textContent = projectQs;
+  partGeneral.textContent = generalQs;
+
+  function updateStats() {
+    const opened = document.querySelectorAll('.qa.open').length;
+    openQ.textContent = opened;
+    const pct = allQA.length > 0 ? (opened / allQA.length * 100) : 0;
+    progressFill.style.width = pct + '%';
+  }
+
+  // Toggle Q&A
+  allQA.forEach(qa => {
+    qa.querySelector('.qa-question').addEventListener('click', () => {
+      qa.classList.toggle('open');
+      updateStats();
+    });
+  });
+
+  // Expand / Collapse All
+  document.getElementById('btnExpandAll').addEventListener('click', () => {
+    allQA.forEach(qa => {
+      if (qa.style.display !== 'none') qa.classList.add('open');
+    });
+    updateStats();
+  });
+  document.getElementById('btnCollapseAll').addEventListener('click', () => {
+    allQA.forEach(qa => qa.classList.remove('open'));
+    updateStats();
+  });
+
+  // Search
+  searchBox.addEventListener('input', () => {
+    const q = searchBox.value.toLowerCase().trim();
+    allQA.forEach(qa => {
+      const text = qa.textContent.toLowerCase();
+      qa.style.display = (!q || text.includes(q)) ? '' : 'none';
+    });
+    // Also hide sections with no visible QAs
+    document.querySelectorAll('.section').forEach(sec => {
+      const visible = sec.querySelectorAll('.qa:not([style*="display: none"])').length;
+      sec.style.display = (!q || visible > 0) ? '' : 'none';
+    });
+    // Update total visible
+    const visibleCount = document.querySelectorAll('.qa:not([style*="display: none"])').length;
+    totalQ.textContent = q ? visibleCount + ' / ' + allQA.length : allQA.length;
+  });
+
+  // Nav tabs scroll
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.getElementById(tab.dataset.target);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  // Update active nav on scroll
+  const sections = document.querySelectorAll('[id^="sec-"], [id^="part-"]');
+  const navTabs = document.querySelectorAll('.nav-tab');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      if (sec.getBoundingClientRect().top < 120) current = sec.id;
+    });
+    if (current) {
+      navTabs.forEach(t => {
+        t.classList.toggle('active', t.dataset.target === current);
+      });
+    }
+  }, { passive: true });
+
+  updateStats();
+});
+</script>
+
+</body>
+</html>

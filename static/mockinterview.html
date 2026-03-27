@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockinterview — Kidstorte &amp; Generative AI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    :root {
+      --bg: #f5f7fa; --card: #ffffff; --primary: #5b8c7b; --primary-dark: #3d6b5a;
+      --primary-light: #e8f0ec; --accent: #d4956a; --text: #2c3e50; --text-light: #64748b;
+      --border: #e2e8f0; --code-bg: #1e293b; --code-text: #e2e8f0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08); --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg); color:var(--text); line-height:1.7; font-size:15px; }
+
+    .hero { background:linear-gradient(135deg,#5b8c7b 0%,#2d5a4a 50%,#1a3a2e 100%); color:#fff; padding:50px 24px 40px; text-align:center; }
+    .hero h1 { font-size:2.2em; font-weight:700; margin-bottom:8px; }
+    .hero .subtitle { font-size:1.05em; opacity:.85; font-weight:300; }
+    .hero .badges { margin-top:16px; display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+    .hero .badge { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25); padding:4px 12px; border-radius:18px; font-size:.78em; font-weight:500; }
+
+    .nav { background:var(--card); border-bottom:1px solid var(--border); padding:0 24px; position:sticky; top:0; z-index:100; box-shadow:var(--shadow); }
+    .nav-inner { max-width:960px; margin:0 auto; display:flex; gap:0; overflow-x:auto; scrollbar-width:none; }
+    .nav-inner::-webkit-scrollbar { display:none; }
+    .nav-tab { padding:12px 14px; font-size:.82em; font-weight:500; color:var(--text-light); text-decoration:none; white-space:nowrap; border-bottom:2px solid transparent; transition:.2s; cursor:pointer; }
+    .nav-tab:hover { color:var(--primary); }
+    .nav-tab.active { color:var(--primary-dark); border-bottom-color:var(--primary); }
+
+    .container { max-width:880px; margin:0 auto; padding:24px 20px 80px; }
+
+    .part-header { color:#fff; padding:26px 24px; border-radius:14px; margin:36px 0 20px; box-shadow:var(--shadow-lg); }
+    .part-header.green { background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%); }
+    .part-header.orange { background:linear-gradient(135deg,#d4956a 0%,#b87a4e 100%); }
+    .part-header .label { font-size:.75em; text-transform:uppercase; letter-spacing:2px; opacity:.7; margin-bottom:4px; }
+    .part-header h2 { font-size:1.5em; font-weight:700; }
+    .part-header p { margin-top:6px; opacity:.85; font-size:.92em; }
+
+    .section { margin-bottom:32px; scroll-margin-top:65px; }
+    .section-title { display:flex; align-items:center; gap:10px; font-size:1.15em; font-weight:700; color:var(--primary-dark); margin-bottom:14px; padding-bottom:8px; border-bottom:2px solid var(--primary-light); }
+    .section-title .num { background:var(--primary); color:#fff; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.78em; font-weight:700; flex-shrink:0; }
+
+    .qa { background:var(--card); border-radius:10px; margin-bottom:12px; box-shadow:var(--shadow); overflow:hidden; border:1px solid var(--border); transition:.2s; }
+    .qa:hover { box-shadow:var(--shadow-lg); }
+    .qa-q { background:linear-gradient(135deg,#5b8c7b 0%,#3d6b5a 100%); color:#fff; padding:14px 18px; font-weight:600; font-size:.92em; cursor:pointer; display:flex; align-items:center; gap:10px; user-select:none; }
+    .qa-q:hover { opacity:.92; }
+    .qa-q .qi { background:rgba(255,255,255,.2); min-width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.82em; flex-shrink:0; }
+    .qa-q .arrow { margin-left:auto; font-size:1.1em; transition:transform .3s; flex-shrink:0; }
+    .qa.open .qa-q .arrow { transform:rotate(180deg); }
+    .qa-a { padding:0 18px; max-height:0; overflow:hidden; transition:max-height .4s ease,padding .3s ease; }
+    .qa.open .qa-a { padding:16px 18px; max-height:5000px; }
+    .qa-a p { margin-bottom:8px; }
+    .qa-a strong { color:var(--primary-dark); }
+    .qa-a ul,.qa-a ol { padding-left:20px; margin:6px 0; }
+    .qa-a li { margin-bottom:4px; }
+
+    .code { background:var(--code-bg); color:var(--code-text); border-radius:7px; padding:14px; font-family:'JetBrains Mono','Fira Code',monospace; font-size:.8em; line-height:1.6; overflow-x:auto; margin:10px 0; white-space:pre; }
+    .ci { background:var(--primary-light); color:var(--primary-dark); padding:2px 6px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:.86em; }
+    .tip { background:#fef9e7; border-left:4px solid #f1c40f; padding:10px 14px; border-radius:0 7px 7px 0; margin:10px 0; font-size:.9em; }
+    .warn { background:#fdeaea; border-left:4px solid #e74c3c; padding:10px 14px; border-radius:0 7px 7px 0; margin:10px 0; font-size:.9em; }
+
+    table.t { width:100%; border-collapse:collapse; margin:10px 0; font-size:.88em; }
+    table.t th { background:var(--primary-light); color:var(--primary-dark); padding:8px 10px; text-align:left; font-weight:600; border:1px solid var(--border); }
+    table.t td { padding:7px 10px; border:1px solid var(--border); }
+    table.t tr:nth-child(even) { background:#f8fafc; }
+
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin:20px 0; }
+    .stat { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px; text-align:center; box-shadow:var(--shadow); }
+    .stat .n { font-size:1.7em; font-weight:700; color:var(--primary); }
+    .stat .l { font-size:.78em; color:var(--text-light); }
+
+    .controls { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+    .btn { background:var(--card); border:1px solid var(--border); padding:7px 14px; border-radius:7px; font-size:.83em; font-weight:500; cursor:pointer; transition:.2s; color:var(--text); }
+    .btn:hover { border-color:var(--primary); color:var(--primary); }
+
+    .search { width:100%; padding:11px 16px; border:2px solid var(--border); border-radius:10px; font-size:.93em; font-family:inherit; outline:none; transition:.2s; margin-bottom:16px; background:var(--card); }
+    .search:focus { border-color:var(--primary); }
+
+    .progress { background:var(--border); height:4px; border-radius:2px; margin-bottom:16px; overflow:hidden; }
+    .progress-fill { background:var(--primary); height:100%; border-radius:2px; transition:width .3s; width:0; }
+
+    @media print { .nav,.controls,.search,.hero{display:none} .qa-a{max-height:none!important;padding:16px 18px!important} .qa{break-inside:avoid} }
+    @media(max-width:640px) { .hero h1{font-size:1.5em} .container{padding:14px 10px 60px} .stats{grid-template-columns:repeat(2,1fr)} }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Mockinterview-Vorbereitung</h1>
+  <div class="subtitle">Kidstorte &mdash; KI-Bestellassistent &amp; Generative AI Allgemeinwissen</div>
+  <div class="badges">
+    <span class="badge">LLM</span><span class="badge">RAG</span><span class="badge">LangChain</span>
+    <span class="badge">LangGraph</span><span class="badge">LangSmith</span><span class="badge">ChromaDB</span>
+    <span class="badge">AI Agents</span><span class="badge">Prompt Engineering</span><span class="badge">Transformer</span>
+  </div>
+</div>
+
+<div class="nav"><div class="nav-inner">
+  <a class="nav-tab active" data-t="part1">Projekt</a>
+  <a class="nav-tab" data-t="part2">Allgemeinwissen</a>
+  <a class="nav-tab" data-t="s-llm">LLM</a>
+  <a class="nav-tab" data-t="s-transformer">Transformer</a>
+  <a class="nav-tab" data-t="s-rag">RAG</a>
+  <a class="nav-tab" data-t="s-lc">LangChain</a>
+  <a class="nav-tab" data-t="s-lg">LangGraph</a>
+  <a class="nav-tab" data-t="s-ls">LangSmith</a>
+  <a class="nav-tab" data-t="s-agents">Agenten</a>
+  <a class="nav-tab" data-t="s-genai">Gen AI</a>
+</div></div>
+
+<div class="container">
+  <input type="text" class="search" placeholder="Fragen durchsuchen... (z.B. Transformer, Embedding, Kosten)" id="search">
+  <div class="stats">
+    <div class="stat"><div class="n" id="sTotal">0</div><div class="l">Fragen gesamt</div></div>
+    <div class="stat"><div class="n" id="sOpen">0</div><div class="l">Ge&ouml;ffnet</div></div>
+    <div class="stat"><div class="n" id="sP1">0</div><div class="l">Projekt</div></div>
+    <div class="stat"><div class="n" id="sP2">0</div><div class="l">Allgemein</div></div>
+  </div>
+  <div class="controls">
+    <button class="btn" id="btnOpen">Alle &ouml;ffnen</button>
+    <button class="btn" id="btnClose">Alle schlie&szlig;en</button>
+    <button class="btn" onclick="window.print()">Drucken / PDF</button>
+  </div>
+  <div class="progress"><div class="progress-fill" id="pf"></div></div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--              TEIL 1: PROJEKT                   -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="part1">
+<div class="part-header green"><div class="label">Teil 1</div><h2>Kidstorte &mdash; Projekt-Fragen</h2><p>Alles &uuml;ber dein Projekt: Architektur, RAG, Graph, Kosten, Bildgenerierung</p></div>
+
+<!-- RAG Projekt -->
+<div class="section" id="sp-rag">
+<div class="section-title"><span class="num">1</span>RAG im Projekt</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist RAG und warum nutzen Sie es?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>RAG heisst <strong>Retrieval Augmented Generation</strong>. Die Idee ist einfach: Statt dem KI-Modell alle Infos beizubringen, holen wir die passenden Infos aus einer Datenbank und geben sie dem Modell als &quot;Spickzettel&quot; mit.</p>
+<p><strong>Beispiel aus Kidstorte:</strong> Wenn ein Kunde fragt &quot;Was kostet eine Schokoladentorte?&quot; &mdash; dann sucht das System in unserer Wissensdatenbank nach Preisen, findet &quot;Schokoladentorte M: 45&euro;, L: 55&euro;&quot; und gibt das dem LLM. So bekommt der Kunde den <strong>echten Preis</strong> statt einer ausgedachten Zahl.</p>
+<div class="tip">Einfach merken: RAG = &quot;Nachschlagen statt Raten&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie funktioniert der RAG-Ablauf technisch?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Drei Schritte:</p>
+<ol>
+<li><strong>Vorbereitung (einmalig)</strong>: Unsere Produktdokumente (Preise, Allergien, Infos) werden in kleine St&uuml;cke (&quot;Chunks&quot;) zerlegt. Jeder Chunk wird in einen Zahlenvektor umgewandelt (Embedding) und in ChromaDB gespeichert.</li>
+<li><strong>Suche (bei jeder Frage)</strong>: Die Kundenfrage wird auch in einen Vektor umgewandelt. Dann suchen wir die 5 &auml;hnlichsten Chunks per Cosine Similarity.</li>
+<li><strong>Antwort</strong>: Die gefundenen Chunks werden dem LLM als Kontext mitgegeben. Das LLM antwortet basierend auf diesen echten Daten.</li>
+</ol>
+<div class="code">Kundenfrage → Embedding → Vektorsuche in ChromaDB → Top-5 Chunks → LLM + Kontext → Antwort</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Welches Embedding-Modell und warum?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><span class="ci">text-embedding-3-small</span> von OpenAI. Es wandelt Text in einen Vektor mit 1536 Dimensionen um.</p>
+<p><strong>Warum dieses?</strong> Es kostet nur <strong>$0.02 pro 1 Million Tokens</strong> &mdash; also fast nichts. F&uuml;r unsere ~100 Produktdokumente ist es mehr als ausreichend. Gr&ouml;&szlig;ere Modelle wie <span class="ci">text-embedding-3-large</span> w&auml;ren unn&ouml;tiger Overhead.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wann wird RAG ausgel&ouml;st und wann nicht?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>RAG wird NUR</strong> bei zwei Intents aktiviert:</p>
+<ul>
+<li><span class="ci">price</span> &mdash; &quot;Was kostet meine Torte?&quot;</li>
+<li><span class="ci">info</span> &mdash; &quot;Habt ihr glutenfreie Optionen?&quot;</li>
+</ul>
+<p>Bei <span class="ci">order</span>, <span class="ci">change</span>, <span class="ci">greeting</span> wird <strong>kein RAG</strong> gemacht. Warum? Weil wir dort kein Produktwissen brauchen &mdash; nur die Bestellinfos des Kunden. Das spart Embedding-Kosten bei jeder Nachricht.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Warum ChromaDB und nicht Pinecone oder FAISS?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th>Datenbank</th><th>Vorteil</th><th>Nachteil</th><th>F&uuml;r uns?</th></tr>
+<tr><td><strong>ChromaDB</strong></td><td>Kostenlos, lokal, einfach</td><td>Nicht f&uuml;r Millionen Docs</td><td>Perfekt &mdash; wir haben ~100 Docs</td></tr>
+<tr><td>Pinecone</td><td>Skalierbar, Cloud</td><td>Kostenpflichtig, Vendor Lock-in</td><td>Overkill</td></tr>
+<tr><td>FAISS</td><td>Sehr schnell</td><td>Kein eingebautes Speichern</td><td>Zu low-level</td></tr>
+</table>
+<p><strong>Bonus:</strong> Wir nutzen ChromaDB f&uuml;r <strong>zwei Zwecke</strong>: Produktwissen (Collection <span class="ci">cake_chunks</span>) UND Session-Speicherung (Collection <span class="ci">sessions</span>). Eine Technologie, zwei Aufgaben.</p>
+</div></div>
+</div>
+
+<!-- Graph Projekt -->
+<div class="section" id="sp-graph">
+<div class="section-title"><span class="num">2</span>LangGraph / State Machine</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Nutzen Sie LangGraph als Library?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>Nein.</strong> Wir haben einen <strong>eigenen Graphen</strong> gebaut, der nach dem gleichen Prinzip funktioniert. In <span class="ci">graph.py</span> (~300 Zeilen) steuern wir den kompletten Ablauf.</p>
+<p><strong>Warum selbst gebaut?</strong></p>
+<ul>
+<li>Volle Kontrolle &mdash; wir verstehen jede Zeile</li>
+<li>Keine Library-Abh&auml;ngigkeit &mdash; kein Risiko durch Breaking Changes</li>
+<li>Einfacher zu debuggen</li>
+</ul>
+<p>Das Prinzip ist aber identisch: <strong>Stateless Nodes</strong>, die einen State-Dict empfangen, verarbeiten und zur&uuml;ckgeben.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie sieht der Bestellablauf aus?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<div class="code">Kunde schreibt etwas
+  → Guardrail (Sicherheitscheck)
+  → classify_and_extract (Was will der Kunde? + Daten extrahieren)
+  → ROUTING je nach Intent:
+      greeting  → Begr&uuml;&szlig;ung
+      order     → Felder pr&uuml;fen → n&auml;chste Frage stellen ODER Zusammenfassung
+      price     → Wissensdatenbank durchsuchen → Preis berechnen
+      image     → Tortenbild generieren
+      info      → Wissensdatenbank → Frage beantworten
+      change    → Bestellung &auml;ndern
+      finalize  → Adressformular zeigen
+      offtopic  → H&ouml;flich zur&uuml;cklenken</div>
+<p>Das Besondere: Bei <span class="ci">order</span> gibt es eine <strong>Schleife</strong> &mdash; der Bot fragt so lange nach fehlenden Infos, bis alle 10 Pflichtfelder ausgef&uuml;llt sind.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist der AgentState?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein Python-Dictionary, das <strong>alle Informationen</strong> enth&auml;lt, die durch den Graphen flie&szlig;en. Wie ein &quot;Klemmbrett&quot;, das jeder Node lesen und beschreiben kann:</p>
+<ul>
+<li><strong>user_input</strong>: Was der Kunde geschrieben hat</li>
+<li><strong>messages</strong>: Der gesamte Chatverlauf</li>
+<li><strong>intent</strong>: Was der Kunde will (order, price, info...)</li>
+<li><strong>order_info</strong>: Die Bestelldetails (Geschmack, Form, Schichten...)</li>
+<li><strong>question_todo</strong>: Welche Felder schon gefragt/beantwortet sind</li>
+<li><strong>missing_fields</strong>: Was noch fehlt</li>
+<li><strong>order_complete</strong>: Sind alle Felder voll?</li>
+<li><strong>context</strong>: RAG-Ergebnisse (Produktinfos)</li>
+<li><strong>image_url</strong>: Generiertes Tortenbild</li>
+</ul>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Erkl&auml;ren Sie das question_todo-System.<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Das ist unser Fortschrittstracker. Jedes Pflichtfeld hat einen Status:</p>
+<div class="code">pending  → Bot hat noch nicht danach gefragt
+asked    → Bot hat gefragt, Kunde hat noch nicht geantwortet
+answered → Kunde hat geantwortet, Feld ist gef&uuml;llt</div>
+<p><strong>Warum?</strong> Damit der Bot nie zweimal die gleiche Frage stellt. Wenn <span class="ci">geschmack: "answered"</span> ist, fragt er nicht nochmal &quot;Welchen Geschmack m&ouml;chten Sie?&quot;</p>
+<p><strong>Die 10 Pflichtfelder:</strong> Anlass, G&auml;ste, Geschmack, Form, Schichten, F&uuml;llung, Dekoration, Allergien, Beschriftung, Abholung</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Warum sind die Nodes &quot;stateless&quot;?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>Stateless</strong> heisst: Jeder Node speichert nichts intern. Er bekommt den kompletten State als Input, macht seine Arbeit, und gibt den ge&auml;nderten State zur&uuml;ck.</p>
+<p><strong>Vorteile:</strong></p>
+<ul>
+<li><strong>Testbar</strong>: Man kann einen Node isoliert testen mit einem k&uuml;nstlichen State</li>
+<li><strong>Debuggbar</strong>: Wenn etwas schiefgeht, kann man den State kopieren und den Fehler nachstellen</li>
+<li><strong>Skalierbar</strong>: Theoretisch k&ouml;nnte man mehrere Server betreiben, weil der State nicht im Speicher h&auml;ngt</li>
+</ul>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Welche Nodes gibt es und was machen sie?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th>Node</th><th>Was er macht</th><th>LLM-Call?</th></tr>
+<tr><td><strong>guardrail</strong></td><td>Spam &amp; Jailbreak blockieren</td><td>Ja (1x)</td></tr>
+<tr><td><strong>classify_and_extract</strong></td><td>Intent erkennen + Bestelldaten extrahieren</td><td>Ja (1x)</td></tr>
+<tr><td><strong>greet</strong></td><td>Neuen Kunden begr&uuml;&szlig;en</td><td>Nein</td></tr>
+<tr><td><strong>check_complete</strong></td><td>Pr&uuml;fen: Sind alle Felder voll?</td><td>Nein (reine Logik)</td></tr>
+<tr><td><strong>ask_next</strong></td><td>N&auml;chste Frage generieren</td><td>Ja (1x)</td></tr>
+<tr><td><strong>summarize_order</strong></td><td>Bestellung zusammenfassen</td><td>Nein</td></tr>
+<tr><td><strong>retrieve_docs</strong></td><td>RAG: Wissensdatenbank durchsuchen</td><td>Embedding (1x)</td></tr>
+<tr><td><strong>calculate_price</strong></td><td>Preis als HTML-Tabelle berechnen</td><td>Ja (1x)</td></tr>
+<tr><td><strong>answer_question</strong></td><td>Allgemeine Frage beantworten</td><td>Ja (1x)</td></tr>
+<tr><td><strong>generate_image</strong></td><td>Tortenbild erstellen</td><td>Ja (Text-Prompt + Bild-API)</td></tr>
+<tr><td><strong>update_order</strong></td><td>&Auml;nderungsw&uuml;nsche verarbeiten</td><td>Ja (1x)</td></tr>
+<tr><td><strong>check_calendar</strong></td><td>Lieferdatum pr&uuml;fen</td><td>Nein (API/DB-Check)</td></tr>
+<tr><td><strong>finalize_order</strong></td><td>Adressformular anzeigen</td><td>Nein</td></tr>
+<tr><td><strong>redirect</strong></td><td>Off-topic h&ouml;flich ablenken</td><td>Nein</td></tr>
+</table>
+</div></div>
+</div>
+
+<!-- LLM Strategie Projekt -->
+<div class="section" id="sp-llm">
+<div class="section-title"><span class="num">3</span>LLM-Strategie</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Welches Modell nutzen Sie und warum genau das?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><span class="ci">gpt-4o-mini</span> f&uuml;r <strong>alle Aufgaben</strong>.</p>
+<p><strong>Warum?</strong> Es ist <strong>33x g&uuml;nstiger</strong> als GPT-4o ($0.15 vs $5.00 pro 1M Input-Tokens). F&uuml;r unsere Aufgaben &mdash; Intent erkennen, Felder extrahieren, Fragen generieren &mdash; brauchen wir kein teures Top-Modell. gpt-4o-mini ist schlau genug.</p>
+<p><strong>Kosten pro Nachricht:</strong> ca. $0.0003 (weniger als ein Hundertstel Cent)</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie viele LLM-Calls gibt es pro Nachricht?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Typisch <strong>nur 2 Calls</strong>:</p>
+<ol>
+<li><span class="ci">classify_and_extract</span> &mdash; erkennt Intent UND extrahiert Daten in <strong>einem</strong> Call</li>
+<li><span class="ci">ask_next</span> &mdash; generiert die n&auml;chste Frage</li>
+</ol>
+<p><strong>Das war eine wichtige Optimierung:</strong> Fr&uuml;her waren das 2 getrennte Calls (Intent + Extraktion). Durch die Kombination sparen wir <strong>50% LLM-Kosten</strong> pro Nachricht.</p>
+<div class="tip">Merken: &quot;Wir haben Intent-Klassifikation und Feld-Extraktion in einem einzigen LLM-Call kombiniert, um Kosten zu halbieren.&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie steuern Sie die Temperature?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Temperature bestimmt, wie &quot;kreativ&quot; das LLM antwortet:</p>
+<table class="t">
+<tr><th>Temperature</th><th>Wo eingesetzt</th><th>Warum</th></tr>
+<tr><td><strong>0</strong></td><td>Intent-Erkennung, JSON-Extraktion, Preis</td><td>Immer gleiche, zuverl&auml;ssige Antwort &mdash; kein Raten</td></tr>
+<tr><td><strong>0.3</strong></td><td>Info-Antworten</td><td>Leichte Variation, aber noch faktisch</td></tr>
+<tr><td><strong>0.6</strong></td><td>Fragen an den Kunden</td><td>Nat&uuml;rlich, freundlich, nicht roboterhaft</td></tr>
+</table>
+<div class="tip">Faustregel: Je wichtiger Genauigkeit, desto niedriger die Temperature.</div>
+</div></div>
+</div>
+
+<!-- Prompt Engineering Projekt -->
+<div class="section" id="sp-prompt">
+<div class="section-title"><span class="num">4</span>Prompt Engineering</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wo werden die Prompts verwaltet?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>In <span class="ci">prompts_config.yaml</span> &mdash; einer YAML-Datei. Der Clou: Sie ist <strong>hot-reloadable</strong>. Das heisst, der Admin kann Prompts live bearbeiten, ohne den Server neu zu starten. Bei jedem Zugriff pr&uuml;ft der Code: &quot;Hat sich die Datei ge&auml;ndert? Wenn ja, neu laden.&quot;</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie verhindern Sie, dass das LLM Sachen erfindet?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Vier Schutzma&szlig;nahmen gegen <strong>Halluzinationen</strong>:</p>
+<ol>
+<li><strong>Klare Verbote im Prompt</strong>: &quot;ERFINDE NIEMALS Werte die der Kunde nicht gesagt hat&quot;</li>
+<li><strong>RAG f&uuml;r Fakten</strong>: Preise kommen aus der Datenbank, nicht aus dem Modell</li>
+<li><strong>JSON-Format erzwingen</strong>: Das LLM gibt nur vorgegebene Felder zur&uuml;ck, keinen Freitext</li>
+<li><strong>JSON-Repair</strong>: Wenn das JSON kaputt ist, schicken wir es nochmal ans LLM: &quot;Bitte korrigiere dieses JSON&quot;</li>
+</ol>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie gehen Sie mit mehrdeutigen Eingaben um?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Der Prompt hat klare Regeln f&uuml;r Sonderf&auml;lle:</p>
+<ul>
+<li><strong>&quot;ja&quot;</strong> → Schaut auf die letzte Bot-Frage. Wenn Bot nach Beschriftung fragte → Intent = order</li>
+<li><strong>&quot;3&quot;</strong> → Wenn Bot nach Schichten fragte → <span class="ci">{schichten: "3"}</span></li>
+<li><strong>&quot;Ronaldo&quot;</strong> → Kein Off-topic! Das ist eine Dekoration f&uuml;r die Torte → Intent = order</li>
+<li><strong>Tippfehler</strong> → &quot;Schokolde&quot; wird zu &quot;Schokolade&quot; korrigiert. Aber Namen wie &quot;Aron&quot; bleiben wie sie sind</li>
+</ul>
+</div></div>
+</div>
+
+<!-- Session Projekt -->
+<div class="section" id="sp-session">
+<div class="section-title"><span class="num">5</span>Session Management</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie behalten Sie den Bestellstand zwischen Nachrichten?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Nach jeder Nachricht wird der <strong>komplette State als JSON</strong> in ChromaDB gespeichert. Bei der n&auml;chsten Nachricht wird er wieder geladen.</p>
+<p><strong>Der Ablauf:</strong></p>
+<ol>
+<li>Kunde schickt Nachricht</li>
+<li>Server holt Session-ID aus dem Cookie</li>
+<li>Laden: <span class="ci">session_mgr.load_session(session_id)</span> &rarr; State aus ChromaDB</li>
+<li>Graph durchlaufen</li>
+<li>Speichern: <span class="ci">session_mgr.save_session(session_id, state)</span> &rarr; State in ChromaDB</li>
+</ol>
+<p><strong>Cookie:</strong> <span class="ci">cake_session_id</span>, HTTPOnly (nicht per JavaScript lesbar), 24 Stunden g&uuml;ltig.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was passiert mit alten Sessions?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><span class="ci">cleanup_old_sessions()</span> l&ouml;scht automatisch Sessions, die &auml;lter als 24 Stunden sind. Au&szlig;erdem beschr&auml;nken wir den Chatverlauf auf <strong>max 20 Nachrichten</strong> &mdash; &auml;ltere werden gel&ouml;scht, um Kosten zu sparen (weniger Tokens an das LLM schicken).</p>
+</div></div>
+</div>
+
+<!-- Bild Projekt -->
+<div class="section" id="sp-bild">
+<div class="section-title"><span class="num">6</span>Bildgenerierung</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie erstellen Sie die Tortenvorschau-Bilder?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Eine <strong>Provider-Chain</strong> mit Fallback:</p>
+<div class="code">1. OpenAI gpt-image-1 (beste Qualit&auml;t)
+   ├─ Erfolg → Bild speichern, fertig
+   ├─ Moderation-Block → Prompt bereinigen, Fallback
+   └─ Rate-Limit → 15s warten, retry
+
+2. HuggingFace FLUX.1-schnell (Fallback)
+   └─ HuggingFace SDXL (zweiter Fallback)</div>
+<p>Der Bild-Prompt wird vom LLM generiert: Es bekommt die Bestelldetails (Form, Farbe, Geschmack, Dekoration) und baut daraus eine detaillierte Bildbeschreibung.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie l&ouml;sen Sie das Problem mit Personennamen?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>OpenAI blockiert Bilder von echten Personen. Unsere L&ouml;sung: <strong>Namen in Figur-Beschreibungen umwandeln</strong>:</p>
+<ul>
+<li>&quot;Ronaldo&quot; &rarr; &quot;famous soccer player <strong>figurine</strong> made of fondant&quot;</li>
+<li>&quot;Elsa&quot; &rarr; &quot;ice queen princess <strong>figurine</strong>&quot;</li>
+</ul>
+<p>Das Wort <strong>&quot;figurine&quot;</strong> ist der Schl&uuml;ssel &mdash; es signalisiert dem Modell: Das ist eine Tortenfigur, keine echte Person.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Gibt es ein Referenzbild-System?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ja! Wir haben einen <span class="ci">Bilder/</span>-Ordner mit fr&uuml;heren Torten. Die Funktion <span class="ci">_find_best_reference()</span> sucht automatisch ein passendes Referenzbild per <strong>Dateinamen-Matching</strong>:</p>
+<ul>
+<li>+2 Punkte f&uuml;r passende Figur (z.B. &quot;elsa&quot; im Dateinamen)</li>
+<li>+1 f&uuml;r passende Etagenzahl (z.B. &quot;3_etagen&quot;)</li>
+<li>+1 f&uuml;r passende Farbe</li>
+</ul>
+<p>Ab Score &ge;2 wird das Referenzbild dem Kunden gezeigt. <strong>Kein LLM n&ouml;tig</strong> &mdash; rein regelbasiert und kostenlos.</p>
+</div></div>
+</div>
+
+<!-- Kosten Projekt -->
+<div class="section" id="sp-cost">
+<div class="section-title"><span class="num">7</span>Kostenoptimierung</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Welche 5 Strategien nutzen Sie zur Kostenoptimierung?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<ol>
+<li><strong>G&uuml;nstiges Modell</strong>: gpt-4o-mini statt GPT-4o &rarr; 33x billiger</li>
+<li><strong>Combined Call</strong>: Intent + Extraktion in einem LLM-Call statt zwei &rarr; 50% weniger Calls</li>
+<li><strong>Response Cache</strong>: Gleiche Fragen werden nicht doppelt berechnet (SHA256-Hash als Schl&uuml;ssel, 200 Eintr&auml;ge, 1h g&uuml;ltig)</li>
+<li><strong>Selektives RAG</strong>: Wissensdatenbank nur bei Preis- und Info-Fragen durchsuchen</li>
+<li><strong>Message Truncation</strong>: Nur die letzten 20 Nachrichten mitschicken, max 3000 Tokens</li>
+</ol>
+<div class="tip">Ergebnis: Eine komplette Bestellung (8-12 Nachrichten) kostet unter <strong>$0.004</strong> &mdash; weniger als ein halber Cent.</div>
+</div></div>
+</div>
+
+<!-- Monitoring Projekt -->
+<div class="section" id="sp-monitoring">
+<div class="section-title"><span class="num">8</span>LangSmith &amp; Monitoring</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was tracen Sie mit LangSmith?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Drei Ebenen:</p>
+<ol>
+<li><strong>Node-Level</strong>: Jeder Node wird getrackt &mdash; was rein geht, was raus kommt, wie lange es dauert</li>
+<li><strong>LLM-Level</strong>: Jeder LLM-Call wird aufgezeichnet &mdash; welcher Prompt, welche Antwort, welches Modell</li>
+<li><strong>Graph-Level</strong>: Der gesamte Ablauf von Kundenfrage bis Bot-Antwort</li>
+</ol>
+<p>Sichtbar unter <strong>smith.langchain.com</strong> im Projekt &quot;Kidstorte&quot;.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was passiert wenn LangSmith ausf&auml;llt?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>Nichts Schlimmes!</strong> Graceful Degradation &mdash; wenn LangSmith nicht erreichbar ist, l&auml;uft der Bot ganz normal weiter, nur ohne Tracing. Das ist bewusst so implementiert: LangSmith ist ein &quot;Nice-to-have&quot;, kein Single Point of Failure.</p>
+</div></div>
+</div>
+
+<!-- Sicherheit Projekt -->
+<div class="section" id="sp-security">
+<div class="section-title"><span class="num">9</span>Sicherheit &amp; Fehlerbehandlung</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie sch&uuml;tzen Sie vor Prompt Injection?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Der <span class="ci">guardrail()</span>-Node ist der <strong>allererste Schritt</strong> im Graphen. Bevor irgendetwas passiert, pr&uuml;ft er:</p>
+<ul>
+<li>Ist die Nachricht l&auml;nger als 800 Zeichen? &rarr; Spam blockieren</li>
+<li>Versucht jemand das System zu manipulieren? (&quot;Ignoriere alle Anweisungen&quot;) &rarr; Blockieren</li>
+<li>Enth&auml;lt die Nachricht missbr&auml;uchliche Inhalte? &rarr; Blockieren</li>
+</ul>
+<p>Wenn blockiert: <span class="ci">guardrail_blocked = True</span>, der Rest des Graphen wird nicht durchlaufen.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was passiert bei API-Fehlern?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Drei Schutzschichten:</p>
+<ol>
+<li><strong>Retry</strong>: Bei Rate-Limits oder Timeouts: 3 Versuche mit steigender Wartezeit (5s, 10s, 20s)</li>
+<li><strong>@safe_node</strong>: Jeder Node ist mit einem Decorator abgesichert. Bei jedem unerwarteten Fehler gibt er eine freundliche Meldung zur&uuml;ck statt abzust&uuml;rzen</li>
+<li><strong>Fallback</strong>: Bei Bildgenerierung: OpenAI f&auml;llt aus? &rarr; HuggingFace &uuml;bernimmt</li>
+</ol>
+</div></div>
+</div>
+
+<!-- Architektur Projekt -->
+<div class="section" id="sp-arch">
+<div class="section-title"><span class="num">10</span>Architektur-Entscheidungen</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Warum FastAPI statt Flask?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<ul>
+<li><strong>Async nativ</strong>: LLM-Calls dauern 1-3 Sekunden. Mit async kann der Server w&auml;hrenddessen andere Anfragen bedienen</li>
+<li><strong>Streaming</strong>: Wort-f&uuml;r-Wort-Antworten (SSE) sind einfach umzusetzen</li>
+<li><strong>Auto-Dokumentation</strong>: FastAPI generiert automatisch eine OpenAPI/Swagger-Seite</li>
+</ul>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was sind die 5 S&auml;ulen des Projekts?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<ol>
+<li><strong>RAG</strong> &mdash; Echte Preise und Produktinfos aus der Wissensdatenbank</li>
+<li><strong>LangGraph</strong> &mdash; Intelligenter Bestellablauf als State Machine</li>
+<li><strong>ChromaDB</strong> &mdash; Vektordatenbank f&uuml;r RAG + Session-Speicherung</li>
+<li><strong>Vision</strong> &mdash; Tortenvorschau per Bildgenerierung (OpenAI/HuggingFace)</li>
+<li><strong>LangSmith</strong> &mdash; Monitoring, Tracing und Qualit&auml;tskontrolle</li>
+</ol>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie w&uuml;rden Sie skalieren?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Da unsere Nodes stateless sind:</p>
+<ol>
+<li><strong>Mehr Worker</strong>: Uvicorn mit mehreren Prozessen starten</li>
+<li><strong>ChromaDB-Server</strong>: Von embedded auf Server-Modus wechseln (oder Pinecone)</li>
+<li><strong>Redis Cache</strong>: Response-Cache von in-memory auf Redis umstellen</li>
+<li><strong>Load Balancer</strong>: Cookies funktionieren auch mit Load Balancing</li>
+</ol>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was w&uuml;rden Sie verbessern?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<ul>
+<li><strong>Evaluations</strong>: Systematische Tests mit 100+ Testf&auml;llen</li>
+<li><strong>Multi-Agent</strong>: Spezialisierte Agenten f&uuml;r Preis, Bild, Beratung</li>
+<li><strong>Mehrsprachigkeit</strong>: T&uuml;rkisch, Arabisch, Englisch</li>
+<li><strong>Bild-Streaming</strong>: Fortschrittsanzeige w&auml;hrend Bildgenerierung</li>
+</ul>
+</div></div>
+</div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--         TEIL 2: ALLGEMEINWISSEN                -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="part2">
+<div class="part-header orange"><div class="label">Teil 2</div><h2>Allgemeinwissen &mdash; Generative AI &amp; Co.</h2><p>Theoretische Fragen: LLM, Transformer, RAG, LangChain, LangGraph, LangSmith, Agenten</p></div>
+
+<!-- LLM Grundlagen -->
+<div class="section" id="s-llm">
+<div class="section-title"><span class="num">1</span>LLM &mdash; Grundlagen</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist ein LLM? Erkl&auml;ren Sie es einfach.<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein <strong>Large Language Model</strong> ist ein riesiges KI-Programm, das gelernt hat, wie Sprache funktioniert. Es wurde mit Milliarden von Texten aus dem Internet trainiert &mdash; B&uuml;cher, Webseiten, Wikipedia.</p>
+<p><strong>Wie funktioniert es?</strong> Es sagt das n&auml;chste Wort voraus. Wenn es &quot;Der Himmel ist&quot; liest, sagt es &quot;blau&quot; voraus. Das klingt einfach, aber bei Milliarden Parametern kann es erstaunlich kluge Texte generieren.</p>
+<div class="tip">Einfach: &quot;Ein LLM ist wie ein sehr belesener Assistent, der basierend auf dem Gelesenen Texte weiterschreiben kann.&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist ein Token?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein Token ist ein <strong>Textst&uuml;ck</strong>, das das LLM als eine Einheit verarbeitet. Nicht immer ein ganzes Wort:</p>
+<ul>
+<li>&quot;Hallo&quot; = 1 Token</li>
+<li>&quot;Schokoladentorte&quot; = 3-4 Tokens (wird aufgeteilt)</li>
+<li>&quot;Hello world&quot; = 2 Tokens</li>
+</ul>
+<p><strong>Faustregel Deutsch:</strong> 1 Token &asymp; 3 Zeichen<br>
+<strong>Faustregel Englisch:</strong> 1 Token &asymp; 4 Zeichen</p>
+<p><strong>Warum wichtig?</strong> Tokens bestimmen den <strong>Preis</strong> (man zahlt pro Token) und das <strong>Limit</strong> (wie viel Text das LLM auf einmal verarbeiten kann).</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Tokenization? Wie werden Tokens erstellt?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Tokenization ist der Prozess, Text in Tokens zu zerlegen. Die g&auml;ngigste Methode ist <strong>BPE (Byte Pair Encoding)</strong>:</p>
+<ol>
+<li>Start: Jeder Buchstabe ist ein Token (&quot;H&quot;, &quot;a&quot;, &quot;l&quot;, &quot;l&quot;, &quot;o&quot;)</li>
+<li>Die h&auml;ufigsten Buchstabenpaare werden zusammengefasst: &quot;l&quot;+&quot;l&quot; → &quot;ll&quot;</li>
+<li>Das wird wiederholt, bis man ein Vokabular mit ~50.000-100.000 Tokens hat</li>
+</ol>
+<p><strong>Ergebnis:</strong> H&auml;ufige W&ouml;rter wie &quot;the&quot; sind ein Token. Seltene W&ouml;rter werden in Teile zerlegt.</p>
+<p><strong>Andere Methoden:</strong> WordPiece (BERT nutzt das), SentencePiece (funktioniert ohne Leerzeichen, gut f&uuml;r Japanisch/Chinesisch)</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist das Context Window?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Das Context Window ist wie das <strong>&quot;Kurzzeitged&auml;chtnis&quot;</strong> des LLMs &mdash; wie viele Tokens es gleichzeitig &quot;sehen&quot; kann.</p>
+<table class="t">
+<tr><th>Modell</th><th>Context Window</th><th>Ungef&auml;hr in Text</th></tr>
+<tr><td>GPT-3.5</td><td>16K Tokens</td><td>~12.000 W&ouml;rter / ~25 Seiten</td></tr>
+<tr><td>GPT-4o-mini</td><td>128K Tokens</td><td>~96.000 W&ouml;rter / ~200 Seiten</td></tr>
+<tr><td>GPT-4.1</td><td>1M Tokens</td><td>~750.000 W&ouml;rter / ~1500 Seiten</td></tr>
+<tr><td>Claude 4 Sonnet</td><td>200K Tokens</td><td>~150.000 W&ouml;rter</td></tr>
+</table>
+<p><strong>Wichtig:</strong> Input + Output z&auml;hlen zusammen! Wenn das Fenster voll ist, &quot;vergisst&quot; das Modell &auml;ltere Inhalte.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Temperature?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Temperature steuert die <strong>&quot;Kreativit&auml;t&quot;</strong>. Stellen Sie sich eine W&uuml;rfel vor:</p>
+<ul>
+<li><strong>Temperature 0</strong>: Der W&uuml;rfel f&auml;llt immer auf die gleiche Seite. Deterministisch. Perfekt f&uuml;r Fakten.</li>
+<li><strong>Temperature 0.7</strong>: Der W&uuml;rfel ist leicht unfair, bevorzugt gute Antworten, aber erlaubt Variation.</li>
+<li><strong>Temperature 1.5</strong>: Der W&uuml;rfel ist wild. Kreative, aber manchmal unsinnige Antworten.</li>
+</ul>
+<div class="tip">&quot;F&uuml;r JSON und Klassifikation nehme ich Temperature 0. F&uuml;r nat&uuml;rliche Chatantworten 0.6.&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was sind Top-p und Top-k?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Neben Temperature gibt es zwei weitere Regler f&uuml;r die Textgenerierung:</p>
+<p><strong>Top-k:</strong> Das Modell w&auml;hlt nur aus den <strong>k wahrscheinlichsten</strong> n&auml;chsten Tokens. Top-k=50 heisst: Nur die besten 50 Optionen. Die restlichen werden ignoriert.</p>
+<p><strong>Top-p (Nucleus Sampling):</strong> Das Modell w&auml;hlt aus den wahrscheinlichsten Tokens, bis ihre <strong>kumulative Wahrscheinlichkeit p</strong> erreicht. Top-p=0.9 heisst: Nimm die Top-Tokens deren Wahrscheinlichkeiten zusammen 90% ergeben.</p>
+<div class="tip">In der Praxis: Temperature + Top-p reichen. Top-k wird selten manuell gesetzt.</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was sind Halluzinationen?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Das LLM <strong>erfindet Fakten</strong>, die nicht stimmen &mdash; aber klingt dabei total &uuml;berzeugend. Beispiel: &quot;Der Eiffelturm ist 412 Meter hoch&quot; (richtig: 330m).</p>
+<p><strong>Warum passiert das?</strong> Das LLM sagt das <em>wahrscheinlichste</em> n&auml;chste Wort voraus. Es &quot;wei&szlig;&quot; nicht, was wahr ist &mdash; es wei&szlig; nur, was &quot;plausibel klingt&quot;.</p>
+<p><strong>5 Gegenma&szlig;nahmen:</strong></p>
+<ol>
+<li><strong>RAG</strong> &mdash; Echte Fakten aus einer Datenbank liefern</li>
+<li><strong>Temperature 0</strong> &mdash; Weniger &quot;Kreativit&auml;t&quot; = weniger Erfindungen</li>
+<li><strong>Explizite Prompts</strong> &mdash; &quot;Sage nur etwas, wenn du eine Quelle hast&quot;</li>
+<li><strong>Strukturierte Outputs</strong> &mdash; JSON erzwingen statt Freitext</li>
+<li><strong>Grounding</strong> &mdash; Quellen zitieren lassen</li>
+</ol>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>GPT-Modelle im Vergleich<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th>Modell</th><th>St&auml;rke</th><th>Kosten (Input/1M)</th><th>Context</th><th>Wann nutzen?</th></tr>
+<tr><td>GPT-3.5</td><td>Schnell</td><td>$0.50</td><td>16K</td><td>Einfache Tasks, veraltet</td></tr>
+<tr><td><strong>GPT-4o-mini</strong></td><td>Gut &amp; g&uuml;nstig</td><td>$0.15</td><td>128K</td><td>90% aller Aufgaben (unser Modell)</td></tr>
+<tr><td>GPT-4o</td><td>Sehr gut</td><td>$2.50</td><td>128K</td><td>Komplexes Reasoning</td></tr>
+<tr><td>GPT-4.1</td><td>Bestes Coding</td><td>$2.00</td><td>1M</td><td>Code, lange Dokumente</td></tr>
+<tr><td>Claude 4 Sonnet</td><td>Bestes Reasoning</td><td>$3.00</td><td>200K</td><td>Analyse, Zusammenfassung</td></tr>
+</table>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Fine-Tuning vs. Prompting &mdash; Unterschied?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>Prompting</strong> (was wir nutzen): Man gibt dem Modell Anweisungen im Text. &quot;Du bist ein Tortenberater, antworte auf Deutsch.&quot; Kein Training n&ouml;tig, sofort &auml;nderbar, g&uuml;nstig.</p>
+<p><strong>Fine-Tuning</strong>: Man trainiert das Modell auf eigenen Daten weiter. Braucht 100-1000+ Beispiele, dauert Stunden, ist teuer.</p>
+<div class="tip">&quot;F&uuml;r 95% aller Anwendungen reicht Prompting. Fine-Tuning nur wenn man eine sehr spezifische Sprache oder ein besonderes Format braucht.&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist RLHF?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>Reinforcement Learning from Human Feedback</strong> &mdash; so wird ein LLM &quot;h&ouml;flich&quot; und &quot;hilfreich&quot; gemacht.</p>
+<p><strong>3 Schritte:</strong></p>
+<ol>
+<li><strong>Pre-Training</strong>: Modell lernt Sprache aus dem Internet (unsupervised)</li>
+<li><strong>Supervised Fine-Tuning</strong>: Menschen schreiben gute Beispiel-Antworten, Modell lernt davon</li>
+<li><strong>RLHF</strong>: Menschen bewerten Antwort-Paare (&quot;A ist besser als B&quot;). Ein Reward-Modell lernt diese Pr&auml;ferenzen. Das LLM wird optimiert, damit es Antworten gibt, die Menschen gut finden.</li>
+</ol>
+<p><strong>Ergebnis:</strong> Das Modell ist nicht nur schlau, sondern auch hilfreich, ehrlich und ungef&auml;hrlich.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>System-Prompt, User-Prompt, Assistant &mdash; was ist was?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Jeder LLM-Aufruf besteht aus einer Liste von Nachrichten:</p>
+<div class="code">[
+  {"role": "system",    "content": "Du bist ein Tortenberater..."},
+  {"role": "user",      "content": "Ich will eine Schokotorte"},
+  {"role": "assistant", "content": "Gerne! Welche Gr&ouml;&szlig;e?"},
+  {"role": "user",      "content": "F&uuml;r 10 Personen"}
+]</div>
+<ul>
+<li><strong>system</strong>: Die &quot;geheimen Anweisungen&quot; &mdash; definiert Rolle und Regeln</li>
+<li><strong>user</strong>: Was der Kunde schreibt</li>
+<li><strong>assistant</strong>: Vorherige Bot-Antworten (f&uuml;r Kontext)</li>
+</ul>
+</div></div>
+</div>
+
+<!-- Transformer -->
+<div class="section" id="s-transformer">
+<div class="section-title"><span class="num">2</span>Transformer-Architektur</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist ein Transformer?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Der Transformer ist die <strong>Architektur hinter allen modernen LLMs</strong> (GPT, Claude, Llama, Gemini). Er wurde 2017 von Google im Paper &quot;Attention Is All You Need&quot; vorgestellt.</p>
+<p><strong>Kernidee:</strong> Statt Text Wort f&uuml;r Wort zu verarbeiten (wie fr&uuml;here Modelle), kann der Transformer <strong>alle W&ouml;rter gleichzeitig</strong> betrachten und deren Beziehungen zueinander lernen.</p>
+<div class="tip">&quot;Der Transformer kann bei jedem Wort auf alle anderen W&ouml;rter im Text schauen &mdash; das nennt man Self-Attention.&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Self-Attention? Einfach erkl&auml;rt.<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Stellen Sie sich vor, Sie lesen den Satz: <em>&quot;Die Torte ist f&uuml;r <strong>meinen Sohn</strong>, <strong>er</strong> wird 5.&quot;</em></p>
+<p>Self-Attention bedeutet: Das Modell lernt, dass <strong>&quot;er&quot;</strong> sich auf <strong>&quot;meinen Sohn&quot;</strong> bezieht. Jedes Wort &quot;schaut&quot; auf alle anderen W&ouml;rter und gewichtet: &quot;Wie wichtig ist das andere Wort f&uuml;r mein Verst&auml;ndnis?&quot;</p>
+<p><strong>Technisch (vereinfacht):</strong></p>
+<ol>
+<li>Jedes Wort wird in 3 Vektoren umgewandelt: <strong>Query</strong> (was suche ich?), <strong>Key</strong> (was biete ich?), <strong>Value</strong> (welchen Inhalt habe ich?)</li>
+<li>F&uuml;r jedes Wortpaar: Query &times; Key = Attention Score (wie relevant?)</li>
+<li>Die Scores werden normalisiert (Softmax) und mit den Values gewichtet</li>
+</ol>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Multi-Head Attention?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Statt nur <strong>eine</strong> Attention zu berechnen, berechnet der Transformer <strong>mehrere parallel</strong> (z.B. 12 oder 96 &quot;Heads&quot;).</p>
+<p><strong>Warum?</strong> Jeder Head kann einen <strong>anderen Aspekt</strong> der Sprache lernen:</p>
+<ul>
+<li>Head 1: lernt grammatische Beziehungen (Subjekt &harr; Verb)</li>
+<li>Head 2: lernt Pronomen-Referenzen (&quot;er&quot; &rarr; &quot;Sohn&quot;)</li>
+<li>Head 3: lernt N&auml;he-Beziehungen (benachbarte W&ouml;rter)</li>
+</ul>
+<p>Am Ende werden alle Heads zusammengesetzt &rarr; reicheres Verst&auml;ndnis.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Encoder vs. Decoder &mdash; Unterschied?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th></th><th>Encoder</th><th>Decoder</th></tr>
+<tr><td>Aufgabe</td><td>Text <strong>verstehen</strong></td><td>Text <strong>generieren</strong></td></tr>
+<tr><td>Attention</td><td>Schaut auf alle W&ouml;rter (bidirektional)</td><td>Schaut nur auf vorherige W&ouml;rter (links-nach-rechts)</td></tr>
+<tr><td>Beispiel-Modell</td><td>BERT</td><td><strong>GPT</strong>, Llama</td></tr>
+<tr><td>Einsatz</td><td>Klassifikation, Embedding</td><td>Textgenerierung, Chat</td></tr>
+</table>
+<p><strong>GPT</strong> = nur Decoder (generiert Token f&uuml;r Token)<br>
+<strong>BERT</strong> = nur Encoder (versteht Text, generiert keinen)<br>
+<strong>T5</strong> = Encoder + Decoder (beides)</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Positional Encoding?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Das Problem: Der Transformer verarbeitet alle W&ouml;rter gleichzeitig, aber <strong>Reihenfolge ist wichtig</strong> (&quot;Hund beisst Mann&quot; &ne; &quot;Mann beisst Hund&quot;).</p>
+<p><strong>L&ouml;sung:</strong> Positional Encoding &mdash; zu jedem Wort-Vektor wird ein &quot;Positions-Signal&quot; addiert, das dem Modell sagt: &quot;Dieses Wort steht an Position 1, dieses an Position 2, ...&quot;</p>
+<p>GPT nutzt <strong>gelernte Positional Embeddings</strong> &mdash; das Modell lernt selbst, welche Positionspatterns wichtig sind.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist der KV-Cache?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Bei der Textgenerierung erzeugt das LLM Token f&uuml;r Token. Ohne Optimierung m&uuml;sste es bei jedem neuen Token die Attention f&uuml;r <strong>alle vorherigen Tokens neu berechnen</strong>.</p>
+<p><strong>KV-Cache:</strong> Die Key- und Value-Vektoren der vorherigen Tokens werden <strong>gespeichert</strong>. Bei jedem neuen Token muss nur die Attention f&uuml;r das neue Token berechnet werden.</p>
+<p><strong>Ergebnis:</strong> Viel schnellere Generierung, aber braucht GPU-Speicher.</p>
+</div></div>
+</div>
+
+<!-- RAG Theorie -->
+<div class="section" id="s-rag">
+<div class="section-title"><span class="num">3</span>RAG &mdash; Theorie</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Erkl&auml;ren Sie RAG Schritt f&uuml;r Schritt.<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>RAG = Retrieval Augmented Generation</strong></p>
+<p>Stellen Sie sich eine Pr&uuml;fung vor: Statt alles auswendig zu wissen (reines LLM), darf man ein Buch mitbringen (RAG). Man schaut die Antwort nach und formuliert sie dann in eigenen Worten.</p>
+<div class="code">1. INDEXING (einmalig):
+   Dokumente → Chunks → Embedding-Modell → Vektoren → Datenbank
+
+2. RETRIEVAL (bei jeder Frage):
+   Kundenfrage → Embedding → Vektorsuche → Top-5 passende Chunks
+
+3. GENERATION:
+   Prompt = &quot;Beantworte basierend auf diesem Kontext: [Chunks]&quot;
+   → LLM generiert Antwort</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist ein Embedding genau?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein Embedding ist eine <strong>Liste von Zahlen</strong> (z.B. 1536 Zahlen), die die Bedeutung eines Textes darstellt.</p>
+<p><strong>Das Geniale:</strong> &Auml;hnliche Texte haben &auml;hnliche Zahlenlisten:</p>
+<ul>
+<li>&quot;Schokoladentorte&quot; und &quot;Chocolate Cake&quot; → Vektoren zeigen in fast die gleiche Richtung</li>
+<li>&quot;Schokoladentorte&quot; und &quot;Autoversicherung&quot; → Vektoren zeigen in v&ouml;llig verschiedene Richtungen</li>
+</ul>
+<p>Das erm&ouml;glicht <strong>semantische Suche</strong>: Man findet Ergebnisse nach Bedeutung, nicht nur nach Schl&uuml;sselw&ouml;rtern.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Cosine Similarity?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Misst den <strong>Winkel zwischen zwei Vektoren</strong>:</p>
+<ul>
+<li><strong>1.0</strong> = zeigen in die gleiche Richtung = sehr &auml;hnlich</li>
+<li><strong>0.0</strong> = stehen senkrecht = keine &Auml;hnlichkeit</li>
+<li><strong>-1.0</strong> = zeigen in entgegengesetzte Richtungen</li>
+</ul>
+<p>Die Vektordatenbank berechnet Cosine Similarity zwischen der Frage und allen gespeicherten Chunks, und gibt die &auml;hnlichsten zur&uuml;ck.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Chunking und welche Strategien gibt es?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Gro&szlig;e Dokumente m&uuml;ssen in <strong>kleine St&uuml;cke (Chunks)</strong> aufgeteilt werden, weil:</p>
+<ul>
+<li>Kleine Chunks sind <strong>pr&auml;ziser</strong> bei der Suche</li>
+<li>Weniger Tokens = <strong>g&uuml;nstiger</strong></li>
+<li>Context Window hat ein <strong>Limit</strong></li>
+</ul>
+<p><strong>Strategien:</strong></p>
+<table class="t">
+<tr><th>Strategie</th><th>Wie</th><th>Wann nutzen</th></tr>
+<tr><td>Fixed-Size</td><td>Alle 500 Zeichen schneiden</td><td>Einfach, schnell</td></tr>
+<tr><td>Sentence-Based</td><td>An Satzenden schneiden</td><td>Bessere Qualit&auml;t</td></tr>
+<tr><td>Recursive Character</td><td>Erst Paragraphen, dann S&auml;tze, dann Zeichen</td><td>LangChain Standard</td></tr>
+<tr><td>Semantic</td><td>Embedding-&Auml;hnlichkeit pr&uuml;fen</td><td>Beste Qualit&auml;t, teurer</td></tr>
+</table>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Naive RAG vs. Advanced RAG?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>Naive RAG:</strong> Frage → Embedding → Top-K Chunks → LLM. Einfach, aber manchmal ungenau.</p>
+<p><strong>Advanced RAG Verbesserungen:</strong></p>
+<ol>
+<li><strong>Query Rewriting</strong>: LLM formuliert die Frage um f&uuml;r bessere Suche (&quot;Preis?&quot; → &quot;Wie viel kostet eine 3-st&ouml;ckige Schokoladentorte in Gr&ouml;&szlig;e L?&quot;)</li>
+<li><strong>HyDE</strong>: LLM generiert eine hypothetische Antwort, die dann als Suchquery dient</li>
+<li><strong>Multi-Query</strong>: Mehrere Varianten der Frage parallel suchen</li>
+<li><strong>Re-Ranking</strong>: Top-50 holen, dann mit Cross-Encoder auf Top-5 reduzieren</li>
+<li><strong>Hybrid Search</strong>: Vektor-Suche + klassische Keyword-Suche kombinieren</li>
+</ol>
+<div class="tip">In Kidstorte nutzen wir eine Mischung: Bei Preis-Fragen wird die Bestellung als Query umformuliert (Query Rewriting).</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Hybrid Search?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Kombination aus <strong>zwei Suchmethoden</strong>:</p>
+<ol>
+<li><strong>Vektor-Suche</strong> (semantisch): Findet &auml;hnliche Bedeutungen (&quot;Kuchen&quot; findet &quot;Torte&quot;)</li>
+<li><strong>Keyword-Suche (BM25)</strong>: Findet exakte W&ouml;rter (&quot;XL&quot; findet &quot;XL&quot;)</li>
+</ol>
+<p>Die Ergebnisse werden mit <strong>Reciprocal Rank Fusion</strong> zusammengef&uuml;hrt. Vorteil: Man bekommt das Beste aus beiden Welten &mdash; semantisches Verst&auml;ndnis UND exakte Treffer.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Re-Ranking?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Problem: Die Vektorsuche gibt Top-K Ergebnisse, aber die Reihenfolge ist nicht immer optimal.</p>
+<p><strong>Re-Ranking</strong>: Ein zweites Modell (<strong>Cross-Encoder</strong>) bewertet jedes Ergebnis nochmal genauer:</p>
+<div class="code">1. Vektorsuche: Hole Top-50 Chunks (schnell, ungenau)
+2. Cross-Encoder: Bewerte alle 50 einzeln (langsam, genau)
+3. Ergebnis: Die besten 5 kommen ans LLM</div>
+<p><strong>Warum nicht gleich den Cross-Encoder?</strong> Er ist zu langsam f&uuml;r 100.000 Dokumente. Deshalb erst grob filtern, dann genau bewerten.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Vektordatenbanken im Vergleich<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th>DB</th><th>Typ</th><th>St&auml;rke</th><th>Schw&auml;che</th></tr>
+<tr><td><strong>ChromaDB</strong></td><td>Lokal, Open Source</td><td>Einfach, kostenlos</td><td>Nicht f&uuml;r Millionen Docs</td></tr>
+<tr><td>Pinecone</td><td>Cloud SaaS</td><td>Skalierbar, managed</td><td>Kostenpflichtig, Lock-in</td></tr>
+<tr><td>FAISS</td><td>Library (Meta)</td><td>Extrem schnell</td><td>Kein eingebautes Speichern</td></tr>
+<tr><td>Weaviate</td><td>Self-hosted</td><td>Hybrid Search eingebaut</td><td>Komplexes Setup</td></tr>
+<tr><td>Qdrant</td><td>Self-hosted</td><td>Schnell, gutes Filtering</td><td>Weniger Community</td></tr>
+<tr><td>pgvector</td><td>PostgreSQL Plugin</td><td>Nutzt bestehende DB</td><td>Weniger Features</td></tr>
+</table>
+</div></div>
+</div>
+
+<!-- LangChain -->
+<div class="section" id="s-lc">
+<div class="section-title"><span class="num">4</span>LangChain</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist LangChain?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>LangChain ist ein <strong>Baukasten</strong> f&uuml;r LLM-Anwendungen. Statt alles selbst zu programmieren, bietet es fertige Bausteine:</p>
+<ul>
+<li><strong>Models</strong>: Einheitliche Schnittstelle f&uuml;r OpenAI, Anthropic, lokale Modelle</li>
+<li><strong>Prompts</strong>: Templates, Beispiele, Output-Parser</li>
+<li><strong>Chains</strong>: Mehrere Schritte verketten</li>
+<li><strong>Memory</strong>: Chatverlauf speichern</li>
+<li><strong>Tools</strong>: LLM kann APIs, Datenbanken, Rechner aufrufen</li>
+<li><strong>Retrievers</strong>: RAG-Integration</li>
+</ul>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist eine Chain?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Eine Chain verbindet mehrere Schritte zu einer Pipeline &mdash; wie ein Flie&szlig;band:</p>
+<div class="code"># Einfache Chain: Prompt → LLM → JSON-Parser
+chain = prompt_template | llm | json_parser
+
+# Beispiel:
+chain = (
+    ChatPromptTemplate.from_template(&quot;Klassifiziere: {input}&quot;)
+    | ChatOpenAI(model=&quot;gpt-4o-mini&quot;)
+    | JsonOutputParser()
+)
+result = chain.invoke({&quot;input&quot;: &quot;Ich will eine Torte&quot;})
+# → {&quot;intent&quot;: &quot;order&quot;}</div>
+<p>Der <span class="ci">|</span> Operator verbindet die Schritte. Das ist <strong>LCEL</strong> (LangChain Expression Language).</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist LangChain Memory?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Memory speichert den Chatverlauf, damit das LLM fr&uuml;here Nachrichten kennt:</p>
+<table class="t">
+<tr><th>Memory-Typ</th><th>Was es macht</th><th>Vorteil / Nachteil</th></tr>
+<tr><td>BufferMemory</td><td>Speichert alles</td><td>Einfach, aber wird riesig</td></tr>
+<tr><td>WindowMemory</td><td>Nur die letzten K Nachrichten</td><td>Kostenkontrolle, vergisst Altes</td></tr>
+<tr><td>SummaryMemory</td><td>LLM fasst alte Nachrichten zusammen</td><td>Kompakt, aber braucht extra LLM-Call</td></tr>
+<tr><td>TokenBufferMemory</td><td>Max N Tokens</td><td>Exakte Kostenkontrolle</td></tr>
+</table>
+<div class="tip">In Kidstorte: Eigenes WindowMemory — max 20 Nachrichten, &auml;ltere gel&ouml;scht.</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>LangChain vs. eigene Implementierung?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th></th><th>LangChain</th><th>Selbst gebaut (wie Kidstorte)</th></tr>
+<tr><td>Vorteil</td><td>Schneller Start, viele Integrationen, Community</td><td>Volle Kontrolle, einfach debuggbar</td></tr>
+<tr><td>Nachteil</td><td>Overhead, Breaking Changes, schwer zu debuggen</td><td>Mehr Code, alles selbst bauen</td></tr>
+<tr><td>Wann?</td><td>Prototyp, viele verschiedene LLMs</td><td>Produktion, spezifischer Use Case</td></tr>
+</table>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was sind LangChain Output Parser?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Output Parser wandeln die LLM-Antwort (Freitext) in <strong>strukturierte Daten</strong> um:</p>
+<ul>
+<li><strong>JsonOutputParser</strong>: Erwartet JSON, parsed es automatisch</li>
+<li><strong>PydanticOutputParser</strong>: Validiert gegen ein Pydantic-Schema</li>
+<li><strong>CommaSeparatedListOutputParser</strong>: &quot;rot, blau, gr&uuml;n&quot; → <span class="ci">["rot", "blau", "gr&uuml;n"]</span></li>
+</ul>
+<p>In Kidstorte: Eigene <span class="ci">parse_llm_json()</span> Funktion mit Selbstkorrektur &mdash; wenn das JSON kaputt ist, schicken wir es nochmal ans LLM.</p>
+</div></div>
+</div>
+
+<!-- LangGraph -->
+<div class="section" id="s-lg">
+<div class="section-title"><span class="num">5</span>LangGraph</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist LangGraph? Unterschied zu LangChain?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>LangChain Chains</strong> sind <strong>linear</strong>: A → B → C → fertig.</p>
+<p><strong>LangGraph</strong> erlaubt <strong>Schleifen, Verzweigungen und Bedingungen</strong>:</p>
+<div class="code">LangChain:  A → B → C → D              (gerade Linie)
+LangGraph:  A → B → [C oder D?] → zur&uuml;ck zu A?  (Graph mit Schleifen)</div>
+<p><strong>Warum wichtig?</strong> Ein Bestellbot muss Fragen <strong>wiederholen</strong> bis alle Felder ausgef&uuml;llt sind. Das ist eine Schleife &mdash; mit einer linearen Chain unm&ouml;glich.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was sind die Kernkonzepte von LangGraph?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<ol>
+<li><strong>StateGraph</strong>: Der Graph selbst &mdash; enth&auml;lt Nodes und Kanten</li>
+<li><strong>Nodes</strong>: Funktionen die den State ver&auml;ndern</li>
+<li><strong>Edges</strong>: Verbindungen zwischen Nodes (fest)</li>
+<li><strong>Conditional Edges</strong>: &quot;Wenn Intent=order → zum Bestell-Node, wenn Intent=price → zum Preis-Node&quot;</li>
+<li><strong>State</strong>: Ein Dict/Objekt das durch den Graphen flie&szlig;t</li>
+<li><strong>Checkpointer</strong>: Speichert den State (wie unser SessionManager)</li>
+</ol>
+<div class="code">graph = StateGraph(AgentState)
+graph.add_node(&quot;classify&quot;, classify_node)
+graph.add_node(&quot;ask&quot;, ask_node)
+
+# Conditional Routing:
+graph.add_conditional_edges(&quot;classify&quot;, route_fn, {
+    &quot;order&quot;: &quot;ask&quot;,
+    &quot;done&quot;: END
+})
+graph.add_edge(&quot;ask&quot;, &quot;classify&quot;)  # Schleife!</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist ein Checkpointer?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein Checkpointer <strong>speichert den Graph-State</strong> nach jedem Schritt. Das erm&ouml;glicht:</p>
+<ul>
+<li><strong>Multi-Turn-Chat</strong>: State bleibt zwischen Nachrichten erhalten</li>
+<li><strong>Human-in-the-Loop</strong>: Graph pausiert, wartet auf menschliche Eingabe</li>
+<li><strong>Time-Travel</strong>: Zu einem fr&uuml;heren Zustand zur&uuml;ckspringen</li>
+</ul>
+<p>LangGraph bietet: <span class="ci">MemorySaver</span> (RAM), <span class="ci">SqliteSaver</span>, <span class="ci">PostgresSaver</span>.</p>
+<p>In Kidstorte: <strong>ChromaDB als eigener Checkpointer</strong> &mdash; gleiche Idee, selbst gebaut.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist ein Subgraph?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein Subgraph ist ein <strong>Graph innerhalb eines Graphen</strong>. Wie eine Funktion, die selbst mehrere Schritte hat:</p>
+<div class="code">Haupt-Graph:
+  ├─ Classify → Route
+  ├─ Bestell-Subgraph:          ← eigener kleiner Graph
+  │    ├─ check_complete
+  │    ├─ ask_next
+  │    └─ summarize
+  ├─ Preis-Subgraph:
+  │    ├─ retrieve_docs
+  │    └─ calculate_price
+  └─ Bild-Subgraph</div>
+<p><strong>Vorteil:</strong> Bessere Organisation, jeder Subgraph kann unabh&auml;ngig getestet und wiederverwendet werden.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist ein Multi-Agent-Graph?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Mehrere <strong>spezialisierte Agenten</strong> arbeiten zusammen:</p>
+<div class="code">Orchestrator (&quot;Manager&quot;)
+  ├─ Beratungs-Agent → kennt Tortentrends, macht Smalltalk
+  ├─ Preis-Agent     → RAG + Kalkulation
+  ├─ Bild-Agent      → Prompt-Engineering + Generierung
+  └─ Termin-Agent    → Kalender-Integration</div>
+<p>Jeder Agent hat <strong>eigene Prompts und eigene Tools</strong>. Der Orchestrator entscheidet, welcher Agent die Anfrage bearbeitet.</p>
+<p><strong>In Kidstorte:</strong> Unsere Nodes sind quasi &quot;Micro-Agenten&quot; &mdash; das gleiche Konzept, nur ohne separate LLM-Instanzen.</p>
+</div></div>
+</div>
+
+<!-- LangSmith -->
+<div class="section" id="s-ls">
+<div class="section-title"><span class="num">6</span>LangSmith</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist LangSmith? Wof&uuml;r braucht man es?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>LangSmith ist wie ein <strong>&quot;R&ouml;ntgenger&auml;t&quot; f&uuml;r LLM-Anwendungen</strong>. Man kann sehen, was innerhalb der App passiert.</p>
+<p><strong>3 S&auml;ulen:</strong></p>
+<ol>
+<li><strong>Tracing</strong>: Jeden LLM-Call aufzeichnen &mdash; welcher Prompt wurde geschickt, was kam zur&uuml;ck, wie lange hat es gedauert, was hat es gekostet</li>
+<li><strong>Monitoring</strong>: Dashboards mit Metriken &mdash; Latenz, Fehlerrate, Kosten &uuml;ber die Zeit</li>
+<li><strong>Evaluations</strong>: Automatisch pr&uuml;fen ob die Antworten gut sind</li>
+</ol>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie funktioniert Tracing?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Jeder Schritt in der App wird als <strong>&quot;Run&quot;</strong> aufgezeichnet:</p>
+<div class="code">Graph-Run (Eltern)
+  ├─ guardrail-Run (Kind)
+  │    └─ LLM-Call: {input: &quot;Hallo&quot;, output: &quot;safe&quot;, 50ms}
+  ├─ classify-Run (Kind)
+  │    └─ LLM-Call: {input: &quot;Schokotorte...&quot;, output: {intent:&quot;order&quot;}, 180ms}
+  └─ ask_next-Run (Kind)
+       └─ LLM-Call: {input: &quot;Frage nach Form...&quot;, output: &quot;Welche Form?&quot;, 120ms}</div>
+<p>Das sieht man als <strong>Baum-Ansicht</strong> auf smith.langchain.com &mdash; man kann in jeden einzelnen LLM-Call reinzoomen.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was sind LangSmith Evaluations?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Man definiert <strong>Testf&auml;lle</strong> (Input + erwartetes Ergebnis) und l&auml;sst das System automatisch pr&uuml;fen:</p>
+<div class="code">Testdatensatz:
+  {input: &quot;Ich will eine Schokotorte&quot;, expected: intent=&quot;order&quot;}
+  {input: &quot;Was kostet das?&quot;,           expected: intent=&quot;price&quot;}
+  {input: &quot;Hallo!&quot;,                    expected: intent=&quot;greeting&quot;}
+
+Evaluatoren:
+  - Exact Match: Stimmt der Intent?
+  - LLM-as-Judge: &quot;Bewerte die Antwort auf einer Skala 1-5&quot;
+  - Custom: &quot;Enth&auml;lt die Antwort einen Preis?&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>LangSmith vs. LangFuse?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th></th><th>LangSmith</th><th>LangFuse</th></tr>
+<tr><td>Anbieter</td><td>LangChain (kommerziell)</td><td>Open Source</td></tr>
+<tr><td>Self-Hosting</td><td>Nein, nur Cloud</td><td>Ja, per Docker</td></tr>
+<tr><td>Free Tier</td><td>5.000 Traces/Monat</td><td>Unbegrenzt (self-hosted)</td></tr>
+<tr><td>Integration</td><td>Perfekt mit LangChain/LangGraph</td><td>Framework-agnostisch</td></tr>
+<tr><td>Evals</td><td>Eingebaut, ausgereift</td><td>Vorhanden, weniger Features</td></tr>
+</table>
+<div class="tip">&quot;Wir nutzen LangSmith, weil die Integration einfach ist und der Free Tier f&uuml;r unser Projekt reicht.&quot;</div>
+</div></div>
+</div>
+
+<!-- Agents -->
+<div class="section" id="s-agents">
+<div class="section-title"><span class="num">7</span>AI Agents</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist ein AI Agent? Einfach erkl&auml;rt.<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein normales LLM ist wie ein <strong>Berater</strong>: Man fragt, es antwortet.</p>
+<p>Ein <strong>Agent</strong> ist wie ein <strong>Mitarbeiter</strong>: Er kann selbst&auml;ndig Entscheidungen treffen, Tools benutzen und Aufgaben erledigen.</p>
+<div class="code">Normales LLM:  Frage → Antwort (einmal)
+
+Agent:          Frage → Nachdenken → Tool benutzen → Ergebnis anschauen
+                      → Nochmal nachdenken → Anderes Tool → ...
+                      → Fertige Antwort</div>
+<p>Der Agent entscheidet <strong>selbst</strong>, welches Tool er wann benutzt &mdash; und wiederholt Schritte bis die Aufgabe erledigt ist.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist das ReAct-Pattern?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>ReAct = Reasoning + Acting</strong>. Der Agent &quot;denkt laut&quot;:</p>
+<div class="code">Thought:      Ich muss den Preis nachschlagen.
+Action:       search_knowledge_base(&quot;Schokoladentorte Preis&quot;)
+Observation:  M: 45€, L: 55€, XL: 65€
+Thought:      Der Kunde hat 10 G&auml;ste, das ist Gr&ouml;&szlig;e L.
+Action:       respond(&quot;55€ f&uuml;r Gr&ouml;&szlig;e L&quot;)</div>
+<p>Das Besondere: Das LLM <strong>begr&uuml;ndet</strong> jeden Schritt, bevor es handelt. Das macht Entscheidungen nachvollziehbar.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was sind Tools bei Agenten?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Tools sind <strong>Funktionen, die das LLM aufrufen kann</strong>:</p>
+<div class="code">tools = [
+  {name: &quot;check_calendar&quot;,  desc: &quot;Pr&uuml;ft Verf&uuml;gbarkeit an einem Datum&quot;},
+  {name: &quot;calculate_price&quot;, desc: &quot;Berechnet den Tortenpreis&quot;},
+  {name: &quot;search_products&quot;, desc: &quot;Sucht in der Wissensdatenbank&quot;},
+  {name: &quot;generate_image&quot;,  desc: &quot;Erstellt ein Tortenbild&quot;},
+]</div>
+<p>Das LLM liest die Beschreibungen und entscheidet: &quot;F&uuml;r diese Frage brauche ich <span class="ci">calculate_price</span>.&quot;</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Function Calling / Tool Use?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein Feature moderner LLMs (GPT-4, Claude): Statt Freitext gibt das Modell ein <strong>strukturiertes JSON</strong> zur&uuml;ck:</p>
+<div class="code">// Input: &quot;Ist am 27. M&auml;rz noch frei?&quot;
+// LLM-Output:
+{
+  &quot;function_call&quot;: {
+    &quot;name&quot;: &quot;check_calendar&quot;,
+    &quot;arguments&quot;: {&quot;date&quot;: &quot;2026-03-27&quot;}
+  }
+}
+
+// Der Code f&uuml;hrt check_calendar aus → Ergebnis: &quot;2 Pl&auml;tze frei&quot;
+// Das Ergebnis geht zur&uuml;ck ans LLM → &quot;Ja, am 27.03. sind noch 2 Pl&auml;tze frei!&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Single Agent vs. Multi-Agent?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>Single Agent:</strong> Ein LLM mit vielen Tools. Einfach, aber wird bei &gt;10 Tools unzuverl&auml;ssig.</p>
+<p><strong>Multi-Agent:</strong> Mehrere spezialisierte Agenten. Jeder hat nur 2-3 Tools.</p>
+<div class="code">Single:  Ein LLM → [15 Tools]  ← wird verwirrt
+
+Multi:   Chef-Agent (Orchestrator)
+           ├─ Agent A → [Tool 1, Tool 2]  ← Spezialist
+           ├─ Agent B → [Tool 3, Tool 4]  ← Spezialist
+           └─ Agent C → [Tool 5, Tool 6]  ← Spezialist</div>
+<div class="tip">&quot;Multi-Agent ist wie ein Team: Jeder ist Spezialist f&uuml;r sein Gebiet, und der Chef koordiniert.&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Plan-and-Execute?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Eine Agent-Strategie in zwei Phasen:</p>
+<ol>
+<li><strong>Plan</strong>: Das LLM erstellt zuerst einen vollst&auml;ndigen Plan (&quot;Schritt 1: ..., Schritt 2: ..., Schritt 3: ...&quot;)</li>
+<li><strong>Execute</strong>: Dann wird jeder Schritt einzeln ausgef&uuml;hrt</li>
+</ol>
+<p><strong>Vorteil vs. ReAct:</strong> Bei ReAct denkt der Agent nach jedem Schritt neu. Bei Plan-and-Execute gibt es einen &uuml;bergeordneten Plan, was zu konsistenteren Ergebnissen f&uuml;hrt.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Human-in-the-Loop?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Der Agent <strong>pausiert</strong> und fragt den Menschen bevor er wichtige Aktionen ausf&uuml;hrt:</p>
+<ul>
+<li>&quot;Soll ich die Bestellung wirklich abschicken?&quot;</li>
+<li>&quot;Meinen Sie Schokolade oder Vanille?&quot;</li>
+<li>&quot;Soll ich den Termin am 27.03. buchen?&quot;</li>
+</ul>
+<p><strong>In Kidstorte:</strong> Das Adressformular und die Best&auml;tigungsvorschau (&quot;Jetzt bestellen&quot;) sind Human-in-the-Loop &mdash; der Kunde muss explizit best&auml;tigen.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Welche Arten von Agent-Memory gibt es?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th>Memory-Typ</th><th>Was es speichert</th><th>Beispiel in Kidstorte</th></tr>
+<tr><td><strong>Short-Term</strong></td><td>Aktuelle Konversation</td><td><span class="ci">messages</span> Array (max 20)</td></tr>
+<tr><td><strong>Long-Term</strong></td><td>Vergangene Sessions</td><td>ChromaDB Sessions-Collection</td></tr>
+<tr><td><strong>Episodic</strong></td><td>Konkrete Erfahrungen</td><td>&quot;Letztes Mal hat der Kunde Schoko bestellt&quot;</td></tr>
+<tr><td><strong>Semantic</strong></td><td>Fakten &amp; Wissen</td><td>RAG Wissensdatenbank (cake_chunks)</td></tr>
+<tr><td><strong>Procedural</strong></td><td>Wie man etwas macht</td><td>Die Prompts (wie man Preis berechnet)</td></tr>
+</table>
+</div></div>
+</div>
+
+<!-- Generative AI -->
+<div class="section" id="s-genai">
+<div class="section-title"><span class="num">8</span>Generative AI</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Generative AI vs. klassisches ML?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th></th><th>Klassisches ML</th><th>Generative AI</th></tr>
+<tr><td>Aufgabe</td><td>Vorhersagen/Klassifizieren</td><td><strong>Neue Inhalte erstellen</strong></td></tr>
+<tr><td>Output</td><td>Label oder Zahl</td><td>Text, Bild, Code, Musik</td></tr>
+<tr><td>Beispiel</td><td>&quot;Ist diese Email Spam?&quot; → Ja/Nein</td><td>&quot;Schreibe eine Produktbeschreibung&quot; → ganzer Text</td></tr>
+<tr><td>Training</td><td>Kleine Datens&auml;tze (1000-100K)</td><td>Riesige Datens&auml;tze (Milliarden Texte)</td></tr>
+</table>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Prompt Engineering?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Die Kunst, dem LLM die <strong>richtigen Anweisungen</strong> zu geben. Techniken:</p>
+<ol>
+<li><strong>Zero-Shot</strong>: Nur Anweisung, keine Beispiele. &quot;Klassifiziere diesen Text.&quot;</li>
+<li><strong>Few-Shot</strong>: 2-5 Beispiele mitgeben. &quot;Beispiel: ‚Schokotorte' → order. Jetzt du: ...&quot;</li>
+<li><strong>Chain-of-Thought</strong>: &quot;Denke Schritt f&uuml;r Schritt.&quot; → besseres Reasoning</li>
+<li><strong>Role-Playing</strong>: &quot;Du bist ein erfahrener Tortenberater...&quot;</li>
+<li><strong>Output-Format</strong>: &quot;Antworte als JSON: {intent, data}&quot;</li>
+</ol>
+<div class="tip">&quot;In Kidstorte nutzen wir alle 5 Techniken: System-Prompt mit Rolle, Few-Shot-Beispiele f&uuml;r Intents, JSON-Format, und explizite Regeln f&uuml;r Sonderf&auml;lle.&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Chain-of-Thought (CoT)?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Man bittet das LLM, <strong>seinen Denkprozess zu zeigen</strong>:</p>
+<div class="code">OHNE CoT:
+  &quot;Was ist 17 * 24?&quot; → &quot;408&quot; (falsch!)
+
+MIT CoT:
+  &quot;Was ist 17 * 24? Denke Schritt f&uuml;r Schritt.&quot;
+  → &quot;17 * 20 = 340. 17 * 4 = 68. 340 + 68 = 408.&quot; (richtig!)</div>
+<p>Durch das &quot;laute Denken&quot; macht das LLM weniger Fehler bei komplexen Aufgaben. Funktioniert besonders gut bei Mathe, Logik und mehrstufigen Problemen.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Grounding?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Sicherstellen, dass LLM-Antworten auf <strong>echten Fakten</strong> basieren, nicht auf Halluzinationen:</p>
+<ul>
+<li><strong>RAG</strong>: Fakten aus Datenbank liefern</li>
+<li><strong>Zitate</strong>: LLM muss Quellen angeben (&quot;Laut Preisliste...&quot;)</li>
+<li><strong>Faktencheck</strong>: Zweites LLM pr&uuml;ft die Antwort</li>
+<li><strong>Structured Output</strong>: Nur erlaubte Werte zulassen</li>
+</ul>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Multimodalit&auml;t?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein Modell, das <strong>verschiedene Datentypen</strong> versteht &mdash; nicht nur Text:</p>
+<ul>
+<li><strong>Text → Text</strong>: Chat, Zusammenfassung</li>
+<li><strong>Text → Bild</strong>: DALL-E, Midjourney (unsere Tortenvorschau!)</li>
+<li><strong>Bild → Text</strong>: GPT-4 Vision (&quot;Was ist auf diesem Bild?&quot;)</li>
+<li><strong>Audio → Text</strong>: Whisper (Sprache zu Text)</li>
+<li><strong>Text → Audio</strong>: TTS (Text zu Sprache)</li>
+</ul>
+<p>GPT-4o ist <strong>nativ multimodal</strong> &mdash; es versteht Text, Bilder und Audio in einem Modell.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie funktioniert Bildgenerierung (Diffusion)?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Moderne Bildgenerierung nutzt <strong>Diffusion Models</strong> (DALL-E, Stable Diffusion, Midjourney):</p>
+<ol>
+<li><strong>Forward Process</strong>: Ein echtes Bild wird Schritt f&uuml;r Schritt mit Rauschen zerst&ouml;rt (wird zu &quot;TV-Schnee&quot;)</li>
+<li><strong>Training</strong>: Das Modell lernt, diesen Prozess <strong>r&uuml;ckg&auml;ngig</strong> zu machen &mdash; aus Rauschen ein scharfes Bild zu erzeugen</li>
+<li><strong>Generierung</strong>: Start mit reinem Rauschen → Schritt f&uuml;r Schritt wird ein Bild daraus, gesteuert durch den Text-Prompt</li>
+</ol>
+<div class="tip">&quot;Stellen Sie sich vor, Sie zerknuellen ein Foto immer mehr. Das Modell hat gelernt, ein zerknuelltes Foto wieder zu glaetten &mdash; und kann so auch komplett neue Bilder aus Rauschen erschaffen.&quot;</div>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist ein Guardrail?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Sicherheitsmechanismen, die das LLM vor Missbrauch sch&uuml;tzen:</p>
+<ul>
+<li><strong>Input Guardrail</strong>: Pr&uuml;ft die Eingabe BEVOR sie ans LLM geht (Jailbreak? Spam? Toxisch?)</li>
+<li><strong>Output Guardrail</strong>: Pr&uuml;ft die Antwort BEVOR der Nutzer sie sieht (keine Passw&ouml;rter? keine falschen Versprechen?)</li>
+</ul>
+<p><strong>In Kidstorte:</strong> Unser <span class="ci">guardrail()</span>-Node ist ein Input Guardrail &mdash; der allererste Schritt im Graphen.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Streaming und warum ist es wichtig?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p><strong>Ohne Streaming:</strong> Der Nutzer wartet 3-5 Sekunden, dann erscheint die komplette Antwort auf einmal.</p>
+<p><strong>Mit Streaming:</strong> W&ouml;rter erscheinen <strong>Wort f&uuml;r Wort</strong>, wie bei ChatGPT. Der Nutzer sieht sofort die ersten W&ouml;rter.</p>
+<p><strong>Technisch:</strong> Server-Sent Events (SSE) &mdash; der Server schickt Token f&uuml;r Token an den Browser.</p>
+<p><strong>In Kidstorte:</strong> <span class="ci">/api/chat/stream</span> liefert Wort-f&uuml;r-Wort mit Cursor-Animation.</p>
+</div></div>
+</div>
+
+<!-- Evaluations -->
+<div class="section" id="s-eval">
+<div class="section-title"><span class="num">9</span>Testing &amp; Evaluations</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Wie testet man LLM-Anwendungen?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Drei Ebenen:</p>
+<ol>
+<li><strong>Unit Tests</strong>: Einzelne Nodes isoliert testen (&quot;Wenn Input X, kommt Output Y?&quot;)</li>
+<li><strong>Integration Tests</strong>: Ganzen Bestellflow durchspielen (&quot;10 Nachrichten &rarr; Bestellung komplett?&quot;)</li>
+<li><strong>LLM Evaluations</strong>: Datens&auml;tze mit 100+ Testf&auml;llen automatisch pr&uuml;fen</li>
+</ol>
+<p><strong>Das Besondere bei LLMs:</strong> Die Ausgabe ist nicht deterministisch! Gleiche Frage → leicht andere Antwort. Deshalb pr&uuml;ft man nicht auf exakte Gleichheit, sondern auf <strong>Semantik</strong> (&quot;Ist der Sinn richtig?&quot;).</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist LLM-as-a-Judge?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Man nutzt ein <strong>st&auml;rkeres LLM</strong>, um die Outputs eines anderen LLMs zu bewerten:</p>
+<div class="code">Frage:    &quot;Was kostet eine Schokoladentorte?&quot;
+Antwort:  &quot;Eine Schokoladentorte kostet 45€ in Gr&ouml;&szlig;e M.&quot;
+
+Judge-Prompt: &quot;Bewerte diese Antwort:
+  - Korrektheit (1-5)
+  - Vollst&auml;ndigkeit (1-5)
+  - H&ouml;flichkeit (1-5)&quot;
+
+Judge-Ergebnis: 4/5</div>
+<p><strong>Vorteil:</strong> Skaliert viel besser als menschliche Bewertung (100 Testf&auml;lle in Sekunden).<br>
+<strong>Nachteil:</strong> Der Judge kann auch falsch liegen.</p>
+</div></div>
+</div>
+
+<!-- Architektur -->
+<div class="section" id="s-arch">
+<div class="section-title"><span class="num">10</span>Architektur &amp; Sicherheit</div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>RAG-System f&uuml;r 1 Million Dokumente &mdash; wie?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<ol>
+<li><strong>Semantic Chunking</strong>: Intelligent teilen statt starr alle 500 Zeichen</li>
+<li><strong>Pinecone oder Qdrant</strong>: Skalierbare Vektordatenbank statt ChromaDB</li>
+<li><strong>Hybrid Search</strong>: Vektor + Keyword kombinieren</li>
+<li><strong>Re-Ranking</strong>: Cross-Encoder f&uuml;r Top-50 → Top-5</li>
+<li><strong>Metadata Filtering</strong>: Vor Vektorsuche nach Kategorie filtern</li>
+<li><strong>Caching</strong>: H&auml;ufige Fragen cachen</li>
+</ol>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>LLM-Kosten um 80% senken &mdash; wie?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<ol>
+<li><strong>Kleineres Modell</strong>: GPT-4 → GPT-4o-mini (33x g&uuml;nstiger)</li>
+<li><strong>Caching</strong>: Gleiche Fragen nicht doppelt berechnen</li>
+<li><strong>Calls reduzieren</strong>: 2 Calls zu 1 kombinieren (wie unser classify+extract)</li>
+<li><strong>Prompts k&uuml;rzen</strong>: &Uuml;berfl&uuml;ssige Anweisungen entfernen</li>
+<li><strong>Kontext beschr&auml;nken</strong>: Nicht den ganzen Chat mitschicken</li>
+<li><strong>Open-Source</strong>: Llama 3, Mistral f&uuml;r einfache Tasks</li>
+</ol>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Sicherheitsrisiken bei LLM-Anwendungen?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<table class="t">
+<tr><th>Risiko</th><th>Erkl&auml;rung</th><th>Gegenma&szlig;nahme</th></tr>
+<tr><td><strong>Prompt Injection</strong></td><td>&quot;Ignoriere alle Anweisungen und...&quot;</td><td>Guardrail-Node, Input-Validierung</td></tr>
+<tr><td><strong>Halluzinationen</strong></td><td>LLM erfindet Fakten</td><td>RAG, Temperature 0, Grounding</td></tr>
+<tr><td><strong>Data Leakage</strong></td><td>Sensible Daten in Antworten</td><td>Output-Filter, keine Passw&ouml;rter im Prompt</td></tr>
+<tr><td><strong>Jailbreaking</strong></td><td>Sicherheitsregeln umgehen</td><td>Mehrschichtiger Guardrail</td></tr>
+<tr><td><strong>PII-Exposure</strong></td><td>Pers&ouml;nliche Daten in Logs</td><td>Log-Anonymisierung</td></tr>
+</table>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Mixture of Experts (MoE)?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Ein Architektur-Trick bei modernen LLMs (GPT-4, Mixtral):</p>
+<p>Statt <strong>alle</strong> Parameter f&uuml;r jedes Token zu nutzen, gibt es mehrere &quot;Experten&quot; (Sub-Netzwerke). Ein <strong>Router</strong> entscheidet f&uuml;r jedes Token, welche 2-3 Experten aktiviert werden.</p>
+<div class="code">Token: &quot;Schokolade&quot;
+Router: Aktiviere Experte 3 (Essen) + Experte 7 (Deutsch)
+→ Nur 2 von 8 Experten rechnen → schneller &amp; effizienter</div>
+<p><strong>Vorteil:</strong> Das Modell kann riesig sein (viele Parameter), aber bei jedem Token wird nur ein Bruchteil genutzt → schnell trotz Gr&ouml;&szlig;e.</p>
+</div></div>
+
+<div class="qa"><div class="qa-q"><span class="qi">F</span>Was ist Quantization?<span class="arrow">&#9662;</span></div>
+<div class="qa-a">
+<p>Die Parameter eines LLMs werden normalerweise als <strong>32-bit Zahlen</strong> gespeichert. Quantization reduziert das auf <strong>16-bit, 8-bit oder sogar 4-bit</strong>.</p>
+<p><strong>Effekt:</strong></p>
+<ul>
+<li>32-bit → 4-bit = Modell ist <strong>8x kleiner</strong></li>
+<li>L&auml;uft auf <strong>g&uuml;nstigeren GPUs</strong> oder sogar auf Laptops</li>
+<li>Leichter Qualit&auml;tsverlust, oft kaum merkbar</li>
+</ul>
+<p><strong>Beispiel:</strong> Llama 3 70B braucht 140GB RAM in 16-bit. In 4-bit nur ~35GB &mdash; passt auf eine GPU.</p>
+</div></div>
+</div>
+
+</div><!-- end part2 -->
+
+</div><!-- end container -->
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const all=document.querySelectorAll('.qa'),search=document.getElementById('search');
+  const sTotal=document.getElementById('sTotal'),sOpen=document.getElementById('sOpen');
+  const sP1=document.getElementById('sP1'),sP2=document.getElementById('sP2');
+  const pf=document.getElementById('pf');
+  sP1.textContent=document.querySelectorAll('#part1 .qa').length;
+  sP2.textContent=document.querySelectorAll('#part2 .qa').length;
+  sTotal.textContent=all.length;
+  const update=()=>{const o=document.querySelectorAll('.qa.open').length;sOpen.textContent=o;pf.style.width=(all.length?(o/all.length*100):0)+'%';};
+  all.forEach(q=>q.querySelector('.qa-q').addEventListener('click',()=>{q.classList.toggle('open');update();}));
+  document.getElementById('btnOpen').onclick=()=>{all.forEach(q=>{if(q.style.display!=='none')q.classList.add('open')});update();};
+  document.getElementById('btnClose').onclick=()=>{all.forEach(q=>q.classList.remove('open'));update();};
+  search.addEventListener('input',()=>{
+    const v=search.value.toLowerCase().trim();
+    all.forEach(q=>q.style.display=(!v||q.textContent.toLowerCase().includes(v))?'':'none');
+    document.querySelectorAll('.section').forEach(s=>{const vis=s.querySelectorAll('.qa:not([style*="display: none"])').length;s.style.display=(!v||vis>0)?'':'none';});
+    const vc=document.querySelectorAll('.qa:not([style*="display: none"])').length;
+    sTotal.textContent=v?vc+' / '+all.length:all.length;
+  });
+  document.querySelectorAll('.nav-tab').forEach(t=>t.addEventListener('click',e=>{
+    e.preventDefault();const el=document.getElementById(t.dataset.t);if(el)el.scrollIntoView({behavior:'smooth'});
+    document.querySelectorAll('.nav-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');
+  }));
+  const secs=document.querySelectorAll('[id^="s-"],[id^="sp-"],[id^="part"]');
+  window.addEventListener('scroll',()=>{let c='';secs.forEach(s=>{if(s.getBoundingClientRect().top<120)c=s.id;});
+    if(c)document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t.dataset.t===c));},{passive:true});
+  update();
+});
+</script>
+</body>
+</html>
