@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kidstorte – ER-Diagramm</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 48px;
+      background: #181825;
+      border-bottom: 1px solid #313244;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      z-index: 100;
+    }
+    .toolbar-logo {
+      font-weight: 700;
+      font-size: 15px;
+      color: #cba6f7;
+      letter-spacing: 0.5px;
+    }
+    .toolbar-sep { width: 1px; height: 20px; background: #313244; }
+    .toolbar-title { font-size: 13px; color: #6c7086; }
+    .toolbar-subtitle { font-size: 11px; color: #45475a; }
+    .toolbar-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+    .tb-btn {
+      padding: 5px 12px;
+      border-radius: 6px;
+      border: 1px solid #313244;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .tb-btn:hover { background: #313244; }
+    .tb-zoom { font-size: 12px; color: #6c7086; min-width: 44px; text-align: center; }
+
+    /* ── Canvas ── */
+    #canvas {
+      position: fixed;
+      top: 48px; left: 0; right: 0; bottom: 0;
+      cursor: grab;
+      user-select: none;
+    }
+    #canvas.grabbing { cursor: grabbing; }
+
+    /* ── SVG ── */
+    #diagram-svg {
+      position: absolute;
+      top: 0; left: 0;
+      pointer-events: none;
+    }
+
+    /* ── Tabellen ── */
+    .er-table {
+      position: absolute;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      width: 220px;
+      font-size: 12px;
+      border: 1px solid transparent;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .er-table:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+    }
+    .er-table-header {
+      padding: 10px 14px 8px;
+      cursor: move;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+    }
+    .er-table-header-icon {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .er-table-body { background: #1e1e2e; }
+    .er-row {
+      display: flex;
+      align-items: center;
+      padding: 5px 14px;
+      border-bottom: 1px solid #313244;
+      gap: 6px;
+      transition: background 0.1s;
+      cursor: default;
+    }
+    .er-row:last-child { border-bottom: none; }
+    .er-row:hover { background: #2a2a3e; }
+    .er-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      min-width: 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .badge-pk { background: #f9e2af22; color: #f9e2af; border: 1px solid #f9e2af44; }
+    .badge-fk { background: #89b4fa22; color: #89b4fa; border: 1px solid #89b4fa44; }
+    .badge-nn { background: #a6e3a122; color: #a6e3a1; border: 1px solid #a6e3a144; }
+    .er-col-name { flex: 1; color: #cdd6f4; }
+    .er-col-type { color: #6c7086; font-size: 10px; font-style: italic; margin-left: auto; }
+
+    /* Farben der Tabellen-Header */
+    .color-purple .er-table-header { background: #7c3aed; }
+    .color-purple { border-color: #7c3aed44; }
+    .color-blue .er-table-header { background: #1d4ed8; }
+    .color-blue { border-color: #1d4ed844; }
+    .color-teal .er-table-header { background: #0d9488; }
+    .color-teal { border-color: #0d948844; }
+    .color-rose .er-table-header { background: #be185d; }
+    .color-rose { border-color: #be185d44; }
+    .color-amber .er-table-header { background: #b45309; }
+    .color-amber { border-color: #b4530944; }
+    .color-green .er-table-header { background: #166534; }
+    .color-green { border-color: #16653444; }
+    .color-slate .er-table-header { background: #334155; }
+    .color-slate { border-color: #33415544; }
+
+    /* ── Legende ── */
+    .legend {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      background: rgba(24,24,37,0.88);
+      border: 1px solid #313244;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 11px;
+      z-index: 90;
+      min-width: 190px;
+      backdrop-filter: blur(4px);
+    }
+    .legend-title {
+      font-weight: 700;
+      font-size: 12px;
+      color: #cba6f7;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+      color: #a6adc8;
+    }
+    .legend-line {
+      width: 36px;
+      height: 2px;
+      flex-shrink: 0;
+    }
+    .legend-line-solid { background: #89b4fa; }
+    .legend-line-dash {
+      background: repeating-linear-gradient(to right, #f9e2af 0, #f9e2af 4px, transparent 4px, transparent 8px);
+    }
+    .legend-line-dot {
+      background: repeating-linear-gradient(to right, #a6e3a1 0, #a6e3a1 2px, transparent 2px, transparent 6px);
+    }
+    .legend-badge-row { display: flex; gap: 6px; margin-top: 4px; }
+
+    /* ── Info-Panel ── */
+    .info-panel {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(24,24,37,0.88);
+      border: 1px solid #313244;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 11px;
+      z-index: 90;
+      min-width: 175px;
+      backdrop-filter: blur(4px);
+    }
+    .info-panel-title {
+      font-weight: 700;
+      font-size: 12px;
+      color: #cba6f7;
+      margin-bottom: 10px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      color: #a6adc8;
+    }
+    .info-val { color: #cdd6f4; font-weight: 600; }
+
+    /* ── Tooltip ── */
+    #tooltip {
+      position: fixed;
+      background: #313244;
+      border: 1px solid #45475a;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      color: #cdd6f4;
+      pointer-events: none;
+      z-index: 200;
+      max-width: 260px;
+      display: none;
+    }
+    #tooltip strong { color: #cba6f7; }
+
+    /* ── Relationstext ── */
+    .rel-label {
+      fill: #6c7086;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 9px;
+      pointer-events: none;
+    }
+    .rel-label-main {
+      fill: #89b4fa;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <span class="toolbar-logo">🎂 Kidstorte</span>
+  <div class="toolbar-sep"></div>
+  <span class="toolbar-title">ER-Diagramm</span>
+  <span class="toolbar-subtitle">&nbsp;— Datenbankstruktur &amp; Systemmodell</span>
+  <div class="toolbar-actions">
+    <button class="tb-btn" onclick="zoomIn()">＋</button>
+    <span class="tb-zoom" id="zoom-display">100%</span>
+    <button class="tb-btn" onclick="zoomOut()">－</button>
+    <button class="tb-btn" onclick="resetView()">Zurücksetzen</button>
+    <a href="/admin" class="tb-btn" style="text-decoration:none;color:#cdd6f4;">← Admin</a>
+  </div>
+</div>
+
+<!-- Canvas -->
+<div id="canvas">
+  <!-- SVG für Verbindungslinien (unter den Tabellen) -->
+  <svg id="diagram-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+
+  <!-- ══════════════════════════════════════════════
+       ENTITÄT 1: Sitzung (Session)
+  ══════════════════════════════════════════════ -->
+  <div class="er-table color-purple" id="tbl-sitzung" style="left:50px;top:70px;">
+    <div class="er-table-header" data-table="sitzung">
+      <span class="er-table-header-icon">🔑</span> Sitzung
+    </div>
+    <div class="er-table-body">
+      <div class="er-row" data-desc="Eindeutige Sitzungs-ID (UUID)">
+        <span class="er-badge badge-pk">PK</span>
+        <span class="er-col-name">sitzungs_id</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Zeitstempel der Erstellung">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">erstellt_am</span>
+        <span class="er-col-type">FLOAT</span>
+      </div>
+      <div class="er-row" data-desc="Zeitstempel des letzten Zugriffs">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">letzter_zugriff</span>
+        <span class="er-col-type">FLOAT</span>
+      </div>
+      <div class="er-row" data-desc="Ablaufzeit der Sitzung">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">ablauf</span>
+        <span class="er-col-type">FLOAT</span>
+      </div>
+      <div class="er-row" data-desc="Serialisierter Zustandsdaten-Blob">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">daten</span>
+        <span class="er-col-type">TEXT (JSON)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ENTITÄT 2: AgenZustand (Agent State)
+  ══════════════════════════════════════════════ -->
+  <div class="er-table color-blue" id="tbl-agenzustand" style="left:290px;top:70px;">
+    <div class="er-table-header" data-table="agenzustand">
+      <span class="er-table-header-icon">🤖</span> AgenZustand
+    </div>
+    <div class="er-table-body">
+      <div class="er-row" data-desc="Zugehörige Sitzungs-ID">
+        <span class="er-badge badge-fk">FK</span>
+        <span class="er-col-name">sitzungs_id</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Erkannte Absicht des Nutzers (intent)">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">intent</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Letzte Benutzereingabe">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">nutzer_eingabe</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Generierte Antwort des Agenten">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">antwort</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="URL des generierten Kuchenbilds">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">bild_url</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Ist die Bestellung vollständig?">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">bestellung_komplett</span>
+        <span class="er-col-type">BOOL</span>
+      </div>
+      <div class="er-row" data-desc="Wurde die Bestellung finalisiert?">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">bestellung_final</span>
+        <span class="er-col-type">BOOL</span>
+      </div>
+      <div class="er-row" data-desc="Adressformular anzeigen?">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">adressformular_zeigen</span>
+        <span class="er-col-type">BOOL</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ENTITÄT 3: Bestellinfo (Order Info)
+  ══════════════════════════════════════════════ -->
+  <div class="er-table color-teal" id="tbl-bestellinfo" style="left:530px;top:70px;">
+    <div class="er-table-header" data-table="bestellinfo">
+      <span class="er-table-header-icon">🎂</span> Bestellinfo
+    </div>
+    <div class="er-table-body">
+      <div class="er-row" data-desc="Anlass (Geburtstag, Hochzeit, ...)">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">anlass</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Anzahl der Gäste">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">gaeste</span>
+        <span class="er-col-type">INTEGER</span>
+      </div>
+      <div class="er-row" data-desc="Geschmacksrichtung des Kuchens">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">geschmack</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Form des Kuchens (rund, eckig, ...)">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">form</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Anzahl der Schichten">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">schichten</span>
+        <span class="er-col-type">INTEGER</span>
+      </div>
+      <div class="er-row" data-desc="Art der Füllung">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">fuellung</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Dekorationsdetails">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">dekoration</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Gewünschte Farbe(n)">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">farbe</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Gewünschter Liefertermin">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">liefertermin</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ENTITÄT 4: Bestellung (Orders DB)
+  ══════════════════════════════════════════════ -->
+  <div class="er-table color-rose" id="tbl-bestellung" style="left:770px;top:70px;">
+    <div class="er-table-header" data-table="bestellung">
+      <span class="er-table-header-icon">📦</span> Bestellung
+    </div>
+    <div class="er-table-body">
+      <div class="er-row" data-desc="Automatisch generierte Bestellnummer">
+        <span class="er-badge badge-pk">PK</span>
+        <span class="er-col-name">bestell_id</span>
+        <span class="er-col-type">INTEGER</span>
+      </div>
+      <div class="er-row" data-desc="Referenz zur Kundensitzung">
+        <span class="er-badge badge-fk">FK</span>
+        <span class="er-col-name">sitzungs_id</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Vollständiger Name des Kunden">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">kunden_name</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="E-Mail-Adresse des Kunden">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">kunden_email</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Telefonnummer des Kunden">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">kunden_telefon</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Straße und Hausnummer">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">kunden_strasse</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Postleitzahl des Kunden">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">kunden_plz</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Stadt des Kunden">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">kunden_stadt</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Serialisierte Bestelldaten (JSON)">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">bestell_info</span>
+        <span class="er-col-type">TEXT (JSON)</span>
+      </div>
+      <div class="er-row" data-desc="Status: neu / in_bearbeitung / fertig / storniert">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">status</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Erstellungszeitpunkt der Bestellung">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">erstellt_am</span>
+        <span class="er-col-type">DATETIME</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ENTITÄT 5: Nachricht (Message)
+  ══════════════════════════════════════════════ -->
+  <div class="er-table color-amber" id="tbl-nachricht" style="left:290px;top:450px;">
+    <div class="er-table-header" data-table="nachricht">
+      <span class="er-table-header-icon">💬</span> Nachricht
+    </div>
+    <div class="er-table-body">
+      <div class="er-row" data-desc="Fortlaufende Nachrichtennummer">
+        <span class="er-badge badge-pk">PK</span>
+        <span class="er-col-name">nachricht_nr</span>
+        <span class="er-col-type">INTEGER</span>
+      </div>
+      <div class="er-row" data-desc="Zugehörige Sitzungs-ID">
+        <span class="er-badge badge-fk">FK</span>
+        <span class="er-col-name">sitzungs_id</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Rolle: user oder assistant">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">rolle</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Inhalt der Nachricht">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">inhalt</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Zeitstempel der Nachricht">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">zeitstempel</span>
+        <span class="er-col-type">FLOAT</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ENTITÄT 6: RAG-Ergebnis (Retrieval)
+  ══════════════════════════════════════════════ -->
+  <div class="er-table color-green" id="tbl-rag" style="left:530px;top:450px;">
+    <div class="er-table-header" data-table="rag">
+      <span class="er-table-header-icon">🔍</span> RAG-Ergebnis
+    </div>
+    <div class="er-table-body">
+      <div class="er-row" data-desc="Eindeutige ID des Wissensfragments">
+        <span class="er-badge badge-pk">PK</span>
+        <span class="er-col-name">chunk_id</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Quelldokument des Chunks">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">dokument</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Text-Inhalt des Chunks">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">inhalt</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Vektoreinbettung (Embedding)">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">embedding</span>
+        <span class="er-col-type">VECTOR</span>
+      </div>
+      <div class="er-row" data-desc="Ähnlichkeitswert zur Anfrage (0–1)">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">relevanz</span>
+        <span class="er-col-type">FLOAT</span>
+      </div>
+      <div class="er-row" data-desc="Speicherort: ChromaDB">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">speicher</span>
+        <span class="er-col-type">chromadb</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       ENTITÄT 7: Prompt-Konfiguration
+  ══════════════════════════════════════════════ -->
+  <div class="er-table color-slate" id="tbl-prompt" style="left:770px;top:450px;">
+    <div class="er-table-header" data-table="prompt">
+      <span class="er-table-header-icon">⚙️</span> Prompt-Konfiguration
+    </div>
+    <div class="er-table-body">
+      <div class="er-row" data-desc="Name des Prompt-Schlüssels">
+        <span class="er-badge badge-pk">PK</span>
+        <span class="er-col-name">schluessel</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Prompt-Text (hot-reloadable)">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">wert</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Ton / Persönlichkeit des Bots">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">bot_ton</span>
+        <span class="er-col-type">TEXT</span>
+      </div>
+      <div class="er-row" data-desc="Quelldatei: prompts_config.yaml">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">quelle</span>
+        <span class="er-col-type">YAML</span>
+      </div>
+      <div class="er-row" data-desc="Zeitpunkt der letzten Änderung">
+        <span class="er-badge badge-nn">NN</span>
+        <span class="er-col-name">geaendert_am</span>
+        <span class="er-col-type">DATETIME</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /canvas -->
+
+<!-- Legende -->
+<div class="legend">
+  <div class="legend-title">Legende</div>
+  <div class="legend-item">
+    <div class="legend-line legend-line-solid"></div>
+    Datenbank-Relation (1:n)
+  </div>
+  <div class="legend-item">
+    <div class="legend-line legend-line-dash"></div>
+    Logische Abhängigkeit
+  </div>
+  <div class="legend-item">
+    <div class="legend-line legend-line-dot"></div>
+    RAG-Abfrage (Vektor)
+  </div>
+  <div style="margin-top:8px; color:#6c7086; font-size:10px; margin-bottom:6px;">Spalten-Badges:</div>
+  <div class="legend-badge-row">
+    <span class="er-badge badge-pk">PK</span>
+    <span style="color:#a6adc8;">Primärschlüssel</span>
+  </div>
+  <div class="legend-badge-row" style="margin-top:4px;">
+    <span class="er-badge badge-fk">FK</span>
+    <span style="color:#a6adc8;">Fremdschlüssel</span>
+  </div>
+  <div class="legend-badge-row" style="margin-top:4px;">
+    <span class="er-badge badge-nn">NN</span>
+    <span style="color:#a6adc8;">Not Null</span>
+  </div>
+</div>
+
+<!-- Info-Panel -->
+<div class="info-panel">
+  <div class="info-panel-title">Systemübersicht</div>
+  <div class="info-row"><span>Entitäten</span><span class="info-val">7</span></div>
+  <div class="info-row"><span>Relationen</span><span class="info-val">6</span></div>
+  <div class="info-row"><span>Speicher</span><span class="info-val">SQLite + ChromaDB</span></div>
+  <div class="info-row"><span>Bestellungen</span><span class="info-val" id="stat-orders">–</span></div>
+  <div class="info-row"><span>Sitzungen</span><span class="info-val" id="stat-sessions">–</span></div>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// PAN & ZOOM
+// ════════════════════════════════════════════════════════════
+const canvas = document.getElementById('canvas');
+let panX = 0, panY = 0, scale = 1;
+let isPanning = false, panStartX = 0, panStartY = 0;
+
+function applyTransform() {
+  canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
+  canvas.style.transformOrigin = '0 0';
+  document.getElementById('zoom-display').textContent = Math.round(scale * 100) + '%';
+  drawRelations();
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  if (e.target === canvas || e.target.id === 'diagram-svg') {
+    isPanning = true;
+    panStartX = e.clientX - panX;
+    panStartY = e.clientY - panY;
+    canvas.classList.add('grabbing');
+  }
+});
+window.addEventListener('mousemove', (e) => {
+  if (!isPanning) return;
+  panX = e.clientX - panStartX;
+  panY = e.clientY - panStartY;
+  applyTransform();
+});
+window.addEventListener('mouseup', () => {
+  isPanning = false;
+  canvas.classList.remove('grabbing');
+});
+
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+  panX = mouseX - (mouseX - panX) * delta;
+  panY = mouseY - (mouseY - panY) * delta;
+  scale *= delta;
+  scale = Math.max(0.2, Math.min(2.5, scale));
+  applyTransform();
+}, { passive: false });
+
+function zoomIn() {
+  scale = Math.min(scale * 1.2, 2.5);
+  applyTransform();
+}
+function zoomOut() {
+  scale = Math.max(scale / 1.2, 0.2);
+  applyTransform();
+}
+function resetView() {
+  panX = 0; panY = 0; scale = 1;
+  applyTransform();
+}
+
+// ════════════════════════════════════════════════════════════
+// TABELLEN VERSCHIEBEN (Drag)
+// ════════════════════════════════════════════════════════════
+document.querySelectorAll('.er-table-header').forEach(header => {
+  const table = header.closest('.er-table');
+  let dragging = false, startX, startY, origLeft, origTop;
+
+  header.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    dragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    origLeft = parseInt(table.style.left);
+    origTop = parseInt(table.style.top);
+    table.style.zIndex = 50;
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    table.style.left = (origLeft + (e.clientX - startX) / scale) + 'px';
+    table.style.top = (origTop + (e.clientY - startY) / scale) + 'px';
+    drawRelations();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (dragging) {
+      dragging = false;
+      table.style.zIndex = '';
+    }
+  });
+});
+
+// ════════════════════════════════════════════════════════════
+// TOOLTIP
+// ════════════════════════════════════════════════════════════
+const tooltip = document.getElementById('tooltip');
+document.querySelectorAll('.er-row[data-desc]').forEach(row => {
+  row.addEventListener('mouseenter', (e) => {
+    const name = row.querySelector('.er-col-name').textContent;
+    const type = row.querySelector('.er-col-type').textContent;
+    const desc = row.dataset.desc;
+    tooltip.innerHTML = `<strong>${name}</strong> <span style="color:#6c7086;">${type}</span><br>${desc}`;
+    tooltip.style.display = 'block';
+  });
+  row.addEventListener('mousemove', (e) => {
+    tooltip.style.left = (e.clientX + 14) + 'px';
+    tooltip.style.top = (e.clientY - 10) + 'px';
+  });
+  row.addEventListener('mouseleave', () => {
+    tooltip.style.display = 'none';
+  });
+});
+
+// ════════════════════════════════════════════════════════════
+// VERBINDUNGSLINIEN
+// ════════════════════════════════════════════════════════════
+function getTableCenter(id, side) {
+  const el = document.getElementById(id);
+  const left = parseInt(el.style.left);
+  const top = parseInt(el.style.top);
+  const w = el.offsetWidth;
+  const h = el.offsetHeight;
+  if (side === 'right')  return { x: left + w, y: top + h / 2 };
+  if (side === 'left')   return { x: left,     y: top + h / 2 };
+  if (side === 'bottom') return { x: left + w / 2, y: top + h };
+  if (side === 'top')    return { x: left + w / 2, y: top };
+}
+
+function makePath(p1, p2, color, dasharray, label, labelOffset) {
+  const mx = (p1.x + p2.x) / 2;
+  const d = `M ${p1.x} ${p1.y} C ${mx} ${p1.y} ${mx} ${p2.y} ${p2.x} ${p2.y}`;
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', d);
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', color);
+  path.setAttribute('stroke-width', '1.5');
+  path.setAttribute('stroke-dasharray', dasharray || 'none');
+  path.setAttribute('opacity', '0.7');
+  path.setAttribute('marker-end', `url(#arrow-${color.replace('#','').substring(0,6)})`);
+
+  const elems = [path];
+
+  if (label) {
+    // Label in der Mitte der Kurve
+    const lx = mx;
+    const ly = (p1.y + p2.y) / 2 + (labelOffset || 0);
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('x', lx - 38); bg.setAttribute('y', ly - 10);
+    bg.setAttribute('width', 76); bg.setAttribute('height', 16);
+    bg.setAttribute('fill', '#1e1e2e'); bg.setAttribute('rx', 3);
+    bg.setAttribute('opacity', '0.85');
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', lx); txt.setAttribute('y', ly + 2);
+    txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('class', 'rel-label-main');
+    txt.textContent = label;
+    elems.push(bg, txt);
+  }
+  return elems;
+}
+
+function makeArrowMarker(id, color) {
+  const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+  marker.setAttribute('id', id);
+  marker.setAttribute('markerWidth', '8');
+  marker.setAttribute('markerHeight', '8');
+  marker.setAttribute('refX', '7');
+  marker.setAttribute('refY', '3');
+  marker.setAttribute('orient', 'auto');
+  const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  poly.setAttribute('points', '0 0, 8 3, 0 6');
+  poly.setAttribute('fill', color);
+  marker.appendChild(poly);
+  return marker;
+}
+
+function makeCrowFoot(p, side, color) {
+  // Kleine Krähen-Fuß Marker (Optionalität)
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const len = 10;
+  let x1, x2, y1, y2;
+  if (side === 'left') {
+    x1 = p.x - len; x2 = p.x; y1 = p.y - 5; y2 = p.y + 5;
+  } else if (side === 'right') {
+    x1 = p.x; x2 = p.x + len; y1 = p.y - 5; y2 = p.y + 5;
+  } else {
+    x1 = p.x - 5; x2 = p.x + 5; y1 = p.y - len; y2 = p.y;
+  }
+  const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line1.setAttribute('x1', p.x); line1.setAttribute('y1', p.y);
+  line1.setAttribute('x2', x1); line1.setAttribute('y2', y1);
+  line1.setAttribute('stroke', color); line1.setAttribute('stroke-width', '1.5'); line1.setAttribute('opacity', '0.7');
+  const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line2.setAttribute('x1', p.x); line2.setAttribute('y1', p.y);
+  line2.setAttribute('x2', x2); line2.setAttribute('y2', y2);
+  line2.setAttribute('stroke', color); line2.setAttribute('stroke-width', '1.5'); line2.setAttribute('opacity', '0.7');
+  g.appendChild(line1); g.appendChild(line2);
+  return g;
+}
+
+function makeN(p, color, side) {
+  const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  const offset = 14;
+  if (side === 'left') { txt.setAttribute('x', p.x - offset); txt.setAttribute('y', p.y - 6); }
+  else if (side === 'right') { txt.setAttribute('x', p.x + 6); txt.setAttribute('y', p.y - 6); }
+  else { txt.setAttribute('x', p.x + 6); txt.setAttribute('y', p.y - 6); }
+  txt.setAttribute('fill', color);
+  txt.setAttribute('font-size', '11');
+  txt.setAttribute('font-weight', '700');
+  txt.setAttribute('opacity', '0.85');
+  txt.textContent = 'n';
+  return txt;
+}
+
+function make1(p, color, side) {
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const offset = 14;
+  let lx = p.x, ly1 = p.y - 6, ly2 = p.y + 6;
+  if (side === 'right') lx = p.x + offset;
+  else if (side === 'left') lx = p.x - offset;
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', lx); line.setAttribute('y1', ly1);
+  line.setAttribute('x2', lx); line.setAttribute('y2', ly2);
+  line.setAttribute('stroke', color); line.setAttribute('stroke-width', '2'); line.setAttribute('opacity', '0.85');
+  g.appendChild(line);
+  return g;
+}
+
+function drawRelations() {
+  const svg = document.getElementById('diagram-svg');
+  svg.innerHTML = '';
+
+  // SVG Größe anpassen
+  const diagramW = 1020, diagramH = 760;
+  svg.setAttribute('width', diagramW);
+  svg.setAttribute('height', diagramH);
+
+  // Defs (Marker)
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const colors = ['89b4fa', 'f9e2af', 'a6e3a1', 'f38ba8', 'cba6f7'];
+  colors.forEach(c => defs.appendChild(makeArrowMarker(`arrow-${c}`, `#${c}`)));
+  svg.appendChild(defs);
+
+  // ── Relation 1: Sitzung ←→ AgenZustand (1:1, blau, enthält)
+  {
+    const p1 = getTableCenter('tbl-sitzung', 'right');
+    const p2 = getTableCenter('tbl-agenzustand', 'left');
+    const color = '#89b4fa';
+    const elems = makePath(p1, p2, color, '', '1:1 enthält');
+    elems.forEach(e => svg.appendChild(e));
+    svg.appendChild(make1(p1, color, 'right'));
+    svg.appendChild(make1(p2, color, 'left'));
+  }
+
+  // ── Relation 2: AgenZustand ←→ Bestellinfo (1:1, blau, führt auf)
+  {
+    const p1 = getTableCenter('tbl-agenzustand', 'right');
+    const p2 = getTableCenter('tbl-bestellinfo', 'left');
+    const color = '#89b4fa';
+    const elems = makePath(p1, p2, color, '', '1:1 führt auf');
+    elems.forEach(e => svg.appendChild(e));
+    svg.appendChild(make1(p1, color, 'right'));
+    svg.appendChild(make1(p2, color, 'left'));
+  }
+
+  // ── Relation 3: Bestellinfo ←→ Bestellung (1:1, rose, erzeugt)
+  {
+    const p1 = getTableCenter('tbl-bestellinfo', 'right');
+    const p2 = getTableCenter('tbl-bestellung', 'left');
+    const color = '#f38ba8';
+    const elems = makePath(p1, p2, color, '', '1:1 erzeugt');
+    elems.forEach(e => svg.appendChild(e));
+    svg.appendChild(make1(p1, color, 'right'));
+    svg.appendChild(make1(p2, color, 'left'));
+  }
+
+  // ── Relation 4: Sitzung ←→ Nachricht (1:n, amber, beinhaltet)
+  {
+    const p1 = getTableCenter('tbl-sitzung', 'bottom');
+    const p2 = getTableCenter('tbl-nachricht', 'left');
+    const color = '#f9e2af';
+    const elems = makePath(p1, p2, color, '', '1:n beinhaltet');
+    elems.forEach(e => svg.appendChild(e));
+    svg.appendChild(make1(p1, color, 'bottom'));
+    svg.appendChild(makeN(p2, color, 'left'));
+    svg.appendChild(makeCrowFoot(p2, 'left', color));
+  }
+
+  // ── Relation 5: AgenZustand ←→ RAG-Ergebnis (1:n, gestrichelt, grün, ruft ab)
+  {
+    const p1 = getTableCenter('tbl-agenzustand', 'bottom');
+    const p2 = getTableCenter('tbl-rag', 'top');
+    const color = '#a6e3a1';
+    const elems = makePath(p1, p2, color, '6 3', '1:n ruft ab');
+    elems.forEach(e => svg.appendChild(e));
+    svg.appendChild(make1(p1, color, 'bottom'));
+    svg.appendChild(makeN(p2, color, 'top'));
+    svg.appendChild(makeCrowFoot(p2, 'top', color));
+  }
+
+  // ── Relation 6: AgenZustand ←→ Prompt-Konfiguration (n:1, gestrichelt, lila, verwendet)
+  {
+    const p1 = getTableCenter('tbl-bestellinfo', 'bottom');
+    const p2 = getTableCenter('tbl-prompt', 'top');
+    const color = '#cba6f7';
+    const elems = makePath(p1, p2, color, '4 4', 'n:1 verwendet');
+    elems.forEach(e => svg.appendChild(e));
+    svg.appendChild(makeN(p1, color, 'bottom'));
+    svg.appendChild(make1(p2, color, 'top'));
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  // Initialen Scale berechnen (Diagramm in Viewport passen)
+  const vw = window.innerWidth;
+  const vh = window.innerHeight - 48;
+  const DIAGRAM_W = 1020;
+  const DIAGRAM_H = 760;
+  scale = Math.min(vw / DIAGRAM_W, vh / DIAGRAM_H, 1.0);
+  scale = Math.max(scale, 0.5);
+  panX = (vw - DIAGRAM_W * scale) / 2;
+  panY = (vh - DIAGRAM_H * scale) / 2;
+
+  // Nach kurzer Verzögerung zeichnen (DOM muss fertig sein)
+  setTimeout(() => {
+    applyTransform();
+    drawRelations();
+  }, 100);
+
+  // Live-Statistiken laden
+  fetch('/admin/orders')
+    .then(r => r.json())
+    .then(data => {
+      const s = data.stats || {};
+      document.getElementById('stat-orders').textContent = s.total_orders ?? '–';
+    })
+    .catch(() => {});
+});
+
+window.addEventListener('resize', () => {
+  drawRelations();
+});
+</script>
+</body>
+</html>

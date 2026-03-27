@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kidstorte – Bewertung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', Arial, sans-serif;
+      background: #fdf6ee;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .rating-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(90,56,37,0.10);
+      max-width: 480px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .rating-header {
+      background: linear-gradient(135deg, #e8b4a0, #5a3825);
+      padding: 28px 32px;
+      text-align: center;
+    }
+    .rating-header h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      color: #fff;
+      font-size: 1.7rem;
+      margin-bottom: 4px;
+    }
+    .rating-header p { color: rgba(255,255,255,0.85); font-size: 0.9rem; }
+    .rating-body { padding: 28px 32px; }
+    .order-info {
+      background: #fdf6ee;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: #5a3825;
+    }
+    .order-info strong { display: block; margin-bottom: 2px; }
+
+    /* Stern-Auswahl */
+    .star-group { display: flex; flex-direction: row-reverse; justify-content: center; gap: 6px; margin: 16px 0 8px; }
+    .star-group input { display: none; }
+    .star-group label {
+      font-size: 2.4rem;
+      cursor: pointer;
+      color: #ddd;
+      transition: color 0.15s, transform 0.1s;
+    }
+    .star-group input:checked ~ label,
+    .star-group label:hover,
+    .star-group label:hover ~ label {
+      color: #f5a623;
+      transform: scale(1.15);
+    }
+
+    .star-hint { text-align: center; font-size: 0.82rem; color: #999; margin-bottom: 16px; }
+
+    textarea {
+      width: 100%;
+      border: 1.5px solid #e0d5c8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: 'DM Sans', Arial, sans-serif;
+      font-size: 0.9rem;
+      resize: vertical;
+      min-height: 90px;
+      color: #333;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    textarea:focus { border-color: #c4956a; }
+
+    label.field-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #5a3825;
+      margin-bottom: 6px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: #5a3825;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: #7a4e35; }
+
+    /* Danke-Zustand */
+    .success-box {
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+    .success-stars { font-size: 2.4rem; margin-bottom: 10px; }
+    .success-box h2 {
+      font-family: 'Playfair Display', serif;
+      color: #5a3825;
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+    .success-box p { color: #666; font-size: 0.9rem; line-height: 1.5; }
+    .back-link {
+      display: inline-block;
+      margin-top: 18px;
+      color: #c4956a;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .footer-bar {
+      background: #f5f5f5;
+      text-align: center;
+      padding: 12px;
+      font-size: 0.75rem;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+<div class="rating-card">
+  <div class="rating-header">
+    <h1>🎂 Kidstorte</h1>
+    <p>Wie war Ihr Kuchen?</p>
+  </div>
+
+  <div class="rating-body">
+
+    {% if already_rated %}
+      <!-- Bereits bewertet oder gerade abgeschickt -->
+      <div class="success-box">
+        {% if submitted %}
+          <div class="success-stars">
+            {% for i in range(submitted_rating) %}⭐{% endfor %}
+          </div>
+          <h2>Vielen Dank! 🙏</h2>
+          <p>Ihre Bewertung wurde gespeichert.<br>Wir freuen uns sehr über Ihr Feedback!</p>
+        {% else %}
+          <div class="success-stars">
+            {% for i in range(existing_rating.rating) %}⭐{% endfor %}
+          </div>
+          <h2>Sie haben bereits bewertet</h2>
+          <p>Sie haben Bestellung #{{ order_id }} bereits mit {{ existing_rating.rating }} Stern{{ 'en' if existing_rating.rating != 1 else '' }} bewertet.</p>
+          {% if existing_rating.comment %}
+            <p style="margin-top:10px;font-style:italic;color:#888;">"{{ existing_rating.comment }}"</p>
+          {% endif %}
+        {% endif %}
+        <a href="/" class="back-link">← Zur Startseite</a>
+      </div>
+
+    {% else %}
+      <!-- Bewertungsformular -->
+      <div class="order-info">
+        <strong>Bestellung #{{ order_id }}</strong>
+        {{ order.customer_name }}
+        {% if order.liefertermin %} · Liefertermin: {{ order.liefertermin }}{% endif %}
+      </div>
+
+      <form method="POST" action="/bewertung/{{ order_id }}">
+        <div class="star-group">
+          <input type="radio" id="s5" name="rating" value="5" required>
+          <label for="s5" title="5 Sterne – Ausgezeichnet">★</label>
+          <input type="radio" id="s4" name="rating" value="4">
+          <label for="s4" title="4 Sterne – Sehr gut">★</label>
+          <input type="radio" id="s3" name="rating" value="3">
+          <label for="s3" title="3 Sterne – Gut">★</label>
+          <input type="radio" id="s2" name="rating" value="2">
+          <label for="s2" title="2 Sterne – Befriedigend">★</label>
+          <input type="radio" id="s1" name="rating" value="1">
+          <label for="s1" title="1 Stern – Verbesserungswürdig">★</label>
+        </div>
+        <p class="star-hint">Bitte Stern auswählen</p>
+
+        <label class="field-label" for="comment">Ihr Kommentar (optional)</label>
+        <textarea id="comment" name="comment" placeholder="Was hat Ihnen besonders gut gefallen? Was können wir verbessern?"></textarea>
+
+        <button type="submit" class="btn-submit">Bewertung abschicken</button>
+      </form>
+    {% endif %}
+
+  </div>
+
+  <div class="footer-bar">
+    Kidstorte Konditorei · Bäckerstraße 12, 50667 Köln · 0221-1234567
+  </div>
+</div>
+
+</body>
+</html>
