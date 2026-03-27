@@ -1,5 +1,5 @@
 
-# Kidstorte – LangGraph Agent
+# Kidstorte – KI-gestützter Bestellassistent
 
 Ein KI-Kundenberater für eine Konditorei, gebaut nach dem **LangGraph-Pattern**:
 Nodes + Edges + Shared State.
@@ -41,50 +41,60 @@ Nodes + Edges + Shared State.
 
 | Datei | Beschreibung |
 |-------|-------------|
-| `state.py` | **Shared State** – Das zentrale Datenobjekt (OrderInfo, AgentState) |
-| `nodes.py` | **Nodes** – 12 eigenständige Verarbeitungsschritte |
-| `graph.py` | **Graph** – Verbindet Nodes mit Routing-Logik (Edges) |
+| `app/state.py` | **Shared State** – Das zentrale Datenobjekt (OrderInfo, AgentState) |
+| `app/nodes.py` | **Nodes** – 14 eigenständige Verarbeitungsschritte |
+| `app/graph.py` | **Graph** – Verbindet Nodes mit Routing-Logik (Edges) |
 | `main.py` | **FastAPI Server** – HTTP-Endpunkte |
-| `ingest.py` | **RAG Setup** – Dokumente in ChromaDB laden |
-| `config.py` | **Konfiguration** – API-Keys, Modelle, Pfade |
+| `utils/ingest.py` | **RAG Setup** – Dokumente in ChromaDB laden |
+| `app/config.py` | **Konfiguration** – API-Keys, Modelle, Pfade |
+| `prompts/prompts_config.yaml` | **Prompts** – Alle LLM-Prompts (Hot-Reload) |
 | `templates/index.html` | **Frontend** – Chat-Interface mit Bild & Order-Panel |
 
 ## Nodes im Detail
 
-### 1. classify_intent
-Erkennt per LLM was der Kunde will: `greeting`, `order`, `price`, `image`, `info`, `change`, `offtopic`
+### 0. guardrail
+Prüft jede Eingabe: blockiert Beleidigungen, Jailbreaks, Spam. Erlaubt Deko-Wünsche.
+
+### 1. classify_and_extract
+Erkennt Intent (`greeting`, `order`, `price`, `image`, `info`, `change`, `finalize`, `offtopic`) UND extrahiert Bestellinfos in einem einzigen LLM-Call.
 
 ### 2. greet
-Begrüßt den Kunden.
+Begrüßt den Kunden und startet eine neue Session.
 
 ### 3. extract_info
 Extrahiert Bestellinfos (Anlass, Gäste, Geschmack, Form...) per LLM aus der Nachricht.
 
 ### 4. check_complete
-Prüft welche Infos noch fehlen. Setzt `order_complete = True` wenn alles da ist.
+Prüft welche Infos noch fehlen. Setzt `order_complete = True` wenn alle 10 Pflichtfelder gefüllt sind.
 
 ### 5. ask_next
-Fragt nach der nächsten fehlenden Info. Bestätigt zuerst was der Kunde gesagt hat.
+Fragt nach der nächsten fehlenden Info. Bestätigt zuerst was der Kunde gesagt hat. Smalltalk bei persönlichen Details.
 
 ### 6. summarize_order
 Fasst die Bestellung zusammen wenn alle Infos da sind.
 
 ### 7. retrieve_docs (RAG)
-Sucht relevante Dokumente in ChromaDB per Embedding-Similarity.
+Sucht relevante Dokumente in ChromaDB per Embedding-Similarity (text-embedding-3-small).
 
 ### 8. calculate_price
-Berechnet den Gesamtpreis basierend auf Bestellinfos + RAG-Kontext.
+Berechnet den Gesamtpreis basierend auf Bestellinfos + RAG-Kontext. Gibt HTML-Tabelle zurück.
 
 ### 9. answer_question
 Beantwortet allgemeine Fragen (Allergene, Öffnungszeiten, Lieferung) per RAG.
 
 ### 10. generate_image
-Generiert ein Kuchenbild mit DALL-E basierend auf den Bestellinfos.
+Generiert Außen- und Querschnittbild mit gpt-image-1. Referenz-Matching aus Portfolio.
 
 ### 11. update_order
 Verarbeitet Änderungswünsche (Farbe, Form, Größe).
 
-### 12. redirect
+### 12. check_calendar
+Prüft Liefertermin-Verfügbarkeit via cal.com API oder SQLite-Kapazität.
+
+### 13. finalize_order
+Zeigt Adressformular, speichert Bestellung in SQLite, sendet E-Mail-Bestätigung.
+
+### 14. redirect
 Leitet Off-Topic-Fragen zurück zum Kuchen.
 
 ## Setup
@@ -93,12 +103,12 @@ Leitet Off-Topic-Fragen zurück zum Kuchen.
 # 1. Dependencies installieren
 pip install -r requirements.txt
 
-# 2. API-Key eintragen
+# 2. API-Keys eintragen
 cp .env.example .env
 # → OPENAI_API_KEY in .env eintragen
 
 # 3. Dokumente in ChromaDB laden
-python ingest.py
+python -m utils.ingest
 
 # 4. Server starten
 python main.py
@@ -112,21 +122,27 @@ Dann öffnen: **http://localhost:5001**
 |----------|---------|-------------|
 | `/` | GET | Frontend |
 | `/api/chat` | POST | Nachricht senden `{question: "..."}` |
+| `/api/chat/stream` | POST | SSE Streaming-Antwort |
 | `/api/generate-image` | POST | Bild generieren |
 | `/api/reset` | POST | Neues Gespräch |
 | `/api/state` | GET | Debug: Aktueller Agent-State |
+| `/api/metrics` | GET | Token-Kosten, Latenz |
+| `/api/submit-order` | POST | Bestellung abschicken |
+| `/order/{id}/pdf` | GET | Bestell-PDF |
+| `/admin` | GET | Admin-Panel |
 
 ## Technologien
 
 - **FastAPI** – Async HTTP Server
-- **OpenAI GPT-4o-mini** – Chat & Intent-Erkennung
+- **OpenAI GPT-4o-mini** – Chat, Intent-Erkennung, Extraktion
+- **OpenAI gpt-image-1** – Bildgenerierung (Außen + Querschnitt)
 - **OpenAI text-embedding-3-small** – Embeddings für RAG
-- **OpenAI DALL-E (gpt-image-1)** – Bildgenerierung
-- **ChromaDB** – Vektor-Datenbank für Dokumente
+- **ChromaDB** – Vektor-Datenbank für RAG + Session-Persistenz
+- **SQLite** – Bestellungen, Bewertungen, Kapazität
+- **LangSmith** – Tracing & Monitoring aller Nodes
 - **LangGraph-Pattern** – Nodes + Edges + Shared State
-=======
-# Kidstorte
->>>>>>> 64ef9d417ef8e6d1eff77902e78adcc1386746eb
-#Das Admin-Passwort ist: cakedreams2024
+- **Pydantic** – Request-Validierung in FastAPI-Endpunkten
 
-#Login unter: http://localhost:5001/admin/login
+## Admin-Panel
+
+Login unter: http://localhost:5001/admin/login

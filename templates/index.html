@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kidstorte – Handgemachte Kuchen aus Köln</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=2">
 </head>
 <body>
 
@@ -205,7 +205,7 @@
       <div class="contact-grid">
         <div class="contact-card"><h4>📍 Adresse</h4><p>Kidstorte Konditorei<br>Bäckerstraße 12<br>50667 Köln</p></div>
         <div class="contact-card"><h4>🕐 Öffnungszeiten</h4><p>Mo – Fr: 8:00 – 18:00<br>Sa: 9:00 – 16:00<br>So: Geschlossen</p></div>
-        <div class="contact-card"><h4>📞 Kontakt</h4><p>Tel: 0221-1234567<br>bestellung@cake-dreams.de<br>@cakedreams_koeln</p></div>
+        <div class="contact-card"><h4>📞 Kontakt</h4><p>Tel: 0221-1234567<br>bestellung@kidstorte.de<br>@kidstore_koeln</p></div>
         <div class="contact-card"><h4>🚚 Lieferung</h4><p>Köln: 10 €<br>30 km Umkreis: 20 €<br>Abholung: Kostenlos</p></div>
       </div>
     </div>
@@ -228,15 +228,25 @@
   <div class="chat-widget" id="chat-widget">
     <div class="chat-header">
       <div class="chat-header-info">
-        <span class="chat-header-title">🎂 Kidstorte Berater</span>
+
+        <a href="#hero" class="nav-logo">
+        <img src="/static/images/logo.png" alt="Kidstorte Logo" class="nav-logo-img" style="height:100px;width:100px;object-fit:cover;object-position:center;">
+      Kidstorte Berater</a>
         <span class="chat-header-status" id="chat-status">KI-gestützt</span>
       </div>
       <button class="chat-close" id="chat-close">✕</button>
     </div>
 
-    <!-- Order Info Panel -->
-    <div class="chat-order-panel" id="order-panel">
-      <div class="order-tags" id="order-tags"></div>
+    <!-- Fortschrittsanzeige -->
+    <div class="chat-progress-bar" id="progress-bar-container" style="display:none;">
+      <div class="progress-bar-header">
+        <span class="progress-label">Bestellfortschritt</span>
+        <span class="progress-count" id="progress-count">0 / 7</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-steps" id="progress-steps"></div>
     </div>
 
     <div class="chat-messages" id="chat-messages">
@@ -244,6 +254,28 @@
         <div class="message-bubble">Hallo und willkommen bei Kidstorte! 👋 Wie kann ich Ihnen helfen?</div>
       </div>
     </div>
+
+    <!-- Adressformular (versteckt, wird per JS eingeblendet) -->
+    <div id="address-form-container" class="address-form-container" style="display:none;">
+      <div class="address-form">
+        <h3 class="address-form-title" id="addr-form-title">Ihre Kontaktdaten</h3>
+        <div class="address-form-fields">
+          <input type="text" id="addr-name" placeholder="Name *" required class="addr-input">
+          <!-- Adress-Felder: nur bei Lieferung sichtbar -->
+          <div id="addr-delivery-fields">
+            <input type="text" id="addr-street" placeholder="Straße und Hausnummer *" required class="addr-input">
+            <div class="addr-row">
+              <input type="text" id="addr-plz" placeholder="PLZ *" required class="addr-input addr-plz">
+              <input type="text" id="addr-city" placeholder="Stadt *" required class="addr-input addr-city">
+            </div>
+          </div>
+          <input type="tel" id="addr-phone" placeholder="Telefonnummer *" required class="addr-input">
+          <input type="email" id="addr-email" placeholder="E-Mail-Adresse *" required class="addr-input">
+        </div>
+        <button id="submit-address-btn" class="btn-submit-address">Bestellung abschicken</button>
+      </div>
+    </div>
+
     <div class="chat-input-area">
       <div class="chat-options">
         <label class="image-toggle">
@@ -265,6 +297,6 @@
     <img id="overlay-img" src="" alt="Kuchen Vorschau">
   </div>
 
-  <script src="/static/script.js"></script>
+  <script src="/static/script.js?v=3"></script>
 </body>
 </html>

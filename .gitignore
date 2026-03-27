@@ -1,7 +1,29 @@
+# Secrets & Umgebung
 .env
+.env.*
 .venv/
 __pycache__/
-chroma_db/
-.idea/
-static/images/*.png
 *.pyc
+*.pyo
+
+# Datenbanken
+*.db
+chroma_db/
+
+# IDE & OS
+.idea/
+.DS_Store
+**/.DS_Store
+
+# Node
+node_modules/
+package-lock.json
+
+# Generierte Dateien
+static/images/*.png
+static/pdfs/
+Bilder/Bildschirmfoto*
+
+# Logs & temporäre Dateien
+*.log
+*.tmp
