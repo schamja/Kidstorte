@@ -1,0 +1,23 @@
+# ── Web-Framework ──
+fastapi==0.133.0
+uvicorn[standard]==0.41.0
+pydantic==2.12.5
+Jinja2==3.1.6
+python-multipart==0.0.20
+
+# ── Konfiguration ──
+python-dotenv==1.2.1
+PyYAML==6.0.3
+
+# ── KI / LLM ──
+openai==2.24.0
+chromadb==1.5.1
+
+# ── PDFs (Bestellbestätigung) ──
+reportlab==4.4.5
+
+# ── HTTP (cal.com, HuggingFace-Fallback) ──
+requests==2.32.5
+
+# ── Tracing (optional, aber dringend empfohlen) ──
+langsmith==0.4.36

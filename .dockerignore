@@ -1,0 +1,64 @@
+# ── Git ──
+.git
+.gitignore
+.gitattributes
+
+# ── Python ──
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv
+env
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.coverage
+htmlcov
+*.egg-info
+dist
+build
+
+# ── Editor / OS ──
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── Claude Code worktrees & local config ──
+.claude
+.cursor
+
+# ── Lokale Daten — KEIN Image-Bestandteil, kommt via Volume ──
+chroma_db
+static/images/*
+static/pdfs/*
+services/*.db
+services/*.db-journal
+
+# ── Logs ──
+*.log
+logs
+
+# ── Tests / Docs ──
+tests
+docs
+*.md
+!README.md
+
+# ── Node (presentation.js etc., wird im Container nicht gebraucht) ──
+node_modules
+package.json
+package-lock.json
+presentation.js
+
+# ── Sensible Dateien — NIEMALS ins Image! ──
+.env
+.env.*
+!.env.example
+*.pem
+*.key

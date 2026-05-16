@@ -1,0 +1,91 @@
+# ─────────────────────────────────────────────────────────────
+# Kidstorte — Production-Setup mit nginx (TLS) als Reverse-Proxy
+# ─────────────────────────────────────────────────────────────
+# Start:        docker compose up -d
+# Logs:         docker compose logs -f kidstorte
+# Update:       git pull && docker compose build && docker compose up -d
+# Stop:         docker compose down
+# ─────────────────────────────────────────────────────────────
+
+services:
+  kidstorte:
+    # Default: Image aus ghcr.io ziehen (CI/CD-Modus auf dem Server).
+    # Für lokales Bauen:  docker compose build  oder  docker compose up --build
+    image: ${KIDSTORTE_IMAGE:-ghcr.io/schamja/kidstorte-longchain:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kidstorte
+    restart: unless-stopped
+    env_file:
+      - .env
+    expose:
+      - "5001"            # NUR intern — nginx terminiert TLS und proxied
+    volumes:
+      # Persistente Daten — überleben Container-Rebuilds
+      - chroma_data:/app/chroma_db
+      - sqlite_data:/app/services
+      - ./Bilder:/app/Bilder:ro                 # Referenzbilder vom Host (read-only)
+      - generated_images:/app/static/images     # generierte KI-Bilder
+      - generated_pdfs:/app/static/pdfs         # Bestellbestätigungen
+    networks:
+      - kidstorte-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:5001/api/calendar/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: kidstorte-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/certbot/conf:/etc/letsencrypt:ro     # TLS-Zertifikate
+      - ./deploy/certbot/www:/var/www/certbot:ro      # ACME-Challenges
+    depends_on:
+      - kidstorte
+    networks:
+      - kidstorte-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: Certbot für Let's-Encrypt-Renewal (einmal pro Tag)
+  certbot:
+    image: certbot/certbot:latest
+    container_name: kidstorte-certbot
+    restart: unless-stopped
+    volumes:
+      - ./deploy/certbot/conf:/etc/letsencrypt
+      - ./deploy/certbot/www:/var/www/certbot
+    entrypoint: >
+      /bin/sh -c "trap exit TERM;
+      while :; do
+        certbot renew --webroot -w /var/www/certbot --quiet;
+        sleep 12h & wait $${!};
+      done"
+    networks:
+      - kidstorte-net
+
+volumes:
+  chroma_data:
+  sqlite_data:
+  generated_images:
+  generated_pdfs:
+
+networks:
+  kidstorte-net:
+    driver: bridge

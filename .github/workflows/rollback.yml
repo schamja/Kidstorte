@@ -1,0 +1,194 @@
+# ═══════════════════════════════════════════════════════════════
+# Rollback — Server auf einen früheren Image-Tag zurücksetzen
+#
+# Nur manuell auslösbar (kein Auto-Trigger!).
+# Behebt einen kaputten Deploy in < 1 Minute.
+#
+# Trigger:
+#   GitHub UI → Actions → "Rollback" → "Run workflow"
+#   → Tag eingeben (z.B. "sha-abc1234" oder "42" oder "previous")
+#
+# Available Tags:
+#   - latest          → aktuell live (also kein echter Rollback)
+#   - sha-<7chars>    → spezifischer Commit
+#   - <run-number>    → fortlaufende Build-Nummer (z.B. "42")
+#   - previous        → der Tag der DAVOR live war (siehe .deploy-history)
+#
+# Available-Tags anschauen:
+#   https://github.com/<owner>/<repo>/pkgs/container/<repo>
+#
+# Required Secrets: gleiche wie deploy.yml
+# ═══════════════════════════════════════════════════════════════
+name: Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image-Tag (z.B. "sha-abc1234", "42", oder "previous")'
+        required: true
+        default: 'previous'
+      reason:
+        description: 'Grund für Rollback (für Audit-Log)'
+        required: true
+        default: 'Bug in latest deploy'
+      skip_health_check:
+        description: 'Health-Check überspringen (Notfall!)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-prod        # blockiert parallele Deploys auf der gleichen Box
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  rollback:
+    name: Rollback to ${{ inputs.tag }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Audit-Log anzeigen
+        run: |
+          echo "─── Rollback gestartet ─────────────────────────"
+          echo "  Tag:    ${{ inputs.tag }}"
+          echo "  Grund:  ${{ inputs.reason }}"
+          echo "  User:   ${{ github.actor }}"
+          echo "  Zeit:   $(date -u +%FT%TZ)"
+          echo "  Skip-HC: ${{ inputs.skip_health_check }}"
+          echo "────────────────────────────────────────────────"
+
+      - name: Verify Image existiert in ghcr.io
+        if: ${{ inputs.tag != 'previous' }}
+        run: |
+          # Login mit GITHUB_TOKEN (read:packages)
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.tag }}"
+          if ! docker manifest inspect "$IMAGE" > /dev/null 2>&1; then
+            echo "✗ Image '$IMAGE' existiert NICHT in ghcr.io"
+            echo "  Verfügbare Tags:"
+            echo "  https://github.com/${{ github.repository }}/pkgs/container/${{ github.event.repository.name }}"
+            exit 1
+          fi
+          echo "✓ Image '$IMAGE' existiert"
+
+      - name: SSH → Rollback
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          command_timeout: 8m
+          envs: INPUT_TAG,INPUT_REASON,INPUT_SKIP_HC,GH_ACTOR,GH_REPO
+          script: |
+            set -euo pipefail
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH || '/opt/kidstorte' }}"
+            REGISTRY="${{ env.REGISTRY }}"
+            IMAGE_BASE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+            HISTORY="$DEPLOY_PATH/.deploy-history"
+            cd "$DEPLOY_PATH"
+
+            TAG="${{ inputs.tag }}"
+
+            # ── "previous" → vorletzten Eintrag aus .deploy-history holen ──
+            if [ "$TAG" = "previous" ]; then
+              if [ ! -f "$HISTORY" ] || [ $(wc -l < "$HISTORY") -lt 2 ]; then
+                echo "✗ Keine Deploy-Historie vorhanden ($HISTORY)."
+                echo "  Bitte expliziten Tag angeben statt 'previous'."
+                exit 1
+              fi
+              TAG=$(tail -2 "$HISTORY" | head -1 | awk '{print $2}')
+              echo "✓ 'previous' aufgelöst zu: $TAG"
+            fi
+
+            CURRENT_IMG=$(docker inspect --format='{{.Config.Image}}' kidstorte 2>/dev/null || echo "none")
+            TARGET_IMG="$IMAGE_BASE:$TAG"
+            echo "── Wechsel: $CURRENT_IMG → $TARGET_IMG"
+
+            if [ "$CURRENT_IMG" = "$TARGET_IMG" ]; then
+              echo "ℹ Ziel-Image ist bereits live — nichts zu tun."
+              exit 0
+            fi
+
+            echo "── Login ghcr.io ─────────────────────────────"
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            echo "── Image pullen ──────────────────────────────"
+            docker pull "$TARGET_IMG"
+
+            echo "── KIDSTORTE_IMAGE in .env setzen/aktualisieren ──"
+            # .env so anpassen dass der Override persistiert (auch nach Reboot!)
+            if grep -q '^KIDSTORTE_IMAGE=' .env 2>/dev/null; then
+              sed -i "s|^KIDSTORTE_IMAGE=.*|KIDSTORTE_IMAGE=$TARGET_IMG|" .env
+            else
+              echo "KIDSTORTE_IMAGE=$TARGET_IMG" >> .env
+            fi
+
+            echo "── Container neu starten ─────────────────────"
+            docker compose up -d --no-deps --remove-orphans kidstorte
+
+            if [ "${{ inputs.skip_health_check }}" != "true" ]; then
+              echo "── Wait for healthy ──────────────────────────"
+              ok=0
+              for i in $(seq 1 30); do
+                status=$(docker inspect --format='{{.State.Health.Status}}' kidstorte 2>/dev/null || echo "starting")
+                echo "  [$i/30] status=$status"
+                if [ "$status" = "healthy" ]; then
+                  ok=1
+                  break
+                fi
+                sleep 5
+              done
+
+              if [ "$ok" -ne 1 ]; then
+                echo "✗ Rollback-Image wurde nicht healthy — Logs:"
+                docker compose logs --tail=80 kidstorte
+                echo ""
+                echo "⚠ Container läuft mit dem fehlerhaften Image weiter."
+                echo "  Manuell prüfen und ggf. anderes Rollback-Ziel wählen."
+                exit 1
+              fi
+            else
+              echo "⚠ Health-Check übersprungen (Notfall-Modus)"
+            fi
+
+            echo "── Deploy-Historie aktualisieren ─────────────"
+            echo "$(date -u +%FT%TZ) $TAG rollback by:${{ github.actor }} reason:\"${{ inputs.reason }}\"" >> "$HISTORY"
+            # nur die letzten 50 Einträge behalten
+            tail -50 "$HISTORY" > "$HISTORY.tmp" && mv "$HISTORY.tmp" "$HISTORY"
+
+            echo ""
+            echo "✓ Rollback abgeschlossen — jetzt live: $TARGET_IMG"
+
+      - name: Smoke-Test
+        if: ${{ !inputs.skip_health_check && secrets.PUBLIC_URL != '' }}
+        run: |
+          for i in 1 2 3 4 5; do
+            code=$(curl -sk -o /dev/null -w "%{http_code}" "${{ secrets.PUBLIC_URL }}/" || echo "000")
+            echo "Try $i: HTTP $code"
+            [ "$code" = "200" ] && exit 0
+            sleep 4
+          done
+          echo "✗ Public-URL antwortet nicht mit 200 nach Rollback"
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Rollback Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Tag | \`${{ inputs.tag }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Reason | ${{ inputs.reason }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Triggered by | @${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ job.status }} |" >> $GITHUB_STEP_SUMMARY
