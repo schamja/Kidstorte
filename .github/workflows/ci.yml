@@ -1,0 +1,75 @@
+# ═══════════════════════════════════════════════════════════════
+# CI — läuft bei jedem Push und PR
+# Schneller Sanity-Check bevor wir deployen.
+# ═══════════════════════════════════════════════════════════════
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint & Syntax-Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install minimal tooling
+        run: pip install ruff pyyaml
+
+      - name: Python syntax (compile all .py)
+        run: python -m compileall -q app monitoring services utils main.py
+
+      - name: Ruff (nur kritische Fehler — kein Style-Geknöter)
+        run: ruff check --select=E9,F63,F7,F82 .
+
+      - name: YAML-Validierung
+        run: |
+          python -c "
+          import yaml, pathlib, sys
+          ok = True
+          for p in pathlib.Path('.').rglob('*.y*ml'):
+              if 'node_modules' in p.parts or '.venv' in p.parts:
+                  continue
+              try:
+                  yaml.safe_load(p.read_text())
+                  print(f'  ✓ {p}')
+              except Exception as e:
+                  print(f'  ✗ {p}: {e}')
+                  ok = False
+          sys.exit(0 if ok else 1)
+          "
+
+  docker-build:
+    name: Docker-Build (dry, kein Push)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: lint
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build (Cache-Layer testen)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          tags: kidstorte:ci-${{ github.sha }}
