@@ -116,6 +116,12 @@ async def chat(request_body: ChatRequest, request: Request, response: Response):
         # Graph durchlaufen (in Thread, damit Event-Loop nicht blockiert)
         state = await asyncio.to_thread(graph.run, state, question)
 
+        # Klassischer Endpoint kann nicht streamen → Bild synchron nachgenerieren
+        if state.get("_pending_image"):
+            from app.nodes import generate_image
+            state["_pending_image"] = False
+            state = await asyncio.to_thread(generate_image, state)
+
         # Session-State speichern
         session_mgr.save_session(session_id, state)
 
@@ -210,11 +216,13 @@ async def chat_stream(request: Request, request_body: ChatRequest):
                 await asyncio.sleep(0.03)  # 30ms pro Wort = natürliches Tippen
 
             # ── Phase 3: Metadaten als finales Event ──
+            image_pending = bool(state.get("_pending_image"))
             meta = {
                 "done": True,
                 "image_url": state.get("image_url"),
                 "image_url_cut": state.get("image_url_cut"),
                 "reference_image_url": state.get("reference_image_url"),
+                "image_pending": image_pending,
                 "intent": state.get("intent", ""),
                 "order_info": state.get("order_info", {}),
                 "order_complete": state.get("order_complete", False),
@@ -225,6 +233,25 @@ async def chat_stream(request: Request, request_body: ChatRequest):
                 "current_field": state.get("current_field", ""),
             }
             yield f"data: {_json.dumps(meta)}\n\n"
+
+            # ── Phase 4: Bild parallel generieren (falls Graph es markiert hat) ──
+            if image_pending:
+                try:
+                    from app.nodes import generate_image
+                    state["_pending_image"] = False
+                    state = await asyncio.to_thread(generate_image, state)
+                    session_mgr.save_session(session_id, state)
+                    img_event = {
+                        "image_ready": True,
+                        "image_url": state.get("image_url"),
+                        "image_url_cut": state.get("image_url_cut"),
+                        "reference_image_url": state.get("reference_image_url"),
+                    }
+                    yield f"data: {_json.dumps(img_event)}\n\n"
+                except Exception as e:
+                    logger.exception(f"Bildgenerierung (deferred) fehlgeschlagen: {e}")
+                    err_event = {"image_ready": True, "image_url": None, "image_error": str(e)}
+                    yield f"data: {_json.dumps(err_event)}\n\n"
 
         except Exception as e:
             logger.exception(f"Streaming-Fehler: {e}")

@@ -44,7 +44,6 @@ from app.nodes import (
     retrieve_docs,
     calculate_price,
     answer_question,
-    generate_image,
     update_order,
     redirect,
     finalize_order,
@@ -94,6 +93,7 @@ class CakeDreamsGraph:
         state["image_url"] = None
         state["guardrail_blocked"] = False
         state["show_address_form"] = False  # Formular nur bei explizitem Trigger zeigen
+        state["_pending_image"] = False  # Wird gesetzt, wenn ein Bild parallel erzeugt werden soll
 
         # User-Nachricht zum Verlauf hinzufügen
         state["messages"].append({"role": "user", "content": user_input})
@@ -168,16 +168,11 @@ class CakeDreamsGraph:
                     state["_pending_calendar_msg"] = cal_msg
 
             if state["order_complete"] and not was_complete_before:
-                # Erste Mal komplett → Zusammenfassung + Vorschaubild generieren
+                # Erste Mal komplett → Zusammenfassung jetzt, Vorschaubild parallel danach
                 state = summarize_order(state)
-                summary_text = state["response"]
-                # Zusammenfassung als Nachricht speichern BEVOR Bild generiert wird
-                state["messages"].append({"role": "assistant", "content": summary_text})
-                # Automatisch Vorschaubild generieren
-                logger.info("Alle Felder komplett → generiere automatisch Vorschaubild")
-                state = generate_image(state)
-                # Zusammenfassung + Bild-Response kombinieren
-                state["response"] = f"{summary_text}\n\n{state['response']}"
+                # Bild wird vom Stream-Endpoint erzeugt (parallel zum Text)
+                logger.info("Alle Felder komplett → Bild wird parallel generiert")
+                state["_pending_image"] = True
             elif state["order_complete"] and was_complete_before:
                 # War schon komplett, Kunde hat optionale Infos ergänzt (z.B. Lieferadresse)
                 # → Nur bestätigen, nicht nochmal summarize
@@ -224,7 +219,8 @@ class CakeDreamsGraph:
                 # Hinweis anhängen dass Bild kommt
                 state["response"] = state["response"] + " Danach generiere ich sofort Ihr Vorschaubild! 🎨"
             else:
-                state = generate_image(state)
+                state["_pending_image"] = True
+                state["response"] = "Einen Moment, ich erstelle Ihr Vorschaubild... 🎨"
 
         elif intent == "info":
             state = retrieve_docs(state)
@@ -250,18 +246,13 @@ class CakeDreamsGraph:
                     state = ask_next(state)
                 elif state["order_complete"] and not was_complete_before:
                     # Bestellung wurde GERADE erst komplett (z.B. abholung war letztes Feld)
-                    logger.info("Finalize-Intent, aber Bestellung gerade erst komplett → summarize + image")
+                    logger.info("Finalize-Intent, aber Bestellung gerade erst komplett → summarize, Bild parallel")
                     state = summarize_order(state)
-                    summary_text = state["response"]
-                    state["messages"].append({"role": "assistant", "content": summary_text})
-                    state = generate_image(state)
-                    state["response"] = f"{summary_text}\n\n{state['response']}"
+                    state["_pending_image"] = True
                 elif not state.get("image_url") and not state.get("last_image_url") and not state.get("_image_gen_failed"):
-                    logger.info("Finalize ohne Vorschaubild → generiere erst Bild")
-                    state = generate_image(state)
-                    # Wenn Bildgenerierung fehlschlägt, merken damit wir nicht endlos loopen
-                    if not state.get("image_url"):
-                        state["_image_gen_failed"] = True
+                    logger.info("Finalize ohne Vorschaubild → Bild parallel generieren")
+                    state["_pending_image"] = True
+                    state["response"] = "Einen Moment, ich erstelle Ihr Vorschaubild... 🎨"
                 else:
                     # Direkt Formular zeigen (kein extra Bestätigungsschritt)
                     state = finalize_order(state)

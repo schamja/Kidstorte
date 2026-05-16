@@ -148,12 +148,32 @@ def guardrail(state: AgentState) -> AgentState:
             max_tokens=5,
         )
         if "BLOCK" in result.upper():
-            state["guardrail_blocked"] = True
-            state["response"] = (
-                "Diese Nachricht kann ich leider nicht verarbeiten. "
-                "Ich helfe Ihnen gerne bei Ihrer Kuchenbestellung! 🎂"
+            # Fail-open Override: Wenn die Nachricht klar Kuchen/Bestell-Vokabular enthält,
+            # eher durchlassen als einen echten Kundenwunsch zu verlieren.
+            cake_domain_keywords = (
+                "kuchen", "torte", "fondant", "deko", "dekoration", "schicht",
+                "füllung", "fuellung", "geschmack", "anlass", "geburtstag", "hochzeit",
+                "form", "rund", "eckig", "herz", "preis", "lieferung", "abholung",
+                "termin", "allergie", "beschriftung", "vorschau", "bild",
+                "sportwagen", "auto", "figur", "ronaldo", "elsa", "spiderman",
+                "einhorn", "dino", "krone", "rakete",
+                "farbe", "rosa", "rose", "pink", "blau", "rot", "grün", "gelb",
+                "schoko", "vanille", "erdbeer", "zitrone", "himbeer",
+                "möchte", "will", "hätte", "gerne", "bitte",
             )
-            logger.warning(f"Guardrail BLOCKIERT: '{user_input[:60]}'")
+            user_low = user_input.lower()
+            if any(kw in user_low for kw in cake_domain_keywords):
+                logger.info(
+                    f"Guardrail wollte BLOCKEN, aber Kuchen-Vokabular erkannt → durchgelassen: "
+                    f"'{user_input[:80]}'"
+                )
+            else:
+                state["guardrail_blocked"] = True
+                state["response"] = (
+                    "Diese Nachricht kann ich leider nicht verarbeiten. "
+                    "Ich helfe Ihnen gerne bei Ihrer Kuchenbestellung! 🎂"
+                )
+                logger.warning(f"Guardrail BLOCKIERT: '{user_input[:60]}'")
     except Exception as e:
         # Bei Fehler: Eingabe durchlassen (fail-open)
         logger.warning(f"Guardrail-Check fehlgeschlagen, Eingabe durchgelassen: {e}")
@@ -1417,6 +1437,41 @@ def _auto_save_to_reference(image_url: str, order_info: dict):
         logger.warning(f"Auto-Speicherung fehlgeschlagen: {e}")
 
 
+# ── In-Memory Cache: gleiche Bestellung → fertiges Bild wiederverwenden ──
+# Persistiert über Server-Lebenszeit. Datei-Existenz wird beim Lookup geprüft,
+# damit gelöschte/aufgeräumte PNGs den Cache nicht falsch beantworten.
+_IMAGE_CACHE: dict = {}
+_IMAGE_CACHE_MAX = 200
+
+
+def _image_cache_key(prompt: str) -> str:
+    import hashlib
+    return hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+
+
+def _image_cache_get(key: str):
+    url = _IMAGE_CACHE.get(key)
+    if not url:
+        return None
+    # URL ist /static/images/xxx.png — Datei muss noch existieren
+    if url.startswith("/static/") and not os.path.exists(url.lstrip("/")):
+        _IMAGE_CACHE.pop(key, None)
+        return None
+    return url
+
+
+def _image_cache_put(key: str, url: str) -> None:
+    if not url:
+        return
+    if len(_IMAGE_CACHE) >= _IMAGE_CACHE_MAX:
+        # Simpler FIFO-Trim: ältesten Eintrag rauswerfen
+        try:
+            _IMAGE_CACHE.pop(next(iter(_IMAGE_CACHE)))
+        except StopIteration:
+            pass
+    _IMAGE_CACHE[key] = url
+
+
 @trace_node("generate_image")
 @safe_node(fallback_response="Die Bildgenerierung ist gerade leider nicht verfügbar. Bitte versuchen Sie es in wenigen Minuten erneut oder fahren Sie mit der Bestellung fort.")
 def generate_image(state: AgentState) -> AgentState:
@@ -1545,16 +1600,12 @@ def generate_image(state: AgentState) -> AgentState:
             color = layer_colors_map.get(part.lower(), "")
             if color:
                 fondant_colors.append(color)
-        # Farben aus Dekoration extrahieren
-        deko_lower = deko_raw.lower()
-        _color_map_de = {
-            "pink": "pink", "rosa": "pink", "rot": "red", "blau": "blue",
-            "grün": "green", "grüne": "green", "gelb": "yellow", "beige": "beige",
-            "weiß": "white", "schwarz": "black", "lila": "purple", "orange": "orange",
-        }
-        for de_color, en_color in _color_map_de.items():
-            if de_color in deko_lower and en_color not in fondant_colors:
-                fondant_colors.append(en_color)
+        # Farben aus Dekoration extrahieren — proximity-aware (siehe _extract_color_from_deko)
+        deko_color_str = _extract_color_from_deko(deko_raw)
+        if deko_color_str:
+            for c in deko_color_str.split(" and "):
+                if c and c not in fondant_colors:
+                    fondant_colors.append(c)
 
         if fondant_colors:
             changes.append(f"CRITICAL: The fondant colors MUST be {' and '.join(fondant_colors)} — ignore any colors from the reference!")
@@ -1604,8 +1655,12 @@ def generate_image(state: AgentState) -> AgentState:
         # Avatar/Figuren (Gitarre, Ronaldo etc.) gehören NUR oben drauf
         # Muster/Themen (Schmetterlinge, Blumen, Sterne) über alle Tiers
         has_avatar = any(word in deko_raw.lower() for word in [
-            "gitarre", "gittare", "auto", "fussball", "fußball", "krone", "rakete",
+            "gitarre", "gittare", "auto", "sportwagen", "rennwagen", "lkw", "traktor",
+            "fussball", "fußball", "krone", "rakete", "flugzeug", "schiff", "boot",
             "ballerina", "dinosaurier", "dino", "pferd", "katze", "hund", "bär",
+            "junge", "mädchen", "baby", "prinzessin", "prinz", "ritter",
+            "spiderman", "elsa", "ronaldo", "messi", "batman", "superman",
+            "einhorn", "drache",
         ])
         has_spread_pattern = any(word in deko_raw.lower() for word in [
             "schmetterling", "blumen", "herz", "stern", "noten", "rosen",
@@ -1613,7 +1668,9 @@ def generate_image(state: AgentState) -> AgentState:
         if has_avatar and not has_spread_pattern:
             # Figur oben, Fondant-Farben auf die Tiers verteilt
             deko_all_tiers = (
-                f"The main figurine decoration goes on TOP of the cake only. "
+                f"CRITICAL FIGURINE REQUIREMENT: A clearly visible fondant figurine matching this exact "
+                f"description MUST be placed ON TOP of the cake: '{deko_raw}'. "
+                f"The figurine is the centerpiece — it MUST be present and recognizable. "
                 f"Each fondant tier should be smooth with its own color as specified. "
             )
         else:
@@ -1637,7 +1694,15 @@ def generate_image(state: AgentState) -> AgentState:
     )
 
     try:
-        image_url = generate_single_image(combined_prompt, "combined", order_info=order_info)
+        # ── Cache-Lookup: identische Bestellung → fertiges Bild wiederverwenden ──
+        cache_key = _image_cache_key(combined_prompt)
+        cached_url = _image_cache_get(cache_key)
+        if cached_url:
+            logger.info(f"Bildgenerierung: Cache-Hit ({cache_key[:10]}…) → {cached_url}")
+            image_url = cached_url
+        else:
+            image_url = generate_single_image(combined_prompt, "combined", order_info=order_info)
+            _image_cache_put(cache_key, image_url)
         state["image_url"] = image_url
         state["image_url_cut"] = None  # Nicht nötig – alles in einem Bild
 
@@ -1950,25 +2015,67 @@ def format_history(messages, max_messages=10):
 
 
 def _extract_color_from_deko(dekoration: str) -> str:
-    """Extrahiert Farbangaben aus dem Dekoration-Feld (z.B. 'fondant blau' → 'blue').
-    Bei mehreren Farben: 'beige fondant und gelbe fondant' → 'beige and yellow'."""
-    color_words = {
-        "blau": "blue", "rot": "red", "rosa": "pink", "pink": "pink",
-        "grün": "green", "grüne": "green", "gelb": "yellow", "gelbe": "yellow",
-        "weiß": "white", "weiss": "white",
-        "schwarz": "black", "lila": "purple", "violett": "purple",
-        "orange": "orange", "beige": "beige", "gold": "gold", "silber": "silver",
-        "türkis": "turquoise", "braun": "brown", "bunt": "colorful",
-        "hellblau": "light blue", "dunkelblau": "dark blue",
-        "hellrosa": "light pink", "dunkelrot": "dark red",
-        "blue": "blue", "red": "red", "green": "green", "white": "white",
-        "yellow": "yellow",
-    }
+    """Extrahiert NUR die Torten-Fondant-Farbe aus dem Deko-Feld.
+    Wenn 'fondant'/'torte'/'kuchen' im Text vorkommt: NUR Farben in deren Nähe nehmen
+    (verhindert dass z.B. 'blauer Sportwagen und rosa Fondant' fälschlich blau zur
+    Tortenfarbe macht). Sonst Fallback: erste gefundene Farbe."""
+    # Längere Tokens zuerst (damit "hellblau" vor "blau" matcht und "light pink" gewinnt)
+    color_words = [
+        ("hellblau", "light blue"), ("dunkelblau", "dark blue"),
+        ("hellrosa", "light pink"), ("hellrose", "light pink"),
+        ("hellrosé", "light pink"), ("rosé", "pink"), ("rose", "pink"),
+        ("dunkelrot", "dark red"),
+        ("hellgrün", "light green"), ("dunkelgrün", "dark green"),
+        ("hellgelb", "light yellow"),
+        ("blau", "blue"), ("rot", "red"), ("rosa", "pink"), ("pink", "pink"),
+        ("grüne", "green"), ("grün", "green"),
+        ("gelbe", "yellow"), ("gelb", "yellow"),
+        ("weiß", "white"), ("weiss", "white"),
+        ("schwarz", "black"), ("lila", "purple"), ("violett", "purple"),
+        ("orange", "orange"), ("beige", "beige"), ("gold", "gold"),
+        ("silber", "silver"), ("türkis", "turquoise"), ("braun", "brown"),
+        ("bunt", "colorful"),
+        ("blue", "blue"), ("red", "red"), ("green", "green"),
+        ("white", "white"), ("yellow", "yellow"),
+    ]
+
     deko_lower = dekoration.lower()
-    found_colors = []
-    for de_color, en_color in color_words.items():
-        if de_color in deko_lower and en_color not in found_colors:
+    cake_anchors = ("fondant", "torte", "kuchen", "cake", "etage", "tier")
+    has_anchor = any(a in deko_lower for a in cake_anchors)
+
+    import re as _re_color
+
+    found_colors: list[str] = []
+
+    def _add(en_color: str):
+        if en_color not in found_colors:
             found_colors.append(en_color)
+
+    def _extract_in_text(text: str):
+        """Extrahiert alle Farben aus einem Textstück (längere Tokens zuerst)."""
+        for de, en in color_words:
+            if _re_color.search(rf"\b{_re_color.escape(de)}", text):
+                _add(en)
+
+    if has_anchor:
+        # Clause-Modus: Text an Satzzeichen + "und"/"sowie" splitten,
+        # dann NUR Farben aus Klauseln mit Anker extrahieren.
+        # Verhindert dass z.B. "roten Kleid, fondantfarbe hellrose" → "rot" rauszieht.
+        clauses = _re_color.split(r"[,;.\n]|\bund\b|\bsowie\b|\baber\b", deko_lower)
+        any_clause_matched = False
+        for clause in clauses:
+            if any(a in clause for a in cake_anchors):
+                any_clause_matched = True
+                _extract_in_text(clause)
+        # Notfall-Fallback: keine Klausel mit Anker hat eine Farbe ergeben
+        # (z.B. weil Anker und Farbe in derselben unsplittbaren Phrase stehen aber
+        # über mehrere Anker verteilt) → den ganzen Text durchsuchen
+        if not found_colors and any_clause_matched is False:
+            _extract_in_text(deko_lower)
+    else:
+        # Fallback: kein Anker im Text → einfache Extraktion (alte Logik)
+        _extract_in_text(deko_lower)
+
     if len(found_colors) >= 2:
         return " and ".join(found_colors)
     elif found_colors:

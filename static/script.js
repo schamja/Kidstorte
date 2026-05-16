@@ -91,6 +91,7 @@ async function sendMessage() {
 // ── Streaming: SSE Wort-für-Wort ──
 async function sendMessageStreaming(text) {
   chatStatus.textContent = "Denkt...";
+  let pendingImagePlaceholder = null;
 
   // Leere Bot-Bubble erstellen die wir live befüllen
   const div = document.createElement("div");
@@ -152,6 +153,10 @@ async function sendMessageStreaming(text) {
             // Metadaten verarbeiten (Bilder, Progress, etc.)
             if (event.image_url || event.image_url_cut) {
               appendImages(event.image_url, event.image_url_cut, event.reference_image_url);
+            } else if (event.image_pending) {
+              // Bild wird parallel generiert → Platzhalter zeigen, später ersetzen
+              pendingImagePlaceholder = appendImagePlaceholder();
+              chatStatus.textContent = "Generiere Bild...";
             }
             updateProgressBar(event.question_todo);
             chatStatus.textContent = event.intent || "KI-gestützt";
@@ -177,6 +182,18 @@ async function sendMessageStreaming(text) {
               showAddressForm(!event.is_pickup);
             }
             else if (event.order_finalized) showNewOrderButton();
+          } else if (event.image_ready) {
+            // Bild fertig → Platzhalter durch echtes Bild ersetzen
+            if (pendingImagePlaceholder && pendingImagePlaceholder.parentNode) {
+              pendingImagePlaceholder.parentNode.removeChild(pendingImagePlaceholder);
+              pendingImagePlaceholder = null;
+            }
+            if (event.image_url || event.image_url_cut) {
+              appendImages(event.image_url, event.image_url_cut, event.reference_image_url);
+            } else {
+              appendMessage("assistant", "Das Vorschaubild konnte leider nicht generiert werden. Möchten Sie es nochmal versuchen?");
+            }
+            chatStatus.textContent = "KI-gestützt";
           } else if (event.error) {
             bubble.classList.remove("streaming-cursor");
             bubble.textContent = "Fehler: " + event.error;
@@ -344,6 +361,30 @@ function sanitizeHtml(html) {
     }
   });
   return temp.innerHTML;
+}
+
+// Platzhalter-Bubble während das Bild generiert wird.
+// Gibt die DOM-Node zurück, damit sie später durch das echte Bild ersetzt werden kann.
+function appendImagePlaceholder() {
+  const div = document.createElement("div");
+  div.className = "message assistant image-placeholder";
+  const bubble = document.createElement("div");
+  bubble.className = "message-bubble message-image";
+  const inner = document.createElement("div");
+  inner.className = "img-preview-row image-loading";
+  inner.innerHTML =
+    '<div class="img-preview-wrapper">' +
+      '<div class="img-preview-label">Vorschaubild wird gemalt…</div>' +
+      '<div class="image-loading-box">' +
+        '<div class="image-loading-spinner"></div>' +
+        '<div class="image-loading-text">🎨 Einen Moment...</div>' +
+      '</div>' +
+    '</div>';
+  bubble.appendChild(inner);
+  div.appendChild(bubble);
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return div;
 }
 
 function appendImages(urlExterior, urlCut, urlReference) {
