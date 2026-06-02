@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kidstorte — KI-Bestellassistent · Architektur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Brand-Farben aus architektur.html / PDF */
+  --bg:        #f8f6f2;
+  --bg-soft:   #f4f0eb;
+  --card:      #ffffff;
+  --border:    #e3ddd2;
+  --border-2:  #d4cfc5;
+  --text:      #2c2c2c;
+  --muted:     #6b6b6b;
+  --light:     #9a9389;
+
+  /* Akzente */
+  --green:     #5b8a72;
+  --green-d:   #3d6b56;
+  --peach:     #e8a87c;
+  --berry:     #7c3f58;
+
+  --code-bg:   #1a1a2e;
+  --code-bg-2: #232342;
+  --code-text: #e0e0e0;
+
+  /* Code-Syntax-Farben (dunkler Modus) */
+  --kw:   #f5b87c;
+  --fn:   #95d5a8;
+  --str:  #d4a8b8;
+  --cm:   #6b6b8c;
+  --var:  #8eb8e0;
+  --cls:  #f0c674;
+  --num:  #d4a8b8;
+
+  --radius:    14px;
+  --mono:      'DM Mono', ui-monospace, monospace;
+  --sans:      'Plus Jakarta Sans', system-ui, sans-serif;
+}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; position: relative; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(248,246,242,.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+
+/* Logo (echtes Kidstorte-Logo aus logo.png) */
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand-logo {
+  height: 52px; width: auto; display: block; flex-shrink: 0;
+  /* leicht zuschneiden, da das PNG einen breiten weißen Rand hat */
+  object-fit: contain;
+}
+.brand-divider {
+  width: 1px; height: 28px; background: var(--border-2);
+}
+.brand-sub {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--muted);
+  font-weight: 600;
+}
+
+.nav-links { display: flex; gap: 28px; font-size: 13px; font-weight: 500; color: var(--muted); }
+.nav-links a { color: inherit; text-decoration: none; transition: color .2s; }
+.nav-links a:hover { color: var(--green); }
+
+.nav-status {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 11px; color: var(--green);
+  padding: 6px 12px; background: rgba(91,138,114,0.08);
+  border: 1px solid rgba(91,138,114,0.25); border-radius: 99px;
+  font-weight: 600;
+}
+.pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: .5; transform: scale(1.4); }
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-d) 100%);
+  color: #fff;
+  padding: 80px 0 100px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -150px; right: -100px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(232,168,124,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -200px; left: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(124,63,88,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero .wrap { position: relative; z-index: 1; }
+
+.eyebrow {
+  display: inline-block; font-family: var(--mono); font-size: 11px; letter-spacing: .25em;
+  text-transform: uppercase; color: var(--peach);
+  padding: 8px 16px; border-radius: 99px;
+  background: rgba(232,168,124,0.15);
+  border: 1px solid rgba(232,168,124,0.35);
+  margin-bottom: 28px;
+}
+h1 {
+  font-size: clamp(38px, 5.5vw, 64px); font-weight: 800; line-height: 1.08;
+  letter-spacing: -0.025em; margin-bottom: 24px; color: #fff;
+}
+h1 em {
+  font-style: normal;
+  color: var(--peach);
+}
+.subtitle {
+  font-size: clamp(16px, 1.8vw, 19px); color: rgba(255,255,255,0.88);
+  max-width: 720px; margin: 0 auto 48px; line-height: 1.65;
+}
+
+.hero-meta {
+  display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+}
+.meta-item {
+  text-align: center;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  padding: 16px 28px; border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  min-width: 130px;
+}
+.meta-num {
+  font-size: 32px; font-weight: 800; color: var(--peach);
+  font-family: var(--mono); letter-spacing: -0.02em;
+}
+.meta-label {
+  font-size: 10.5px; color: rgba(255,255,255,0.7); text-transform: uppercase;
+  letter-spacing: .15em; margin-top: 4px; font-family: var(--mono);
+}
+
+/* ── SECTIONS ── */
+section { padding: 90px 0; }
+.section-head { margin-bottom: 56px; max-width: 760px; }
+.section-eyebrow {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--berry); margin-bottom: 12px;
+  font-weight: 600;
+}
+h2 {
+  font-size: clamp(30px, 3.5vw, 44px); font-weight: 700;
+  line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 18px;
+  color: var(--text);
+}
+.section-sub { font-size: 17px; color: var(--muted); line-height: 1.7; }
+
+/* ── ARCHITECTURE FLOW ── */
+.flow {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+}
+.flow-state {
+  background: linear-gradient(135deg, rgba(91,138,114,0.06) 0%, rgba(232,168,124,0.04) 100%);
+  border: 1px solid rgba(91,138,114,0.18);
+  border-radius: 12px;
+  padding: 22px 28px; margin-bottom: 36px; text-align: center;
+}
+.flow-state-title {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--green); margin-bottom: 8px;
+  font-weight: 700;
+}
+.flow-state-desc { font-size: 13px; color: var(--muted); font-family: var(--mono); }
+
+.flow-row { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.flow-arrow { color: var(--light); font-size: 18px; }
+
+.node-box {
+  background: var(--bg-soft); border: 1.5px solid var(--border-2);
+  border-radius: 12px; padding: 16px 28px; min-width: 220px; text-align: center;
+  font-weight: 600; font-size: 14px; transition: all .2s;
+  font-family: var(--mono);
+}
+.node-box.entry {
+  border-color: var(--green); background: rgba(91,138,114,0.08); color: var(--green-d);
+}
+.node-box.merge {
+  border-color: var(--berry); background: rgba(124,63,88,0.06); color: var(--berry);
+}
+.node-box:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+
+.flow-fork {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px; width: 100%;
+}
+.fork-col {
+  background: var(--bg-soft); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; text-align: center;
+}
+.fork-col-title {
+  font-size: 10.5px; font-family: var(--mono); color: var(--berry);
+  text-transform: uppercase; letter-spacing: .15em; margin-bottom: 10px;
+  font-weight: 700;
+}
+.fork-col-nodes .node-pill {
+  display: inline-block; padding: 4px 9px; background: var(--card);
+  border-radius: 6px; margin: 2px; font-family: var(--mono); font-size: 10.5px;
+  border: 1px solid var(--border-2); color: var(--text);
+}
+
+/* ── NODES GRID ── */
+.nodes-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.node-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px;
+  transition: all .25s; position: relative; overflow: hidden;
+  border-left: 4px solid var(--green);
+}
+.node-card:nth-child(3n+1) { border-left-color: var(--green); }
+.node-card:nth-child(3n+2) { border-left-color: var(--peach); }
+.node-card:nth-child(3n+3) { border-left-color: var(--berry); }
+
+.node-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+.node-num {
+  font-family: var(--mono); font-size: 11px; color: var(--berry);
+  letter-spacing: .12em; font-weight: 600;
+}
+.node-title {
+  font-weight: 700; font-size: 17px; margin: 8px 0 10px;
+  letter-spacing: -0.01em; color: var(--text);
+}
+.node-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+
+/* ── CODE BLOCKS ── */
+.code-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 800px) { .code-grid { grid-template-columns: 1fr; } }
+.code-block {
+  background: var(--code-bg); border: 1px solid var(--code-bg-2);
+  border-radius: 14px; overflow: hidden;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+.code-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+}
+.code-filename {
+  font-family: var(--mono); font-size: 12px; color: rgba(224,224,224,0.7);
+}
+.code-dots { display: flex; gap: 6px; }
+.code-dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.12); }
+.code-dot:nth-child(1) { background: rgba(232,168,124,0.5); }
+.code-dot:nth-child(2) { background: rgba(245,184,124,0.5); }
+.code-dot:nth-child(3) { background: rgba(149,213,168,0.5); }
+
+.code-content {
+  padding: 22px; font-family: var(--mono); font-size: 12.5px;
+  line-height: 1.75; overflow-x: auto; color: var(--code-text);
+}
+.code-content pre { margin: 0; }
+.kw   { color: var(--kw); }
+.fn   { color: var(--fn); }
+.str  { color: var(--str); }
+.cm   { color: var(--cm); font-style: italic; }
+.var  { color: var(--var); }
+.cls  { color: var(--cls); }
+.num  { color: var(--num); }
+
+/* ── STACK ── */
+.stack {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.stack-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px;
+  transition: all .2s;
+  border-top: 3px solid var(--green);
+}
+.stack-card:nth-child(4n+1) { border-top-color: var(--green); }
+.stack-card:nth-child(4n+2) { border-top-color: var(--peach); }
+.stack-card:nth-child(4n+3) { border-top-color: var(--berry); }
+.stack-card:nth-child(4n+4) { border-top-color: var(--green-d); }
+
+.stack-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+.stack-name {
+  font-weight: 700; font-size: 14px; margin-bottom: 4px;
+  font-family: var(--mono); color: var(--berry);
+}
+.stack-role { font-size: 13px; color: var(--muted); }
+
+/* ── ANALOGY BOX ── */
+.analogy {
+  background: rgba(232,168,124,0.10);
+  border-left: 4px solid var(--peach);
+  padding: 18px 22px;
+  border-radius: 0 10px 10px 0;
+  margin: 24px 0;
+  font-style: italic;
+  color: var(--text);
+  font-size: 14.5px;
+  line-height: 1.65;
+}
+.analogy strong { font-style: normal; color: var(--berry); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--bg-soft);
+  border-top: 1px solid var(--border);
+  padding: 48px 0 36px; margin-top: 60px; text-align: center;
+}
+.foot-line {
+  font-size: 13px; color: var(--muted); font-family: var(--mono);
+  letter-spacing: .05em;
+}
+.foot-line strong { color: var(--text); font-weight: 700; }
+.foot-brand {
+  display: inline-flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+
+/* ── DEBUG / BUG-FIX SECTION ── */
+.debug-section {
+  background: linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%);
+}
+.debug-grid {
+  display: grid; gap: 18px;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+@media (max-width: 900px) { .debug-grid { grid-template-columns: 1fr; } }
+
+.debug-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 26px 24px;
+  position: relative;
+  display: flex; flex-direction: column;
+}
+.debug-card.symptom  { border-top: 4px solid var(--berry); }
+.debug-card.diagnose { border-top: 4px solid var(--peach); }
+.debug-card.fix      { border-top: 4px solid var(--green); }
+
+.debug-step {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .18em;
+  text-transform: uppercase; font-weight: 700;
+  margin-bottom: 8px;
+}
+.debug-card.symptom  .debug-step { color: var(--berry); }
+.debug-card.diagnose .debug-step { color: var(--peach-d, #d18856); }
+.debug-card.fix      .debug-step { color: var(--green); }
+
+.debug-title {
+  font-size: 18px; font-weight: 700; letter-spacing: -0.01em;
+  color: var(--text); margin-bottom: 12px; line-height: 1.3;
+}
+.debug-text {
+  font-size: 14px; color: var(--muted); line-height: 1.65;
+  margin-bottom: 14px;
+}
+.debug-text strong { color: var(--text); font-weight: 600; }
+
+.debug-quote {
+  background: rgba(124,63,88,0.06);
+  border-left: 3px solid var(--berry);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 14px; margin: 6px 0 14px;
+  font-size: 13px; font-style: italic; color: var(--text);
+  line-height: 1.55;
+}
+
+/* Layered fix list */
+.fix-layers { list-style: none; padding: 0; margin: 0; }
+.fix-layers li {
+  position: relative;
+  padding: 10px 12px 10px 36px;
+  font-size: 13.5px; color: var(--text);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  line-height: 1.45;
+}
+.fix-layers li:last-child { margin-bottom: 0; }
+.fix-layers li::before {
+  content: counter(layer);
+  counter-increment: layer;
+  position: absolute; left: 10px; top: 10px;
+  width: 20px; height: 20px;
+  background: var(--green); color: #fff;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.fix-layers { counter-reset: layer; }
+.fix-layers .layer-label {
+  display: block;
+  font-family: var(--mono); font-size: 10.5px;
+  font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--green); margin-bottom: 2px;
+}
+.fix-layers .layer-detail { color: var(--muted); font-size: 12.5px; }
+
+.debug-takeaway {
+  background: linear-gradient(135deg, rgba(91,138,114,0.10) 0%, rgba(232,168,124,0.08) 100%);
+  border: 1px solid rgba(91,138,114,0.22);
+  border-radius: 14px;
+  padding: 22px 26px;
+  margin-top: 28px;
+  display: flex; align-items: center; gap: 18px;
+}
+.debug-takeaway-icon {
+  flex-shrink: 0; width: 44px; height: 44px;
+  background: var(--green); color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-weight: 800; font-size: 18px;
+}
+.debug-takeaway-text {
+  font-size: 14.5px; color: var(--text); line-height: 1.6;
+}
+.debug-takeaway-text strong { color: var(--berry); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .wrap { padding: 0 20px; }
+  .hero { padding: 60px 0 70px; }
+  .hero-meta { gap: 16px; }
+  .meta-item { padding: 12px 18px; min-width: 100px; }
+  section { padding: 60px 0; }
+  .flow { padding: 28px 20px; }
+  .nav-links { display: none; }
+  .brand-sub, .brand-divider { display: none; }
+  .brand-logo { height: 42px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap nav-inner">
+    <div class="brand">
+      <img src="logo.png" alt="Kidstorte" class="brand-logo">
+      <div class="brand-divider"></div>
+      <div class="brand-sub">KI-Bestellassistent</div>
+    </div>
+    <div class="nav-links">
+      <a href="#architektur">Architektur</a>
+      <a href="#nodes">Nodes</a>
+      <a href="#code">Code</a>
+      <a href="#debug">Debug-Story</a>
+      <a href="#stack">Stack</a>
+    </div>
+    <div class="nav-status">
+      <span class="pulse"></span>
+      <span>läuft produktiv</span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">KI-Bestellassistent · Konditorei</div>
+    <h1>Wenn KI nicht <em>antwortet</em> –<br>sondern <em>berät</em>.</h1>
+    <p class="subtitle">
+      Kidstorte führt Kunden durch eine komplette Tortenbestellung:
+      versteht Wünsche, stellt die richtigen Fragen, berechnet Preise, generiert Vorschau-Bilder
+      und liefert am Ende Bestätigung &amp; PDF — automatisch.
+    </p>
+    <div class="hero-meta">
+      <div class="meta-item">
+        <div class="meta-num">15</div>
+        <div class="meta-label">Nodes</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-num">1</div>
+        <div class="meta-label">Shared State</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-num">RAG</div>
+        <div class="meta-label">Wissensbasis</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-num">E2E</div>
+        <div class="meta-label">Wunsch → PDF</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ARCHITECTURE -->
+<section id="architektur">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Architektur · LangGraph-Pattern</div>
+      <h2>Nodes &middot; Edges &middot; Shared State</h2>
+      <p class="section-sub">
+        Jede Kundeninteraktion durchläuft einen kontrollierten Graph spezialisierter Verarbeitungsschritte.
+        Keine Black-Box — jede Entscheidung ist nachvollziehbar.
+      </p>
+    </div>
+
+    <div class="analogy">
+      <strong>Analogie:</strong> Stell dir eine Bäckerei vor. Der <b>Graph</b> ist der Chef-Konditor — er entscheidet, wer als Nächstes dran ist. Die <b>Nodes</b> sind die Mitarbeiter — jeder hat eine spezielle Aufgabe. Die <b>Services</b> sind die Werkzeuge (Ofen, Kühlschrank, Telefon). Der <b>State</b> ist das Bestellformular, das von Hand zu Hand weitergereicht wird.
+    </div>
+
+    <div class="flow">
+      <div class="flow-state">
+        <div class="flow-state-title">Shared State</div>
+        <div class="flow-state-desc">user_input · messages · intent · order_info · context · price · image</div>
+      </div>
+
+      <div class="flow-row">
+        <div class="node-box entry">guardrail</div>
+        <div class="flow-arrow">↓</div>
+        <div class="node-box entry">classify_and_extract</div>
+        <div class="flow-arrow">↓</div>
+
+        <div class="flow-fork">
+          <div class="fork-col">
+            <div class="fork-col-title">Greet</div>
+            <div class="fork-col-nodes">
+              <span class="node-pill">greet</span>
+            </div>
+          </div>
+          <div class="fork-col">
+            <div class="fork-col-title">Order</div>
+            <div class="fork-col-nodes">
+              <span class="node-pill">extract_info</span>
+              <span class="node-pill">check_complete</span>
+              <span class="node-pill">ask_next</span>
+              <span class="node-pill">summarize</span>
+            </div>
+          </div>
+          <div class="fork-col">
+            <div class="fork-col-title">Price</div>
+            <div class="fork-col-nodes">
+              <span class="node-pill">retrieve_docs</span>
+              <span class="node-pill">calculate_price</span>
+            </div>
+          </div>
+          <div class="fork-col">
+            <div class="fork-col-title">Image</div>
+            <div class="fork-col-nodes">
+              <span class="node-pill">generate_image</span>
+            </div>
+          </div>
+          <div class="fork-col">
+            <div class="fork-col-title">Info</div>
+            <div class="fork-col-nodes">
+              <span class="node-pill">retrieve_docs</span>
+              <span class="node-pill">answer_question</span>
+            </div>
+          </div>
+          <div class="fork-col">
+            <div class="fork-col-title">Finalize</div>
+            <div class="fork-col-nodes">
+              <span class="node-pill">check_calendar</span>
+              <span class="node-pill">finalize_order</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-arrow">↓</div>
+        <div class="node-box merge">response</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NODES -->
+<section id="nodes">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">15 spezialisierte Verarbeitungsschritte</div>
+      <h2>Jeder Schritt hat einen klaren Job.</h2>
+      <p class="section-sub">
+        Statt einer einzigen "do-everything"-Prompt-Logik wird jede Verantwortung
+        in eine eigene, isoliert testbare Node ausgelagert.
+      </p>
+    </div>
+
+    <div class="nodes-grid">
+      <div class="node-card">
+        <div class="node-num">NODE 0 · GUARDRAIL</div>
+        <div class="node-title">guardrail</div>
+        <div class="node-desc">Filtert jede Eingabe — blockiert Beleidigungen, Jailbreaks, Spam. Erlaubt Deko-Wünsche.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 1 · CLASSIFY</div>
+        <div class="node-title">classify_and_extract</div>
+        <div class="node-desc">Erkennt Intent &amp; extrahiert Bestellinfos in einem einzigen LLM-Call. ~50% Kostenersparnis.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 2 · GREET</div>
+        <div class="node-title">greet</div>
+        <div class="node-desc">Begrüßt den Kunden, startet eine neue Session, setzt question_todo zurück.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 3 · ORDER</div>
+        <div class="node-title">extract_info</div>
+        <div class="node-desc">Extrahiert Anlass, Gäste, Geschmack, Form per LLM aus der Nachricht.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 4 · GATE</div>
+        <div class="node-title">check_complete</div>
+        <div class="node-desc">Prüft welche der 10 Pflichtfelder fehlen — gating für Bestell-Abschluss.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 5 · LOOP</div>
+        <div class="node-title">ask_next</div>
+        <div class="node-desc">Fragt nach der nächsten fehlenden Info — bestätigt zuerst, was der Kunde gesagt hat.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 6 · SUMMARY</div>
+        <div class="node-title">summarize_order</div>
+        <div class="node-desc">Fasst die komplette Bestellung zusammen, sobald alle Infos vorhanden sind.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 7 · RAG</div>
+        <div class="node-title">retrieve_docs</div>
+        <div class="node-desc">Sucht relevante Dokumente in ChromaDB per Embedding-Similarity (Top-5).</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 8 · PRICE</div>
+        <div class="node-title">calculate_price</div>
+        <div class="node-desc">Berechnet den Gesamtpreis aus Bestellinfos + RAG-Kontext. Temperature 0.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 9 · INFO</div>
+        <div class="node-title">answer_question</div>
+        <div class="node-desc">Beantwortet allgemeine Fragen (Allergene, Öffnungszeiten, Lieferung) per RAG.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 10 · IMAGE</div>
+        <div class="node-title">generate_image</div>
+        <div class="node-desc">Generiert Vorschau-Bild mit gpt-image-1, Fallback HuggingFace FLUX.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 11 · CHANGE</div>
+        <div class="node-title">update_order</div>
+        <div class="node-desc">Verarbeitet Änderungswünsche — Farbe, Form, Größe — vergleicht vorher/nachher.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 12 · CALENDAR</div>
+        <div class="node-title">check_calendar</div>
+        <div class="node-desc">Prüft Liefertermin-Verfügbarkeit via SQLite-Kapazität oder cal.com API.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 13 · FINALIZE</div>
+        <div class="node-title">finalize_order</div>
+        <div class="node-desc">Adressformular, Speicherung in SQLite, automatische E-Mail mit PDF-Anhang.</div>
+      </div>
+      <div class="node-card">
+        <div class="node-num">NODE 14 · OFFTOPIC</div>
+        <div class="node-title">redirect</div>
+        <div class="node-desc">Lenkt höflich zurück zum Thema. Feste Antwort aus Config — spart LLM-Kosten.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CODE -->
+<section id="code">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Code · Auszüge</div>
+      <h2>Strukturiert. Typsicher. Lesbar.</h2>
+      <p class="section-sub">
+        Drei Ausschnitte aus dem System — Shared State, eine typische Node und das Routing.
+        Kein Demo-Code: das ist der Aufbau, der produktiv läuft.
+      </p>
+    </div>
+
+    <div class="code-grid">
+      <!-- STATE -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/state.py</span>
+          <div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>
+        </div>
+        <div class="code-content"><pre><span class="cm"># Shared State — die zentrale Datenstruktur</span>
+<span class="cm"># Jede Node liest &amp; schreibt hier.</span>
+
+<span class="kw">class</span> <span class="cls">OrderInfo</span>(BaseModel):
+    anlass:       <span class="cls">str</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    gaeste:       <span class="cls">int</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    geschmack:    <span class="cls">str</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    form:         <span class="cls">str</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    schichten:    <span class="cls">int</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    fuellung:     <span class="cls">str</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    dekoration:   <span class="cls">str</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    allergien:    <span class="cls">list</span>[<span class="cls">str</span>] = []
+    abholung:     <span class="cls">str</span> | <span class="kw">None</span> = <span class="kw">None</span>
+
+<span class="kw">class</span> <span class="cls">AgentState</span>(BaseModel):
+    user_input:    <span class="cls">str</span>
+    messages:      <span class="cls">list</span>[<span class="cls">Message</span>] = []
+    intent:        <span class="cls">Intent</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    order_info:    <span class="cls">OrderInfo</span> = <span class="cls">OrderInfo</span>()
+    context:       <span class="cls">str</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    price:         <span class="cls">Decimal</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    image_url:     <span class="cls">str</span> | <span class="kw">None</span> = <span class="kw">None</span>
+    order_complete: <span class="cls">bool</span> = <span class="kw">False</span></pre></div>
+      </div>
+
+      <!-- ROUTING -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">app/graph.py</span>
+          <div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>
+        </div>
+        <div class="code-content"><pre><span class="cm"># Routing — welcher Node kommt als nächstes?</span>
+
+<span class="kw">def</span> <span class="fn">route_after_classify</span>(state: <span class="cls">AgentState</span>) -&gt; <span class="cls">str</span>:
+    <span class="kw">match</span> state.intent:
+        <span class="kw">case</span> <span class="cls">Intent</span>.GREETING:  <span class="kw">return</span> <span class="str">"greet"</span>
+        <span class="kw">case</span> <span class="cls">Intent</span>.ORDER:     <span class="kw">return</span> <span class="str">"extract_info"</span>
+        <span class="kw">case</span> <span class="cls">Intent</span>.PRICE:     <span class="kw">return</span> <span class="str">"retrieve_docs"</span>
+        <span class="kw">case</span> <span class="cls">Intent</span>.IMAGE:     <span class="kw">return</span> <span class="str">"generate_image"</span>
+        <span class="kw">case</span> <span class="cls">Intent</span>.INFO:      <span class="kw">return</span> <span class="str">"retrieve_docs"</span>
+        <span class="kw">case</span> <span class="cls">Intent</span>.FINALIZE:  <span class="kw">return</span> <span class="str">"check_calendar"</span>
+        <span class="kw">case</span> <span class="cls">Intent</span>.OFFTOPIC:  <span class="kw">return</span> <span class="str">"redirect"</span>
+        <span class="kw">case</span> _:                   <span class="kw">return</span> <span class="str">"redirect"</span>
+
+<span class="kw">def</span> <span class="fn">route_after_check_complete</span>(state) -&gt; <span class="cls">str</span>:
+    <span class="kw">if</span> state.order_info.is_complete():
+        <span class="kw">return</span> <span class="str">"summarize_order"</span>
+    <span class="kw">return</span> <span class="str">"ask_next"</span>      <span class="cm"># Schleife</span></pre></div>
+      </div>
+
+      <!-- NODE EXAMPLE -->
+      <div class="code-block" style="grid-column: 1 / -1;">
+        <div class="code-header">
+          <span class="code-filename">app/nodes.py · classify_and_extract</span>
+          <div class="code-dots"><span class="code-dot"></span><span class="code-dot"></span><span class="code-dot"></span></div>
+        </div>
+        <div class="code-content"><pre><span class="cm"># Eine typische Node — erkennt Intent &amp; extrahiert Daten in einem einzigen LLM-Call.</span>
+<span class="cm"># Hot-reloadbarer Prompt aus YAML, strikt typisierte Antwort, kein freier Text.</span>
+
+<span class="kw">async def</span> <span class="fn">classify_and_extract</span>(state: <span class="cls">AgentState</span>) -&gt; <span class="cls">AgentState</span>:
+    prompt = prompts.render(<span class="str">"classify_and_extract"</span>, user_input=state.user_input)
+
+    response = <span class="kw">await</span> openai.chat.completions.create(
+        model=<span class="str">"gpt-4o-mini"</span>,
+        response_format={<span class="str">"type"</span>: <span class="str">"json_object"</span>},
+        temperature=<span class="num">0</span>,
+        messages=[
+            {<span class="str">"role"</span>: <span class="str">"system"</span>, <span class="str">"content"</span>: prompt.system},
+            {<span class="str">"role"</span>: <span class="str">"user"</span>,   <span class="str">"content"</span>: state.user_input},
+        ],
+    )
+
+    parsed = <span class="cls">ClassifyResponse</span>.model_validate_json(response.choices[<span class="num">0</span>].message.content)
+
+    state.intent = parsed.intent
+    state.order_info = state.order_info.merge(parsed.extracted)
+
+    track_metrics(node=<span class="str">"classify_and_extract"</span>, tokens=response.usage.total_tokens)
+    <span class="kw">return</span> state</pre></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEBUG STORY -->
+<section id="debug" class="debug-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Debugging in der Praxis · Real-World Beispiel</div>
+      <h2>Ein State-Bug — und warum ich ihn in <em>drei&nbsp;Schichten</em> fixe.</h2>
+      <p class="section-sub">
+        Bei einem System mit 14 Nodes und einem geteilten State entstehen Bugs nicht im LLM,
+        sondern in den Übergängen zwischen Nodes. Hier ein konkretes Beispiel — wie ich
+        es diagnostiziert und behoben habe.
+      </p>
+    </div>
+
+    <div class="debug-grid">
+
+      <!-- SYMPTOM -->
+      <div class="debug-card symptom">
+        <div class="debug-step">01 · Symptom</div>
+        <div class="debug-title">Quick-Option-Buttons erschienen <em style="font-style:normal;color:var(--berry)">nach</em> der Bestellung</div>
+        <div class="debug-text">
+          Die Karte <strong>"Abholung oder Lieferung"</strong> tauchte wieder auf, obwohl
+          die Bestellung bereits komplett zusammengefasst war — auch bei späteren
+          Folge-Fragen zum Preis oder Liefertermin.
+        </div>
+        <div class="debug-quote">
+          "Es taucht wieder dieser Button mit Abholung und Lieferung auf, ich dachte, du hast den Bug entfernt."
+        </div>
+      </div>
+
+      <!-- DIAGNOSE -->
+      <div class="debug-card diagnose">
+        <div class="debug-step">02 · Diagnose</div>
+        <div class="debug-title">State wird gesetzt, aber nicht <em style="font-style:normal;color:var(--peach-d, #d18856)">geleert</em></div>
+        <div class="debug-text">
+          <code style="background:rgba(232,168,124,0.10);padding:2px 6px;border-radius:5px;font-size:12px;color:var(--berry)">state["current_field"]</code>
+          wurde nur in <code style="background:rgba(232,168,124,0.10);padding:2px 6px;border-radius:5px;font-size:12px;color:var(--berry)">ask_next</code>
+          gesetzt — beim Abbiegen zu <code style="background:rgba(232,168,124,0.10);padding:2px 6px;border-radius:5px;font-size:12px;color:var(--berry)">summarize_order</code> blieb der alte Wert in
+          ChromaDB-Session erhalten. Frontend bekam in jedem Folgeturn dasselbe Feld.
+        </div>
+        <pre style="background:var(--code-bg);color:var(--code-text);font-family:var(--mono);font-size:11.5px;padding:14px 16px;border-radius:10px;line-height:1.6;margin:0;overflow-x:auto;"><span class="cm"># Buggy Flow:</span>
+ask_next     → state["current_field"]=<span class="str">"abholung"</span>
+summarize    → <span class="cm"># vergisst zu leeren ✗</span>
+calc_price   → state["current_field"] <span class="cm"># noch da</span>
+finalize     → state["current_field"] <span class="cm"># noch da</span>
+              <span class="cm">  → Buttons rendern erneut ✗</span></pre>
+      </div>
+
+      <!-- FIX -->
+      <div class="debug-card fix">
+        <div class="debug-step">03 · Fix · 3 Schichten</div>
+        <div class="debug-title">Wurzel beheben + zweimal abdichten</div>
+        <ol class="fix-layers">
+          <li>
+            <span class="layer-label">Quelle · nodes.py</span>
+            <span class="layer-detail"><code style="font-size:11.5px">summarize_order</code> setzt <code style="font-size:11.5px">current_field = ""</code></span>
+          </li>
+          <li>
+            <span class="layer-label">Filter · main.py</span>
+            <span class="layer-detail">Helper <code style="font-size:11.5px">_safe_current_field()</code> sendet stale Felder gar nicht erst an das Frontend</span>
+          </li>
+          <li>
+            <span class="layer-label">Defense · script.js</span>
+            <span class="layer-detail">UI prüft selbst: <code style="font-size:11.5px">order_info[field]</code> oder <code style="font-size:11.5px">order_complete</code> → keine Buttons</span>
+          </li>
+        </ol>
+      </div>
+
+    </div>
+
+    <!-- TAKEAWAY -->
+    <div class="debug-takeaway">
+      <div class="debug-takeaway-icon">★</div>
+      <div class="debug-takeaway-text">
+        <strong>Lehre:</strong> Bei verteilten States (LangGraph, Redux, Session-Storage)
+        ist es nicht die Frage <em>ob</em> ein Feld stale wird, sondern <em>wann</em>.
+        Robust ist nicht „eine perfekte Stelle finden", sondern an Quelle, Schnittstelle
+        und UI <em>alle drei</em> abdichten — so bleibt das System auch beim nächsten
+        Refactor verlässlich.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section id="stack">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-eyebrow">Tech-Stack</div>
+      <h2>Bewusst gewählt. Bewusst klein gehalten.</h2>
+      <p class="section-sub">
+        Jede Komponente hat eine klare Aufgabe. Keine Über-Engineering, kein Framework-Stacking.
+      </p>
+    </div>
+
+    <div class="stack">
+      <div class="stack-card"><div class="stack-name">FastAPI</div><div class="stack-role">Async HTTP Server &amp; Streaming (SSE)</div></div>
+      <div class="stack-card"><div class="stack-name">OpenAI GPT-4o-mini</div><div class="stack-role">Intent · Extraktion · Konversation</div></div>
+      <div class="stack-card"><div class="stack-name">gpt-image-1</div><div class="stack-role">Vorschau-Bildgenerierung</div></div>
+      <div class="stack-card"><div class="stack-name">text-embedding-3-small</div><div class="stack-role">Embeddings für RAG</div></div>
+      <div class="stack-card"><div class="stack-name">ChromaDB</div><div class="stack-role">Vektor-DB · Wissensbasis · Sessions</div></div>
+      <div class="stack-card"><div class="stack-name">SQLite</div><div class="stack-role">Bestellungen · Kapazität · Bewertungen</div></div>
+      <div class="stack-card"><div class="stack-name">Pydantic</div><div class="stack-role">Typsichere Datenmodelle</div></div>
+      <div class="stack-card"><div class="stack-name">LangSmith</div><div class="stack-role">Tracing &amp; Monitoring aller Nodes</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-brand">
+      <img src="kidstorte-logo.png" alt="Kidstorte" style="height:64px;width:auto;display:block;">
+    </div>
+    <div class="foot-line">
+      KI-Bestellassistent · produktiv im Einsatz
+    </div>
+    <div class="foot-line" style="margin-top: 6px; opacity: .6;">
+      Architektur · Design · Implementation
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -209,11 +209,14 @@ async def chat_stream(request: Request, request_body: ChatRequest):
             yield f"data: {_json.dumps({'status': 'streaming'})}\n\n"
 
             # ── Phase 2: Antwort Wort-für-Wort streamen (Live-Tippen) ──
+            # Kein künstliches sleep mehr — der Graph braucht eh schon 1–3 s pro Turn.
+            # Wörter werden so schnell rausgegeben wie der Browser sie rendert (= sofort).
+            # Falls du den visuellen "Tipp-Effekt" zurück willst:
+            #   await asyncio.sleep(0.005)  # 5 ms = kaum spürbar, sieht aber lebendig aus
             words = answer.split(" ")
             for i, word in enumerate(words):
                 token = word if i == 0 else " " + word
                 yield f"data: {_json.dumps({'token': token})}\n\n"
-                await asyncio.sleep(0.03)  # 30ms pro Wort = natürliches Tippen
 
             # ── Phase 3: Metadaten als finales Event ──
             image_pending = bool(state.get("_pending_image"))

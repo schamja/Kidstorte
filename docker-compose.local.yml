@@ -1,0 +1,56 @@
+# ─────────────────────────────────────────────────────────────
+# LOKALES Setup: kidstorte + nginx, OHNE TLS, OHNE certbot
+# Start: docker compose -f docker-compose.local.yml up -d
+# Stop:  docker compose -f docker-compose.local.yml down
+# ─────────────────────────────────────────────────────────────
+
+services:
+  kidstorte:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kidstorte:local
+    container_name: kidstorte
+    restart: unless-stopped
+    env_file:
+      - .env
+    expose:
+      - "5001"            # nur intern, nginx proxied
+    volumes:
+      - chroma_data:/app/chroma_db
+      - sqlite_data:/app/services
+      - ./Bilder:/app/Bilder:ro
+      - generated_images:/app/static/images
+      - generated_pdfs:/app/static/pdfs
+    networks:
+      - kidstorte-net
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:5001/api/calendar/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: kidstorte-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"          # http://localhost:8080
+    volumes:
+      - ./deploy/nginx-local.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      kidstorte:
+        condition: service_started
+    networks:
+      - kidstorte-net
+
+volumes:
+  chroma_data:
+  sqlite_data:
+  generated_images:
+  generated_pdfs:
+
+networks:
+  kidstorte-net:
+    driver: bridge

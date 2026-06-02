@@ -20,14 +20,26 @@ from reportlab.platypus import (
 
 logger = logging.getLogger("kidstorte")
 
-# Farben passend zum Kidstorte-Design
-BRAUN       = colors.HexColor("#5a3825")
-BRAUN_HELL  = colors.HexColor("#c4956a")
-BRAUN_BG    = colors.HexColor("#fdf6ee")
-GRAU        = colors.HexColor("#666666")
-HELLGRAU    = colors.HexColor("#f5f5f5")
-GREEN       = colors.HexColor("#5a8c6f")
-WEISS       = colors.white
+# Farben passend zum Kidstorte-Webseiten-Design (Petrol/Teal-Palette)
+# Aus static/style.css :root → CSS vars
+# Aliase BRAUN/BRAUN_HELL bleiben für Rückwärtskompatibilität, mappen aber jetzt
+# auf Petrol/Teal — so muss der restliche Code nicht angefasst werden.
+PETROL       = colors.HexColor("#0E6B61")   # --color-brown (Webseite Primärfarbe)
+PETROL_DARK  = colors.HexColor("#225049")   # --color-brown-dark
+PETROL_LIGHT = colors.HexColor("#7DAFA6")   # --color-accent-hover
+ACCENT       = colors.HexColor("#3F8378")   # --color-accent
+CREAM        = colors.HexColor("#E3FDFB")   # --color-cream (Mint-Hellton)
+WARM         = colors.HexColor("#DFE5E4")   # --color-warm
+BRAUN        = PETROL                       # Alias → Header-Banner
+BRAUN_HELL   = ACCENT                       # Alias → Sub-Banner / Linien
+BRAUN_BG     = CREAM                        # Alias → Hintergrund-Sektionen
+GRAU         = colors.HexColor("#666666")
+HELLGRAU     = colors.HexColor("#f5f5f5")
+GREEN        = PETROL_DARK                  # Section-Headlines
+WEISS        = colors.white
+
+# Logo-Pfad (relativ zu Projekt-Root)
+LOGO_PATH    = Path(__file__).resolve().parent.parent / "logo.png"
 
 PDF_DIR = Path("static/pdfs")
 PDF_DIR.mkdir(parents=True, exist_ok=True)
@@ -419,18 +431,34 @@ def generate_order_pdf(order: dict, image_path: str | None = None) -> bytes:
     s = _make_styles()
     story = []
 
-    # ── Header-Banner ──────────────────────────────────
-    header_data = [[
-        Paragraph("🎂 Kidstorte", s["title"]),
-    ]]
-    header_table = Table(header_data, colWidths=[doc.width])
+    # ── Header-Banner mit Logo (links) + Titel ────────
+    # Wenn logo.png existiert: 2-Spalten-Layout, sonst nur Titel zentriert
+    if LOGO_PATH.exists():
+        try:
+            logo = Image(str(LOGO_PATH), width=1.6 * cm, height=1.6 * cm,
+                         kind="proportional")
+            header_data = [[
+                logo,
+                Paragraph("Kidstorte", s["title"]),
+            ]]
+            header_table = Table(header_data,
+                                 colWidths=[2.0 * cm, doc.width - 2.0 * cm])
+        except Exception as e:
+            logger.warning(f"Logo konnte nicht geladen werden: {e}")
+            header_data = [[Paragraph("🎂 Kidstorte", s["title"])]]
+            header_table = Table(header_data, colWidths=[doc.width])
+    else:
+        header_data = [[Paragraph("🎂 Kidstorte", s["title"])]]
+        header_table = Table(header_data, colWidths=[doc.width])
+
     header_table.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, -1), BRAUN),
         ("ROUNDEDCORNERS", [6]),
-        ("TOPPADDING", (0, 0), (-1, -1), 14),
+        ("TOPPADDING", (0, 0), (-1, -1), 10),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
         ("LEFTPADDING", (0, 0), (-1, -1), 16),
         ("RIGHTPADDING", (0, 0), (-1, -1), 16),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
     ]))
     story.append(header_table)
 
