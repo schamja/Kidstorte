@@ -1,0 +1,119 @@
+# ─────────────────────────────────────────────────────────────
+# Monitoring-Stack — Prometheus + Grafana + Loki + Promtail + cAdvisor + node-exporter
+#
+# Zusammen mit docker-compose.local.yml starten:
+#   docker compose \
+#     -f docker-compose.local.yml \
+#     -f docker-compose.monitoring.yml \
+#     up -d
+#
+# Zugriff:
+#   Grafana:    http://localhost:3000   (admin / kidstorte-admin)
+#   Prometheus: http://localhost:9090
+# ─────────────────────────────────────────────────────────────
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.0.1
+    container_name: kidstorte-prometheus
+    restart: unless-stopped
+    volumes:
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    ports:
+      - "9090:9090"
+    networks:
+      - kidstorte-net
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: kidstorte-cadvisor
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    networks:
+      - kidstorte-net
+    expose:
+      - "8080"
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: kidstorte-node-exporter
+    restart: unless-stopped
+    command:
+      - '--path.rootfs=/host'
+    volumes:
+      - '/:/host:ro,rslave'
+    networks:
+      - kidstorte-net
+    expose:
+      - "9100"
+
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: kidstorte-loki
+    restart: unless-stopped
+    volumes:
+      - ./deploy/loki/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - kidstorte-net
+    expose:
+      - "3100"
+
+  promtail:
+    image: grafana/promtail:3.3.2
+    container_name: kidstorte-promtail
+    restart: unless-stopped
+    volumes:
+      - ./deploy/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - kidstorte-net
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: kidstorte-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: kidstorte-admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_INSTALL_PLUGINS: ""
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./deploy/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3000:3000"
+    networks:
+      - kidstorte-net
+    depends_on:
+      - prometheus
+      - loki
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+
+networks:
+  kidstorte-net:
+    external: true
+    name: kidstorte-longchain_kidstorte-net
