@@ -180,7 +180,7 @@ def chat(body: ChatRequest, request: Request):
         return JSONResponse(status_code=429, content={"error": "limit"})
     hits.append(now)
 
-    lang = "en" if body.lang == "en" else "es"
+    lang = body.lang if body.lang in ("es", "en", "de") else "es"
     try:
         from app.casa_chat import run_chat
         reply = run_chat(cfg, body.message, [t.model_dump() for t in body.history], lang)
@@ -209,7 +209,7 @@ def order(body: OrderRequest, request: Request):
     if errors:
         return JSONResponse(status_code=400, content={"error": "invalid", "fields": errors})
 
-    lang = "en" if body.lang == "en" else "es"
+    lang = body.lang if body.lang in ("es", "en", "de") else "es"
     t = _by_id(cfg["types"], body.selection.type)
     s = _by_id(cfg["sizes"], body.selection.size)
     doughs = [_by_id(cfg["doughs"], d)["name"][lang] for d in body.selection.doughs]

@@ -473,7 +473,7 @@ footer{padding:6px 0 30px}
   .mbar strong{font:600 1.4rem var(--serif);color:var(--pink-deep)}
 }
 /* Kleine Laptops: Überschrift im Hero etwas kleiner, damit die Zeilen nicht umbrechen */
-@media (min-width:921px) and (max-width:1100px){.hero h1{font-size:1.55rem}}
+@media (min-width:921px) and (max-width:1100px){.hero h1{font-size:1.55rem}.menu{gap:2px}.menu a{padding:6px 8px;font-size:.9rem}.lang{margin-left:6px}.lang button{padding:4px 8px}}
 /* Handy/Tablet quer (wenig Höhe): Logo, Torte und Text kompakt nebeneinander */
 @media (max-width:920px) and (max-height:520px){
   .hero{padding-top:12px}
@@ -503,7 +503,7 @@ footer{padding:6px 0 30px}
       <li><a href="#disena" class="pink" data-i18n="nav.design">Diseña tu Pastel</a></li>
       <li><a href="#contacto" data-i18n="nav.contact">Contacto</a></li>
       <li class="lang" role="group" aria-label="Idioma / Language">
-        <button data-lang="es" class="on">ES</button><button data-lang="en">EN</button>
+        <button data-lang="es" class="on">ES</button><button data-lang="en">EN</button><button data-lang="de">DE</button>
       </li>
     </ul>
   </div>
@@ -834,6 +834,63 @@ const T = {
   "chat.chips":["How much is a 2-tier cake?","Which flavors do you have?","How far ahead should I order?","Do you deliver?"],
   "chat.error":"I can’t answer right now. Message us on WhatsApp and we’ll help. 💬","chat.limit":"You’ve sent a lot of messages. Please try later or message us on WhatsApp.",
   "layers":"layers"
+ },
+ de:{
+  "nav.home":"Start","nav.story":"Unsere Geschichte","nav.gallery":"Instagram-Galerie","nav.design":"Torte gestalten","nav.contact":"Kontakt",
+  "hero.title":"Handgemachte Konditorei in Chitré.<br>Süßes, mit Liebe gemacht.<br>Willkommen bei Casa Pastel!",
+  "hero.cta":"Torte gestalten","hero.alt":"Zweistöckige Torte mit Rosen",
+  "story.title":"Unsere Geschichte",
+  "story.p1":"[Beispieltext – ersetzen] Casa Pastel ist in unserer Küche zu Hause entstanden, mit Familienrezepten und viel Liebe. Jede Torte wird hier in Chitré von Hand gebacken und verziert.",
+  "story.p2":"[Beispieltext – ersetzen] Ich heiße … und komme aus … . Was als Hobby für die Familie begann, ist heute meine Art, die schönsten Momente unserer Kundinnen und Kunden zu versüßen.",
+  "story.caption":"Hallo aus Chitré!","story.photoalt":"Unsere Familie",
+  "ig.title":"Instagram-Galerie","ig.follow":"Folge uns auf Instagram",
+  "cfg.title":"Torten-Konfigurator",
+  "s1.title":"Schritt 1: Basis","pg.next":"Schritt 3 und 4: Teig und Füllung","pg.back":"Schritt 1 und 2: Basis und Größe",
+  "s2.title":"Schritt 2: Größe","s2.one":"1 Etage","s2.two":"2 Etagen",
+  "s2.info1":"Eine Torte mit 1 Etage ist etwa 10 cm hoch.","s2.info2":"2 Etagen = zwei gestapelte Torten, die kleinere oben.",
+  "s2.layers":"Jede Etage hat {n} Teigschichten mit Füllung.","s2.pick":"Wähle die Größe passend zu deinen Gästen.",
+  "s3.title":"Schritt 3: Teig",
+  "s3.hint1":"Deine Torte hat {n} Teigschichten. Du kannst bis zu 2 Sorten wählen; sie wechseln sich zwischen den Schichten ab.",
+  "s3.hint2":"Jede Etage hat {n} Teigschichten. Du kannst bis zu 2 Sorten wählen; sie wechseln sich zwischen den Schichten ab.",
+  "s3.max":"Höchstens 2 Sorten. Entferne eine, um eine andere zu wählen.",
+  "s4.title":"Schritt 4: Füllung","s4.hint":"Die Füllung kommt zwischen die Teigschichten.",
+  "from":"ab",
+  "ai.title":"Design mit KI",
+  "ai.ph":"Beschreibe deine Torte…",
+  "ai.btn":"Erstellen","ai.again":"Noch eins erstellen","ai.empty":"Hier erscheint das Bild deiner Torte.",
+  "ai.loading":"Dein Bild wird erstellt… das kann etwa 20–40 Sekunden dauern.","ai.tag":"KI-Bild · nur zur Inspiration",
+  "ai.short":"Beschreibe deine Idee etwas genauer (mindestens 5 Buchstaben).","ai.limit":"Du hast das stündliche Bildlimit erreicht. Bitte versuche es später noch einmal.","ai.error":"Das Bild konnte gerade nicht erstellt werden. Deine Beschreibung wird trotzdem mit der Bestellung gesendet.",
+  "ai.note":"⚠️ Nur zur Inspiration: Die echte Torte kann anders aussehen.",
+  "ai.ideas":["Rosa mit Blumen","Elegante weiße Hochzeit","Geburtstag mit Einhorn","Frisches Obst und Sahne"],
+  "sum.estimate":"Geschätzter Preis:","sum.price":"Geschätzter Preis",
+  "sum.note":"— Die Anzahlung von 50 % zahlst du erst, nachdem wir per WhatsApp bestätigt haben, dass deine Torte möglich ist.",
+  "sum.type":"Art","sum.size":"Größe","sum.dough":"Teig","sum.filling":"Füllung","sum.design":"Design","sum.none":"– noch nicht gewählt –","sum.designYes":"beschrieben ✓",
+  "disc.title":"Hinweis zu KI-Bildern:",
+  "disc.text":"KI-Bilder sind nur eine Inspiration und kein Versprechen für das Ergebnis: Die echte, handgemachte Torte kann anders aussehen. Wir besprechen alles mit dir per WhatsApp.",
+  "terms.t1":"<b>Keine Online-Zahlung.</b> Du sendest nur eine Anfrage.",
+  "terms.t2":"Wir prüfen deine Bestellung und melden uns <b>per WhatsApp</b>.",
+  "terms.t3":"Nach der Zusage: <b>50 % Anzahlung</b>, der Rest bei der <b>Abholung</b>.",
+  "form.name":"Name","form.wa":"WhatsApp-Nummer","form.date":"Abholdatum","form.email":"E-Mail","form.optional":"(optional)",
+  "form.notes":"Anmerkungen","form.notesph":"Anlass, Text auf der Torte, Allergien…",
+  "form.agree":"Ich verstehe, dass dies eine Anfrage ohne Online-Zahlung ist. Casa Pastel meldet sich per WhatsApp, und nach der Bestätigung zahle ich 50 % an.",
+  "form.submit":"Anfragen","form.sending":"Wird gesendet…",
+  "err.config":"Bitte alle 4 Schritte im Konfigurator ausfüllen (auch Teig und Füllung).","err.name":"Bitte gib deinen Namen ein.","err.wa":"Bitte gib eine gültige WhatsApp-Nummer ein.","err.date":"Wähle ein Datum (frühestens in {n} Tagen).","err.agree":"Bitte bestätige die Bedingungen.","err.server":"Senden hat nicht geklappt. Bitte versuche es noch einmal oder schreib uns per WhatsApp.",
+  "ok.title":"Danke! Wir haben deine Anfrage erhalten.","ok.text":"Deine Bestellnummer ist #{id}. Wir schreiben dir bald per WhatsApp zur Bestätigung. Denk daran: Es wird noch nichts bezahlt.","ok.wa":"Per WhatsApp schreiben",
+  "wa.msg":"Hallo Casa Pastel! Ich habe die Anfrage #{id} gesendet:\n{summary}\nGeschätzter Preis: {price}\nAbholung: {date}",
+  "foot.terms":"Bedingungen","foot.loc":"Standort Chitré",
+  "nav.products":"Torten & Preise",
+  "prod.title":"Unsere Torten & Preise","prod.hint":"Jede Torte wird frisch gebacken und in Chitré von Hand verziert. Wähle den Stil, der dir am besten gefällt.",
+  "prod.pick":"Auswählen","price.title":"Preise nach Größe","price.cake":"Torte","price.serv":"Portionen","price.one":"1 Etage","price.two":"2 Etagen",
+  "price.extras":"Aufpreis pro Etage:","price.fine":"Preise in US-Dollar. Der Endpreis kann je nach Dekoration abweichen; wir bestätigen ihn per WhatsApp.",
+  "how.title":"So funktioniert's","how.lead":"⏱ Bitte mindestens {n} Tage vorher bestellen.",
+  "contact.title":"Kontakt & Öffnungszeiten","contact.where":"Wo wir sind","contact.pickup":"Nur Abholung, nach Absprache.","contact.hours":"Öffnungszeiten",
+  "contact.wa":"Per WhatsApp schreiben","contact.ask":"Assistent fragen",
+  "chat.fab":"Fragen? Chatten","chat.title":"Casa-Pastel-Assistent","chat.sub":"KI · antwortet sofort",
+  "chat.ph":"Schreib deine Frage…","chat.note":"KI-Assistent: Er kann sich irren. Bestellt wird über den Konfigurator.",
+  "chat.hello":"Hallo! 👋 Ich bin der Assistent von Casa Pastel. Frag mich nach Sorten, Größen, Preisen oder wie du bestellst.",
+  "chat.chips":["Was kostet eine Torte mit 2 Etagen?","Welche Sorten gibt es?","Wie früh muss ich bestellen?","Liefert ihr auch?"],
+  "chat.error":"Ich kann gerade nicht antworten. Schreib uns per WhatsApp, wir helfen dir. 💬","chat.limit":"Du hast viele Nachrichten gesendet. Bitte versuche es später oder schreib uns per WhatsApp.",
+  "layers":"Schichten"
  }
 };
 
@@ -1093,7 +1150,7 @@ $("#orderForm").addEventListener("submit",async e=>{
 
 /* ===================== START ===================== */
 (async function init(){
-  try{const s=localStorage.getItem("cp_lang");if(s==="es"||s==="en")lang=s;else if((navigator.language||"").startsWith("en"))lang="en"}catch(_){}
+  try{const s=localStorage.getItem("cp_lang"),nl=(navigator.language||"").slice(0,2);if(T[s])lang=s;else if(nl==="en"||nl==="de")lang=nl}catch(_){}
   $("#year").textContent=new Date().getFullYear();
   try{CFG=await (await fetch("/api/casa/config")).json()}catch(_){CFG=await (await fetch("/static/casa-pastel/config.json")).json()}
   const d=new Date();d.setDate(d.getDate()+(CFG.min_lead_days||3));$("#fDate").min=d.toISOString().slice(0,10);
