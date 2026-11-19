@@ -608,9 +608,19 @@ async def admin_update_order_status(order_id: int, request: Request, body: dict 
     """Ändert den Status einer Bestellung. Bei 'fertig' → Bewertungseinladung."""
     verify_admin(request)
     status = body.get("status", "")
+    before = get_order(order_id)
     ok = update_order_status(order_id, status)
     if not ok:
         raise HTTPException(status_code=400, detail="Ungültiger Status")
+
+    # Casa Pastel: Bestellung angenommen → Rechnung mit 50 % Anzahlung per E-Mail
+    if status == "in_bearbeitung" and before and before.get("status") != "in_bearbeitung":
+        try:
+            from app.casa_invoice import is_casa_order, send_document_async
+            if is_casa_order(before):
+                send_document_async(order_id, "invoice")
+        except Exception as e:
+            logger.warning(f"Casa Pastel Rechnung fehlgeschlagen: {e}")
 
     if status == "fertig":
         try:
