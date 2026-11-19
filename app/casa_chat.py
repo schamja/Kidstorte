@@ -16,7 +16,10 @@ import re
 import logging
 from typing import TypedDict
 
-from langgraph.graph import StateGraph, START, END
+try:
+    from langgraph.graph import StateGraph, START, END
+except ImportError:  # langgraph nicht installiert (z. B. im Server-Image) → einfacher Ablauf ohne Graph
+    StateGraph = None
 
 logger = logging.getLogger("kidstorte")
 
@@ -149,7 +152,15 @@ def _build_graph():
     return g.compile()
 
 
-casa_chat_graph = _build_graph()
+class _SimpleGraph:
+    """Gleicher Ablauf wie der LangGraph-Graph, falls langgraph fehlt."""
+    def invoke(self, state):
+        state = {**state, **check_input(state)}
+        state = {**state, **(refuse(state) if _route(state) == "refuse" else answer(state))}
+        return state
+
+
+casa_chat_graph = _build_graph() if StateGraph else _SimpleGraph()
 
 
 def run_chat(cfg: dict, message: str, history: list, lang: str) -> str:

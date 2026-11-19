@@ -388,7 +388,7 @@ def verify_admin(request: Request):
 
 @app.get("/admin/login")
 async def admin_login_page(request: Request):
-    return templates.TemplateResponse("admin.html", {"request": request, "page": "login"})
+    return templates.TemplateResponse(request, "admin.html", {"request": request, "page": "login"})
 
 
 @app.post("/admin/login")
@@ -412,7 +412,7 @@ async def admin_dashboard(request: Request):
     orders = get_all_orders()
     order_stats = get_order_stats()
 
-    return templates.TemplateResponse("admin.html", {
+    return templates.TemplateResponse(request, "admin.html", {
         "request": request,
         "page": "dashboard",
         "config": config,
@@ -787,7 +787,7 @@ async def bewertung_page(order_id: int, request: Request):
     if not order:
         return HTMLResponse("<h2>Bestellung nicht gefunden.</h2>", status_code=404)
     existing = get_rating(order_id)
-    return templates.TemplateResponse("bewertung.html", {
+    return templates.TemplateResponse(request, "bewertung.html", {
         "request": request,
         "order": order,
         "order_id": order_id,
@@ -812,7 +812,7 @@ async def submit_bewertung(order_id: int, request: Request):
 
     existing = get_rating(order_id)
     if existing:
-        return templates.TemplateResponse("bewertung.html", {
+        return templates.TemplateResponse(request, "bewertung.html", {
             "request": request,
             "order": order,
             "order_id": order_id,
@@ -821,7 +821,7 @@ async def submit_bewertung(order_id: int, request: Request):
         })
 
     save_rating(order_id, int(rating_val), comment)
-    return templates.TemplateResponse("bewertung.html", {
+    return templates.TemplateResponse(request, "bewertung.html", {
         "request": request,
         "order": order,
         "order_id": order_id,
