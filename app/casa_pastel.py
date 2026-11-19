@@ -121,6 +121,17 @@ def get_config():
 GALLERY_DIR = Path("static/casa-pastel/galeria")
 
 
+def _post_date(f: Path) -> str:
+    """Datum des Instagram-Beitrags aus dem Dateinamen (instagram_JJJJMMTThhmm.jpg).
+    Ohne Datum im Namen zählt das Änderungsdatum der Datei."""
+    import re
+    from datetime import datetime
+    m = re.search(r"(\d{8,12})", f.stem)
+    if m:
+        return m.group(1).ljust(12, "0")
+    return datetime.fromtimestamp(f.stat().st_mtime).strftime("%Y%m%d%H%M")
+
+
 @router.get("/gallery")
 def gallery():
     """Fotos aus static/casa-pastel/galeria/ (einfach Bilder dort hineinlegen)."""
@@ -128,7 +139,7 @@ def gallery():
         return {"images": []}
     files = sorted(
         (f for f in GALLERY_DIR.iterdir() if f.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}),
-        key=lambda f: f.stat().st_mtime, reverse=True,
+        key=_post_date, reverse=True,
     )
     return {"images": [f"/static/casa-pastel/galeria/{f.name}" for f in files[:12]]}
 
