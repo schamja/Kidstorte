@@ -622,6 +622,7 @@ footer{padding:6px 0 30px}
           <div class="fields">
             <input id="fName" autocomplete="name" required data-i18n-ph="form.name" placeholder="Nombre" aria-label="Nombre">
             <input id="fWa" type="tel" inputmode="tel" autocomplete="tel" required data-i18n-ph="form.wa" placeholder="Número WhatsApp" aria-label="WhatsApp">
+            <input id="fEmail" class="full" type="email" inputmode="email" autocomplete="email" required data-i18n-ph="form.email" placeholder="Correo electrónico" aria-label="E-mail">
             <label class="date-l" for="fDate"><span data-i18n="form.date">Fecha de recogida</span><input id="fDate" type="date" required></label>
           </div>
         </div>
@@ -756,12 +757,12 @@ const T = {
   "terms.t1":"<b>No pagas en línea.</b> Solo envías tu solicitud.",
   "terms.t2":"Revisamos tu pedido y te contactamos <b>por WhatsApp</b>.",
   "terms.t3":"Al aceptar: <b>50 % de anticipo</b>, el resto al <b>recoger</b>.",
-  "form.name":"Nombre","form.wa":"Número WhatsApp","form.date":"Fecha de recogida","form.email":"Correo","form.optional":"(opcional)",
+  "form.name":"Nombre","form.wa":"Número WhatsApp","form.date":"Fecha de recogida","form.email":"Correo electrónico","form.optional":"(opcional)",
   "form.notes":"Comentarios","form.notesph":"Ocasión, texto en el pastel, alergias…",
   "form.agree":"Entiendo que esta es una solicitud sin pago en línea. Casa Pastel me contactará por WhatsApp y, al confirmar, pagaré un anticipo del 50 %.",
   "form.submit":"Solicitar","form.sending":"Enviando…",
-  "err.config":"Completa los 4 pasos del configurador (también masa y relleno).","err.name":"Escribe tu nombre.","err.wa":"Escribe un número de WhatsApp válido.","err.date":"Elige una fecha (mínimo {n} días desde hoy).","err.agree":"Por favor confirma las condiciones.","err.server":"No se pudo enviar. Inténtalo de nuevo o escríbenos por WhatsApp.",
-  "ok.title":"¡Gracias! Recibimos tu solicitud.","ok.text":"Tu número de pedido es #{id}. Te escribiremos pronto por WhatsApp para confirmar. Recuerda: no se paga nada todavía.","ok.wa":"Escríbenos por WhatsApp",
+  "err.config":"Completa los 4 pasos del configurador (también masa y relleno).","err.name":"Escribe tu nombre.","err.wa":"Escribe un número de WhatsApp válido.","err.email":"Escribe un correo electrónico válido (te enviamos la confirmación).","err.date":"Elige una fecha (mínimo {n} días desde hoy).","err.agree":"Por favor confirma las condiciones.","err.server":"No se pudo enviar. Inténtalo de nuevo o escríbenos por WhatsApp.",
+  "ok.title":"¡Gracias! Recibimos tu solicitud.","ok.text":"Tu número de pedido es #{id}. Te enviamos la confirmación por correo y te escribiremos pronto por WhatsApp. Recuerda: no se paga nada todavía.","ok.wa":"Escríbenos por WhatsApp",
   "wa.msg":"¡Hola Casa Pastel! Envié la solicitud #{id}:\n{summary}\nPrecio estimado: {price}\nRecogida: {date}",
   "foot.terms":"Términos","foot.loc":"Ubicación Chitré",
   "nav.products":"Pasteles y Precios",
@@ -817,8 +818,8 @@ const T = {
   "form.notes":"Comments","form.notesph":"Occasion, text on the cake, allergies…",
   "form.agree":"I understand this is a request without online payment. Casa Pastel will contact me on WhatsApp and, once confirmed, I will pay a 50 % deposit.",
   "form.submit":"Order","form.sending":"Sending…",
-  "err.config":"Please complete all 4 configurator steps (including sponge and filling).","err.name":"Please enter your name.","err.wa":"Please enter a valid WhatsApp number.","err.date":"Choose a date (at least {n} days from today).","err.agree":"Please confirm the conditions.","err.server":"Couldn’t send. Please try again or message us on WhatsApp.",
-  "ok.title":"Thank you! We received your request.","ok.text":"Your order number is #{id}. We’ll message you on WhatsApp soon to confirm. Remember: nothing is paid yet.","ok.wa":"Message us on WhatsApp",
+  "err.config":"Please complete all 4 configurator steps (including sponge and filling).","err.name":"Please enter your name.","err.wa":"Please enter a valid WhatsApp number.","err.email":"Please enter a valid email (we send your confirmation there).","err.date":"Choose a date (at least {n} days from today).","err.agree":"Please confirm the conditions.","err.server":"Couldn’t send. Please try again or message us on WhatsApp.",
+  "ok.title":"Thank you! We received your request.","ok.text":"Your order number is #{id}. We emailed you a confirmation and will message you on WhatsApp soon. Remember: nothing is paid yet.","ok.wa":"Message us on WhatsApp",
   "wa.msg":"Hi Casa Pastel! I sent request #{id}:\n{summary}\nEstimated price: {price}\nPickup: {date}",
   "foot.terms":"Terms","foot.loc":"Location Chitré",
   "nav.products":"Cakes & Prices",
@@ -874,8 +875,8 @@ const T = {
   "form.notes":"Anmerkungen","form.notesph":"Anlass, Text auf der Torte, Allergien…",
   "form.agree":"Ich verstehe, dass dies eine Anfrage ohne Online-Zahlung ist. Casa Pastel meldet sich per WhatsApp, und nach der Bestätigung zahle ich 50 % an.",
   "form.submit":"Anfragen","form.sending":"Wird gesendet…",
-  "err.config":"Bitte alle 4 Schritte im Konfigurator ausfüllen (auch Teig und Füllung).","err.name":"Bitte gib deinen Namen ein.","err.wa":"Bitte gib eine gültige WhatsApp-Nummer ein.","err.date":"Wähle ein Datum (frühestens in {n} Tagen).","err.agree":"Bitte bestätige die Bedingungen.","err.server":"Senden hat nicht geklappt. Bitte versuche es noch einmal oder schreib uns per WhatsApp.",
-  "ok.title":"Danke! Wir haben deine Anfrage erhalten.","ok.text":"Deine Bestellnummer ist #{id}. Wir schreiben dir bald per WhatsApp zur Bestätigung. Denk daran: Es wird noch nichts bezahlt.","ok.wa":"Per WhatsApp schreiben",
+  "err.config":"Bitte alle 4 Schritte im Konfigurator ausfüllen (auch Teig und Füllung).","err.name":"Bitte gib deinen Namen ein.","err.wa":"Bitte gib eine gültige WhatsApp-Nummer ein.","err.email":"Bitte gib eine gültige E-Mail-Adresse ein (dorthin schicken wir die Bestätigung).","err.date":"Wähle ein Datum (frühestens in {n} Tagen).","err.agree":"Bitte bestätige die Bedingungen.","err.server":"Senden hat nicht geklappt. Bitte versuche es noch einmal oder schreib uns per WhatsApp.",
+  "ok.title":"Danke! Wir haben deine Anfrage erhalten.","ok.text":"Deine Bestellnummer ist #{id}. Wir haben dir eine Bestätigung per E-Mail geschickt und melden uns bald per WhatsApp. Denk daran: Es wird noch nichts bezahlt.","ok.wa":"Per WhatsApp schreiben",
   "wa.msg":"Hallo Casa Pastel! Ich habe die Anfrage #{id} gesendet:\n{summary}\nGeschätzter Preis: {price}\nAbholung: {date}",
   "foot.terms":"Bedingungen","foot.loc":"Standort Chitré",
   "nav.products":"Torten & Preise",
@@ -1133,12 +1134,14 @@ $("#orderForm").addEventListener("submit",async e=>{
   if(computePrice()==null){msg.textContent=t("err.config");goPage(sel.type&&sel.size?2:1);$("#disena").scrollIntoView({behavior:"smooth"});return}
   if(name.length<2)return bad("#fName","err.name");
   if(wa.replace(/\D/g,"").length<7)return bad("#fWa","err.wa");
+  const email=$("#fEmail").value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))return bad("#fEmail","err.email");
   if(!date||date<$("#fDate").min)return bad("#fDate","err.date",{n:CFG.min_lead_days});
   const btn=$("#submitBtn"); btn.disabled=true; btn.textContent=t("form.sending"); msg.textContent="";
   try{
     const r=await fetch("/api/casa/order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
       selection:{...sel},design:$("#aiText").value.trim(),preview_url:previewUrl,name,whatsapp:wa,
-      email:"",pickup_date:date,notes:"",lang})});
+      email,pickup_date:date,notes:"",lang})});
     const j=await r.json(); if(!r.ok)throw new Error();
     $("#orderForm").style.display="none"; $("#success").classList.add("on");
     $("#okText").textContent=t("ok.text",{id:j.order_id});

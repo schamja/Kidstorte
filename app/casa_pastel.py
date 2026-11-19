@@ -106,7 +106,7 @@ class OrderRequest(BaseModel):
     preview_url: str = ""
     name: str = Field(min_length=2, max_length=80)
     whatsapp: str = Field(min_length=7, max_length=25)
-    email: str = Field(default="", max_length=120)
+    email: str = Field(min_length=5, max_length=120)
     pickup_date: str
     notes: str = Field(default="", max_length=600)
     lang: str = "es"
@@ -241,6 +241,10 @@ def order(body: OrderRequest, request: Request):
     if len(phone.replace("+", "")) < 7:
         errors.append("whatsapp")
 
+    import re
+    if not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", body.email.strip()):
+        errors.append("email")
+
     try:
         pickup = date.fromisoformat(body.pickup_date)
         if pickup < date.today() + timedelta(days=int(cfg.get("min_lead_days", 3))):
@@ -272,6 +276,8 @@ def order(body: OrderRequest, request: Request):
         "abholung": body.pickup_date,
         "liefertermin": body.pickup_date,
         "anzahlung": f"${deposit:.2f} (50 %)",
+        "preis_usd": price,
+        "anzahlung_usd": deposit,
         "sprache": lang,
         "quelle": "Casa Pastel Website",
     }
@@ -292,4 +298,7 @@ def order(body: OrderRequest, request: Request):
         return JSONResponse(status_code=500, content={"error": "save"})
 
     logger.info(f"Casa Pastel Bestellung #{order_id}: {t['id']} {s['id']} ${price}")
+    # Bestellbestätigung als PDF per E-Mail (im Hintergrund, die Antwort wartet nicht darauf)
+    from app.casa_invoice import send_document_async
+    send_document_async(order_id, "confirmation")
     return {"order_id": order_id, "price": price, "deposit": deposit}
