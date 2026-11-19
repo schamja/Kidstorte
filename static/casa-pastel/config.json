@@ -9,44 +9,49 @@
   "preview_limit_per_hour": 5,
   "chat_limit_per_hour": 40,
 
-  "hours": {"es": "Lunes a sábado · 8:00 – 18:00 · solo con cita previa", "en": "Monday to Saturday · 8 am – 6 pm · by appointment only"},
+  "hours": {"es": "Lunes a sábado · 8:00 – 18:00 · solo con cita previa", "en": "Monday to Saturday · 8 am – 6 pm · by appointment only", "de": "Montag bis Samstag · 8–18 Uhr · nur nach Absprache"},
 
   "process": [
     {"es": {"t": "Diseña y solicita", "p": "Elige tu pastel en el configurador o pregúntale a nuestro asistente. Sin pago en línea."},
-     "en": {"t": "Design & request", "p": "Build your cake in the configurator or ask our assistant. No online payment."}},
+     "en": {"t": "Design & request", "p": "Build your cake in the configurator or ask our assistant. No online payment."},
+     "de": {"t": "Gestalten und anfragen", "p": "Stell deine Torte im Konfigurator zusammen oder frag unseren Assistenten. Keine Online-Zahlung."}},
     {"es": {"t": "Te contactamos", "p": "Revisamos si tu pedido es posible y lo confirmamos contigo por WhatsApp."},
-     "en": {"t": "We contact you", "p": "We check that your order is possible and confirm it with you on WhatsApp."}},
+     "en": {"t": "We contact you", "p": "We check that your order is possible and confirm it with you on WhatsApp."},
+     "de": {"t": "Wir melden uns", "p": "Wir prüfen, ob deine Bestellung möglich ist, und bestätigen sie mit dir per WhatsApp."}},
     {"es": {"t": "Anticipo del 50 %", "p": "Cuando aceptamos tu pedido, pagas el 50 % de anticipo."},
-     "en": {"t": "50 % deposit", "p": "Once we accept your order, you pay a 50 % deposit."}},
+     "en": {"t": "50 % deposit", "p": "Once we accept your order, you pay a 50 % deposit."},
+     "de": {"t": "50 % Anzahlung", "p": "Sobald wir deine Bestellung annehmen, zahlst du 50 % an."}},
     {"es": {"t": "Hecho a mano", "p": "Horneamos tu pastel fresco y lo decoramos a mano en Chitré."},
-     "en": {"t": "Made by hand", "p": "We bake your cake fresh and decorate it by hand in Chitré."}},
+     "en": {"t": "Made by hand", "p": "We bake your cake fresh and decorate it by hand in Chitré."},
+     "de": {"t": "Handgemacht", "p": "Wir backen deine Torte frisch und verzieren sie in Chitré von Hand."}},
     {"es": {"t": "Recoges tu pastel", "p": "Lo recoges en Chitré en la fecha acordada y pagas el resto."},
-     "en": {"t": "Pick up your cake", "p": "Pick it up in Chitré on the agreed date and pay the rest."}}
+     "en": {"t": "Pick up your cake", "p": "Pick it up in Chitré on the agreed date and pay the rest."},
+     "de": {"t": "Torte abholen", "p": "Du holst sie am vereinbarten Tag in Chitré ab und zahlst den Rest."}}
   ],
 
   "types": [
-    {"id": "fondant", "icon": "fondant", "photo": "/static/casa-pastel/tipos/fondant.jpg", "card_photo": "/static/casa-pastel/tipos/fondant-karte.jpg", "short": {"es": "Fondant", "en": "Fondant"}, "name": {"es": "Pastel de fondant", "en": "Fondant cake"},
-     "desc": {"es": "Cubierta lisa de fondant, ideal para diseños temáticos y figuras.", "en": "Smooth fondant covering, perfect for themed designs and figures."}},
-    {"id": "crema", "icon": "crema", "photo": "/static/casa-pastel/tipos/crema.jpg", "card_photo": "/static/casa-pastel/tipos/crema-karte.jpg", "short": {"es": "Crema", "en": "Buttercream"}, "name": {"es": "Pastel de crema", "en": "Buttercream cake"},
-     "desc": {"es": "Decorado con crema suave, flores de manga y acabados delicados.", "en": "Decorated with soft cream, piped flowers and delicate finishes."}},
-    {"id": "fruta", "icon": "fruta", "photo": "/static/casa-pastel/tipos/fruta.jpg", "short": {"es": "Fruta", "en": "Fruit"}, "name": {"es": "Pastel de frutas", "en": "Fruit cake"},
-     "desc": {"es": "Fresco y ligero, decorado con frutas de temporada.", "en": "Fresh and light, topped with seasonal fruit."}},
-    {"id": "simple", "icon": "simple", "photo": "/static/casa-pastel/tipos/simple.jpg", "short": {"es": "Simple", "en": "Simple"}, "name": {"es": "Pastel sencillo", "en": "Simple cake"},
-     "desc": {"es": "Clásico y casero, sin decoración elaborada.", "en": "Classic and homemade, without elaborate decoration."}}
+    {"id": "fondant", "icon": "fondant", "photo": "/static/casa-pastel/tipos/fondant.jpg", "card_photo": "/static/casa-pastel/tipos/fondant-karte.jpg", "short": {"es": "Fondant", "en": "Fondant", "de": "Fondant"}, "name": {"es": "Pastel de fondant", "en": "Fondant cake", "de": "Fondanttorte"},
+     "desc": {"es": "Cubierta lisa de fondant, ideal para diseños temáticos y figuras.", "en": "Smooth fondant covering, perfect for themed designs and figures.", "de": "Glatter Fondantüberzug, ideal für Motivtorten und Figuren."}},
+    {"id": "crema", "icon": "crema", "photo": "/static/casa-pastel/tipos/crema.jpg", "card_photo": "/static/casa-pastel/tipos/crema-karte.jpg", "short": {"es": "Crema", "en": "Buttercream", "de": "Creme"}, "name": {"es": "Pastel de crema", "en": "Buttercream cake", "de": "Cremetorte"},
+     "desc": {"es": "Decorado con crema suave, flores de manga y acabados delicados.", "en": "Decorated with soft cream, piped flowers and delicate finishes.", "de": "Mit zarter Creme, gespritzten Blüten und feinen Details verziert."}},
+    {"id": "fruta", "icon": "fruta", "photo": "/static/casa-pastel/tipos/fruta.jpg", "short": {"es": "Fruta", "en": "Fruit", "de": "Obst"}, "name": {"es": "Pastel de frutas", "en": "Fruit cake", "de": "Obsttorte"},
+     "desc": {"es": "Fresco y ligero, decorado con frutas de temporada.", "en": "Fresh and light, topped with seasonal fruit.", "de": "Frisch und leicht, belegt mit Obst der Saison."}},
+    {"id": "simple", "icon": "simple", "photo": "/static/casa-pastel/tipos/simple.jpg", "short": {"es": "Simple", "en": "Simple", "de": "Schlicht"}, "name": {"es": "Pastel sencillo", "en": "Simple cake", "de": "Schlichter Kuchen"},
+     "desc": {"es": "Clásico y casero, sin decoración elaborada.", "en": "Classic and homemade, without elaborate decoration.", "de": "Klassisch und hausgemacht, ohne aufwendige Dekoration."}}
   ],
 
   "_hinweis_groessen": "photo = Foto der Größe, scale = wie groß es in der Kachel erscheint (0.5–1). diam = Durchmesser in cm (Ersatz-Grafik, falls kein Foto; bei 2 Etagen [oben, unten]).",
   "sizes": [
-    {"id": "s3",  "tiers": 1, "diam": [8], "photo": "/static/casa-pastel/tamanos/s3.jpg", "scale": 0.55,  "servings": "2 – 4", "name": {"es": "Mini · 8 cm", "en": "Mini · 8 cm"},
-     "desc": {"es": "Ø 8 cm, mini pastel individual. 2 – 4 porciones.", "en": "Ø 8 cm, individual mini cake. 2 – 4 servings."}},
-    {"id": "s6",  "tiers": 1, "diam": [15], "photo": "/static/casa-pastel/tamanos/s6.jpg", "scale": 0.75, "servings": "8 – 10", "name": {"es": "Mediano · 15 cm", "en": "Medium · 15 cm"},
-     "desc": {"es": "Ø 15 cm, aprox. 10 cm de alto. 8 – 10 porciones.", "en": "Ø 15 cm, approx. 10 cm tall. 8 – 10 servings."}},
-    {"id": "s10", "tiers": 1, "diam": [25], "photo": "/static/casa-pastel/tamanos/s10.jpg", "scale": 1, "servings": "25 – 30", "name": {"es": "Grande · 25 cm", "en": "Large · 25 cm"},
-     "desc": {"es": "Ø 25 cm, aprox. 10 cm de alto. 25 – 30 porciones.", "en": "Ø 25 cm, approx. 10 cm tall. 25 – 30 servings."}},
-    {"id": "t6_8",  "tiers": 2, "diam": [15, 20], "photo": "/static/casa-pastel/tamanos/t6_8.jpg", "scale": 0.88, "servings": "25 – 30", "name": {"es": "2 pisos · 15 + 20 cm", "en": "2 tiers · 15 + 20 cm"},
-     "desc": {"es": "Piso inferior Ø 20 cm, superior Ø 15 cm, aprox. 22 cm de alto. 25 – 30 porciones.", "en": "Bottom tier Ø 20 cm, top tier Ø 15 cm, approx. 22 cm tall. 25 – 30 servings."}},
-    {"id": "t8_10", "tiers": 2, "diam": [20, 25], "photo": "/static/casa-pastel/tamanos/t8_10.jpg", "scale": 1, "servings": "40 – 50", "name": {"es": "2 pisos · 20 + 25 cm", "en": "2 tiers · 20 + 25 cm"},
-     "desc": {"es": "Piso inferior Ø 25 cm, superior Ø 20 cm, aprox. 22 cm de alto. 40 – 50 porciones.", "en": "Bottom tier Ø 25 cm, top tier Ø 20 cm, approx. 22 cm tall. 40 – 50 servings."}}
+    {"id": "s3",  "tiers": 1, "diam": [8], "photo": "/static/casa-pastel/tamanos/s3.jpg", "scale": 0.55,  "servings": "2 – 4", "name": {"es": "Mini · 8 cm", "en": "Mini · 8 cm", "de": "Mini · 8 cm"},
+     "desc": {"es": "Ø 8 cm, mini pastel individual. 2 – 4 porciones.", "en": "Ø 8 cm, individual mini cake. 2 – 4 servings.", "de": "Ø 8 cm, kleine Torte für wenige Personen. 2 – 4 Portionen."}},
+    {"id": "s6",  "tiers": 1, "diam": [15], "photo": "/static/casa-pastel/tamanos/s6.jpg", "scale": 0.75, "servings": "8 – 10", "name": {"es": "Mediano · 15 cm", "en": "Medium · 15 cm", "de": "Mittel · 15 cm"},
+     "desc": {"es": "Ø 15 cm, aprox. 10 cm de alto. 8 – 10 porciones.", "en": "Ø 15 cm, approx. 10 cm tall. 8 – 10 servings.", "de": "Ø 15 cm, ca. 10 cm hoch. 8 – 10 Portionen."}},
+    {"id": "s10", "tiers": 1, "diam": [25], "photo": "/static/casa-pastel/tamanos/s10.jpg", "scale": 1, "servings": "25 – 30", "name": {"es": "Grande · 25 cm", "en": "Large · 25 cm", "de": "Groß · 25 cm"},
+     "desc": {"es": "Ø 25 cm, aprox. 10 cm de alto. 25 – 30 porciones.", "en": "Ø 25 cm, approx. 10 cm tall. 25 – 30 servings.", "de": "Ø 25 cm, ca. 10 cm hoch. 25 – 30 Portionen."}},
+    {"id": "t6_8",  "tiers": 2, "diam": [15, 20], "photo": "/static/casa-pastel/tamanos/t6_8.jpg", "scale": 0.88, "servings": "25 – 30", "name": {"es": "2 pisos · 15 + 20 cm", "en": "2 tiers · 15 + 20 cm", "de": "2 Etagen · 15 + 20 cm"},
+     "desc": {"es": "Piso inferior Ø 20 cm, superior Ø 15 cm, aprox. 22 cm de alto. 25 – 30 porciones.", "en": "Bottom tier Ø 20 cm, top tier Ø 15 cm, approx. 22 cm tall. 25 – 30 servings.", "de": "Untere Etage Ø 20 cm, obere Etage Ø 15 cm, ca. 22 cm hoch. 25 – 30 Portionen."}},
+    {"id": "t8_10", "tiers": 2, "diam": [20, 25], "photo": "/static/casa-pastel/tamanos/t8_10.jpg", "scale": 1, "servings": "40 – 50", "name": {"es": "2 pisos · 20 + 25 cm", "en": "2 tiers · 20 + 25 cm", "de": "2 Etagen · 20 + 25 cm"},
+     "desc": {"es": "Piso inferior Ø 25 cm, superior Ø 20 cm, aprox. 22 cm de alto. 40 – 50 porciones.", "en": "Bottom tier Ø 25 cm, top tier Ø 20 cm, approx. 22 cm tall. 40 – 50 servings.", "de": "Untere Etage Ø 25 cm, obere Etage Ø 20 cm, ca. 22 cm hoch. 40 – 50 Portionen."}}
   ],
 
   "prices": {
@@ -59,20 +64,20 @@
   "layers_per_tier": 4,
 
   "doughs": [
-    {"id": "vainilla",  "extra": 0, "name": {"es": "Vainilla", "en": "Vanilla"}},
-    {"id": "chocolate", "extra": 0, "name": {"es": "Chocolate", "en": "Chocolate"}},
-    {"id": "marmoleado","extra": 0, "name": {"es": "Marmoleado", "en": "Marble"}},
-    {"id": "naranja",   "extra": 0, "name": {"es": "Naranja", "en": "Orange"}},
-    {"id": "zanahoria", "extra": 5, "name": {"es": "Zanahoria", "en": "Carrot"}},
-    {"id": "redvelvet", "extra": 5, "name": {"es": "Red velvet", "en": "Red velvet"}}
+    {"id": "vainilla",  "extra": 0, "name": {"es": "Vainilla", "en": "Vanilla", "de": "Vanille"}},
+    {"id": "chocolate", "extra": 0, "name": {"es": "Chocolate", "en": "Chocolate", "de": "Schokolade"}},
+    {"id": "marmoleado","extra": 0, "name": {"es": "Marmoleado", "en": "Marble", "de": "Marmor"}},
+    {"id": "naranja",   "extra": 0, "name": {"es": "Naranja", "en": "Orange", "de": "Orange"}},
+    {"id": "zanahoria", "extra": 5, "name": {"es": "Zanahoria", "en": "Carrot", "de": "Karotte"}},
+    {"id": "redvelvet", "extra": 5, "name": {"es": "Red velvet", "en": "Red velvet", "de": "Red Velvet"}}
   ],
 
   "fillings": [
-    {"id": "dulcedeleche", "extra": 0, "name": {"es": "Dulce de leche", "en": "Dulce de leche"}},
-    {"id": "chocolate",    "extra": 0, "name": {"es": "Ganache de chocolate", "en": "Chocolate ganache"}},
-    {"id": "vainilla",     "extra": 0, "name": {"es": "Crema de vainilla", "en": "Vanilla cream"}},
-    {"id": "fresa",        "extra": 4, "name": {"es": "Fresas con crema", "en": "Strawberries & cream"}},
-    {"id": "maracuya",     "extra": 4, "name": {"es": "Maracuyá", "en": "Passion fruit"}},
-    {"id": "nutella",      "extra": 6, "name": {"es": "Nutella", "en": "Nutella"}}
+    {"id": "dulcedeleche", "extra": 0, "name": {"es": "Dulce de leche", "en": "Dulce de leche", "de": "Dulce de Leche"}},
+    {"id": "chocolate",    "extra": 0, "name": {"es": "Ganache de chocolate", "en": "Chocolate ganache", "de": "Schokoladenganache"}},
+    {"id": "vainilla",     "extra": 0, "name": {"es": "Crema de vainilla", "en": "Vanilla cream", "de": "Vanillecreme"}},
+    {"id": "fresa",        "extra": 4, "name": {"es": "Fresas con crema", "en": "Strawberries & cream", "de": "Erdbeeren mit Sahne"}},
+    {"id": "maracuya",     "extra": 4, "name": {"es": "Maracuyá", "en": "Passion fruit", "de": "Maracuja"}},
+    {"id": "nutella",      "extra": 6, "name": {"es": "Nutella", "en": "Nutella", "de": "Nutella"}}
   ]
 }
