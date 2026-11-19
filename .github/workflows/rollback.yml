@@ -44,6 +44,7 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  PUBLIC_URL: ${{ secrets.PUBLIC_URL }}   # secrets sind in if: nicht erlaubt → über env prüfen
 
 permissions:
   contents: read
@@ -170,10 +171,10 @@ jobs:
             echo "✓ Rollback abgeschlossen — jetzt live: $TARGET_IMG"
 
       - name: Smoke-Test
-        if: ${{ !inputs.skip_health_check && secrets.PUBLIC_URL != '' }}
+        if: ${{ !inputs.skip_health_check && env.PUBLIC_URL != '' }}
         run: |
           for i in 1 2 3 4 5; do
-            code=$(curl -sk -o /dev/null -w "%{http_code}" "${{ secrets.PUBLIC_URL }}/" || echo "000")
+            code=$(curl -sk -o /dev/null -w "%{http_code}" "${{ env.PUBLIC_URL }}/" || echo "000")
             echo "Try $i: HTTP $code"
             [ "$code" = "200" ] && exit 0
             sleep 4

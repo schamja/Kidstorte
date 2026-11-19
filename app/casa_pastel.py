@@ -207,6 +207,23 @@ def preview(body: PreviewRequest, request: Request):
         return JSONResponse(status_code=503, content={"error": "image"})
 
 
+@router.get("/dokument/{order_id}/{kind}/{token}")
+def dokument(order_id: int, kind: str, token: str):
+    """Bestellbestätigung oder Rechnung als PDF (Link aus E-Mail oder WhatsApp)."""
+    import hmac
+    from fastapi.responses import Response
+    from services.order_db import get_order
+    from app.casa_invoice import build_pdf, doc_token, is_casa_order, TXT, _order_values
+    if kind not in ("confirmation", "invoice") or not hmac.compare_digest(token, doc_token(order_id, kind)):
+        return JSONResponse(status_code=404, content={"error": "not found"})
+    order = get_order(order_id)
+    if not order or not is_casa_order(order):
+        return JSONResponse(status_code=404, content={"error": "not found"})
+    name = TXT[_order_values(order)["lang"]][f"file_{kind}"]
+    return Response(build_pdf(order, kind), media_type="application/pdf",
+                    headers={"Content-Disposition": f'inline; filename="CasaPastel_{name}_CP-{order_id:04d}.pdf"'})
+
+
 _chat_hits: dict[str, deque] = defaultdict(deque)
 
 

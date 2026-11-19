@@ -402,6 +402,21 @@ async def admin_login(response: Response, password: str = Form(...)):
     return resp
 
 
+def _with_casa_whatsapp(orders: list, request: Request) -> list:
+    """Hängt bei Casa-Pastel-Bestellungen den WhatsApp-Link (Bestätigung/Rechnung) an."""
+    try:
+        from app.casa_invoice import is_casa_order, whatsapp_url, doc_kind_for
+        base = f"https://{request.headers.get('host')}" if request.headers.get("x-forwarded-proto") == "https" \
+            else str(request.base_url).rstrip("/")
+        for o in orders:
+            if is_casa_order(o):
+                o["casa_wa"] = whatsapp_url(o, base)
+                o["casa_doc"] = doc_kind_for(o)
+    except Exception as e:
+        logger.warning(f"Casa Pastel WhatsApp-Links fehlgeschlagen: {e}")
+    return orders
+
+
 @app.get("/admin")
 async def admin_dashboard(request: Request):
     verify_admin(request)
@@ -409,7 +424,7 @@ async def admin_dashboard(request: Request):
     config = load_prompts_config()
     stats = session_mgr.get_statistics()
     sessions = session_mgr.list_sessions()
-    orders = get_all_orders()
+    orders = _with_casa_whatsapp(get_all_orders(), request)
     order_stats = get_order_stats()
 
     return templates.TemplateResponse(request, "admin.html", {
@@ -599,7 +614,7 @@ async def submit_order(request_body: OrderSubmitRequest, request: Request):
 async def admin_orders(request: Request):
     """Gibt alle Bestellungen als JSON zurück."""
     verify_admin(request)
-    orders = get_all_orders()
+    orders = _with_casa_whatsapp(get_all_orders(), request)
     return JSONResponse({"orders": orders, "stats": get_order_stats()})
 
 
