@@ -37,6 +37,8 @@ TXT = {
         "type": "Tipo", "size": "Tamaño", "tiers": "Pisos", "dough": "Masa", "filling": "Relleno",
         "design": "Diseño", "notes": "Comentarios",
         "total": "Total", "deposit": "Anticipo 50 %", "rest": "Resto al recoger",
+        "included": "incluido", "per_tier": "por piso", "tier1": "piso", "tierN": "pisos",
+        "base": "Pastel", "extra_dough": "Masa", "extra_filling": "Relleno", "details": "Detalles",
         "note_confirmation": "Esto es la confirmación de tu solicitud, todavía no es una factura. "
                              "No pagas nada ahora: revisamos tu pedido y te contactamos por WhatsApp.",
         "note_invoice": "¡Tu pedido fue aceptado! Por favor paga el anticipo del 50 % ({dep}). "
@@ -60,6 +62,8 @@ TXT = {
         "type": "Type", "size": "Size", "tiers": "Tiers", "dough": "Sponge", "filling": "Filling",
         "design": "Design", "notes": "Comments",
         "total": "Total", "deposit": "50 % deposit", "rest": "Balance at pickup",
+        "included": "included", "per_tier": "per tier", "tier1": "tier", "tierN": "tiers",
+        "base": "Cake", "extra_dough": "Sponge", "extra_filling": "Filling", "details": "Details",
         "note_confirmation": "This confirms your request; it is not an invoice yet. "
                              "You pay nothing now: we review your order and contact you on WhatsApp.",
         "note_invoice": "Your order has been accepted! Please pay the 50 % deposit ({dep}). "
@@ -83,6 +87,8 @@ TXT = {
         "type": "Art", "size": "Größe", "tiers": "Etagen", "dough": "Teig", "filling": "Füllung",
         "design": "Design", "notes": "Anmerkungen",
         "total": "Gesamt", "deposit": "Anzahlung 50 %", "rest": "Rest bei Abholung",
+        "included": "inklusive", "per_tier": "pro Etage", "tier1": "Etage", "tierN": "Etagen",
+        "base": "Torte", "extra_dough": "Teig", "extra_filling": "Füllung", "details": "Details",
         "note_confirmation": "Dies ist die Bestätigung deiner Anfrage, noch keine Rechnung. "
                              "Du zahlst jetzt nichts: Wir prüfen deine Bestellung und melden uns per WhatsApp.",
         "note_invoice": "Deine Bestellung wurde angenommen! Bitte zahle die Anzahlung von 50 % ({dep}). "
@@ -172,11 +178,27 @@ def build_pdf(order: dict, kind: str) -> bytes:
     who = Table([[cust, pick]], colWidths=[100 * mm, None])
     who.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
 
-    rows = [[Paragraph(f"<b>{t['item']}</b>", S["body"]), Paragraph(f"<b>{t['amount']}</b>", S["body"])]]
-    desc = [(t["type"], info.get("art")), (t["size"], info.get("groesse")), (t["dough"], info.get("geschmack")),
-            (t["filling"], info.get("fuellung")), (t["design"], info.get("design")), (t["notes"], info.get("notizen"))]
-    text = "<br/>".join(f"<b>{escape(k)}:</b> {escape(str(val))}" for k, val in desc if val)
-    rows.append([Paragraph(text, S["body"]), Paragraph(_money(v["total"]), S["body"])])
+    R = lambda txt: Paragraph(txt, ParagraphStyle("r", parent=S["body"], alignment=2))
+    rows = [[Paragraph(f"<b>{t['item']}</b>", S["body"]), R(f"<b>{t['amount']}</b>")]]
+    positions = info.get("positionen")
+    if positions:  # jede Preisposition einzeln
+        label = {"base": t["base"], "dough": t["extra_dough"], "filling": t["extra_filling"]}
+        for pos in positions:
+            txt = f"<b>{escape(label.get(pos.get('kind'), ''))}:</b> {escape(str(pos.get('text', '')))}"
+            if pos.get("kind") != "base" and pos.get("unit"):
+                n = int(pos.get("tiers") or 1)
+                txt += f" <font color='#7B7166'>(+{_money(pos['unit'])} {t['per_tier']} × {n} {t['tier1'] if n == 1 else t['tierN']})</font>"
+            amount = _money(pos["usd"]) if pos.get("usd") else t["included"]
+            rows.append([Paragraph(txt, S["body"]), R(amount)])
+        extra = [(t["design"], info.get("design")), (t["notes"], info.get("notizen"))]
+        extra_txt = "<br/>".join(f"<b>{escape(k)}:</b> {escape(str(val))}" for k, val in extra if val)
+        if extra_txt:
+            rows.append([Paragraph(extra_txt, S["small"]), ""])
+    else:  # ältere Bestellungen ohne Positionen: eine Zeile mit Gesamtbetrag
+        desc = [(t["type"], info.get("art")), (t["size"], info.get("groesse")), (t["dough"], info.get("geschmack")),
+                (t["filling"], info.get("fuellung")), (t["design"], info.get("design")), (t["notes"], info.get("notizen"))]
+        text = "<br/>".join(f"<b>{escape(k)}:</b> {escape(str(val))}" for k, val in desc if val)
+        rows.append([Paragraph(text, S["body"]), R(_money(v["total"]))])
     W = [140 * mm, 34 * mm]  # Seitenbreite 210 mm minus Ränder
     items = Table(rows, colWidths=W)
     items.setStyle(TableStyle([
