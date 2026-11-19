@@ -46,6 +46,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 #Jinja2 wird initialisert HTML mit echten daten befüllt
 templates = Jinja2Templates(directory="templates")
 
+# Casa Pastel (Chitré, Panamá): Konfigurator-API unter /api/casa
+from app.casa_pastel import router as casa_router
+app.include_router(casa_router)
+
 # --- Shared Instances (stateless(vergesslich):bedeutet sie enthalten selbst
 # keine Daten,sondern verarbeitet die state) die Werkzeuge---
 graph = CakeDreamsGraph()
@@ -95,6 +99,12 @@ class ChatRequest(BaseModel):
 @app.get("/")
 def index():
     return FileResponse("templates/index.html", headers={"Cache-Control": "no-cache"})
+
+
+@app.get("/chat")
+def kidstorte_chat():
+    """Bisherige Kidstorte-Seite mit dem KI-Chat."""
+    return FileResponse("templates/kidstorte_chat.html", headers={"Cache-Control": "no-cache"})
 
 
 @app.post("/api/chat")
