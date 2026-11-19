@@ -131,6 +131,9 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
               {% if order.status == 'storniert' %}
               <button class="btn-delete-order" onclick="deleteOrder({{ order.id }})" title="Stornierte Bestellung endgültig löschen">🗑️ Entfernen</button>
               {% endif %}
+              {% if order.casa_wa %}
+              <a class="btn-wa-invoice" href="{{ order.casa_wa }}" target="_blank" rel="noopener" title="Öffnet WhatsApp mit fertigem Text und PDF-Link">📲 {{ 'Rechnung' if order.casa_doc == 'invoice' else 'Bestätigung' }} per WhatsApp</a>
+              {% endif %}
             </td>
           </tr>
           {% endfor %}
@@ -274,6 +277,9 @@ document.getElementById("logout-btn").addEventListener("click", async (e) => {
   if (data.redirect) window.location.href = data.redirect;
 });
 
+// Knopf "per WhatsApp" (Casa Pastel)
+(function(){const s=document.createElement("style");s.textContent=".btn-wa-invoice{display:inline-block;margin-top:6px;background:#25D366;color:#fff;border-radius:8px;padding:5px 10px;font-size:.78rem;font-weight:700;text-decoration:none;white-space:nowrap}.btn-wa-invoice:hover{background:#1EBE5A}";document.head.appendChild(s)})();
+
 // Bestellungsstatus ändern
 async function updateOrderStatus(orderId, status) {
   const res = await fetch(`/admin/orders/${orderId}/status`, {
@@ -335,9 +341,11 @@ async function refreshOrders() {
         .map(s => `<option value="${s}" ${o.status===s?"selected":""}>${statusLabels[s]}</option>`)
         .join("");
 
-      const deleteBtn = o.status === "storniert"
+      const deleteBtn = (o.status === "storniert"
         ? `<button class="btn-delete-order" onclick="deleteOrder(${o.id})">🗑️ Entfernen</button>`
-        : "";
+        : "") + (o.casa_wa
+        ? `<a class="btn-wa-invoice" href="${o.casa_wa}" target="_blank" rel="noopener">📲 ${o.casa_doc === "invoice" ? "Rechnung" : "Bestätigung"} per WhatsApp</a>`
+        : "");
 
       return `<tr id="order-row-${o.id}">
         <td><strong>#${o.id}</strong><br><span class="td-sub">${o.created_at}</span></td>

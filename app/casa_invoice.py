@@ -39,6 +39,7 @@ TXT = {
         "total": "Total", "deposit": "Anticipo 50 %", "rest": "Resto al recoger",
         "included": "incluido", "per_tier": "por piso", "tier1": "piso", "tierN": "pisos",
         "base": "Pastel", "extra_dough": "Masa", "extra_filling": "Relleno", "details": "Detalles",
+        "ai_title": "Tu diseño con IA", "ai_note": "Imagen solo de inspiración: el pastel real, hecho a mano, puede verse diferente.",
         "note_confirmation": "Esto es la confirmación de tu solicitud, todavía no es una factura. "
                              "No pagas nada ahora: revisamos tu pedido y te contactamos por WhatsApp.",
         "note_invoice": "¡Tu pedido fue aceptado! Por favor paga el anticipo del 50 % ({dep}). "
@@ -64,6 +65,7 @@ TXT = {
         "total": "Total", "deposit": "50 % deposit", "rest": "Balance at pickup",
         "included": "included", "per_tier": "per tier", "tier1": "tier", "tierN": "tiers",
         "base": "Cake", "extra_dough": "Sponge", "extra_filling": "Filling", "details": "Details",
+        "ai_title": "Your AI design", "ai_note": "Inspiration only: the real, handmade cake may look different.",
         "note_confirmation": "This confirms your request; it is not an invoice yet. "
                              "You pay nothing now: we review your order and contact you on WhatsApp.",
         "note_invoice": "Your order has been accepted! Please pay the 50 % deposit ({dep}). "
@@ -89,6 +91,7 @@ TXT = {
         "total": "Gesamt", "deposit": "Anzahlung 50 %", "rest": "Rest bei Abholung",
         "included": "inklusive", "per_tier": "pro Etage", "tier1": "Etage", "tierN": "Etagen",
         "base": "Torte", "extra_dough": "Teig", "extra_filling": "Füllung", "details": "Details",
+        "ai_title": "Dein KI-Design", "ai_note": "Nur zur Inspiration: Die echte, handgemachte Torte kann anders aussehen.",
         "note_confirmation": "Dies ist die Bestätigung deiner Anfrage, noch keine Rechnung. "
                              "Du zahlst jetzt nichts: Wir prüfen deine Bestellung und melden uns per WhatsApp.",
         "note_invoice": "Deine Bestellung wurde angenommen! Bitte zahle die Anzahlung von 50 % ({dep}). "
@@ -128,6 +131,67 @@ def _order_values(order: dict) -> dict:
     total = float(total)
     deposit = float(info.get("anzahlung_usd", round(total / 2, 2)))
     return {"info": info, "lang": lang, "total": total, "deposit": deposit, "rest": round(total - deposit, 2)}
+
+
+def _ai_image(url: str | None):
+    """KI-Vorschaubild (z. B. /static/images/abc.png) verkleinert als JPEG für das PDF."""
+    if not url or not str(url).startswith("/static/images/"):
+        return None
+    path = Path("." + str(url))
+    if not path.is_file() or ".." in path.parts:
+        return None
+    try:
+        from PIL import Image as PILImage
+        im = PILImage.open(path).convert("RGB")
+        im.thumbnail((700, 700))
+        out = io.BytesIO()
+        im.save(out, "JPEG", quality=82)
+        out.seek(0)
+        return out
+    except Exception as e:
+        logger.warning(f"Casa Pastel: KI-Bild für PDF nicht lesbar ({url}): {e}")
+        return None
+
+
+WA_TXT = {
+    "es": {"invoice": "¡Hola {name}! Tu pedido #{id} en Casa Pastel fue aceptado 🎂\nAquí está tu factura: {url}\nAnticipo (50 %): {dep} · Resto al recoger: {rest}",
+           "confirmation": "¡Hola {name}! Recibimos tu pedido #{id} en Casa Pastel 🎂\nAquí está la confirmación: {url}\nTodavía no pagas nada; te escribimos para confirmar los detalles."},
+    "en": {"invoice": "Hi {name}! Your Casa Pastel order #{id} has been accepted 🎂\nHere is your invoice: {url}\nDeposit (50 %): {dep} · Balance at pickup: {rest}",
+           "confirmation": "Hi {name}! We received your Casa Pastel order #{id} 🎂\nHere is the confirmation: {url}\nYou don't pay anything yet; we'll message you to confirm the details."},
+    "de": {"invoice": "Hallo {name}! Deine Bestellung #{id} bei Casa Pastel wurde angenommen 🎂\nHier ist deine Rechnung: {url}\nAnzahlung (50 %): {dep} · Rest bei Abholung: {rest}",
+           "confirmation": "Hallo {name}! Wir haben deine Bestellung #{id} bei Casa Pastel erhalten 🎂\nHier ist die Bestätigung: {url}\nDu zahlst noch nichts; wir melden uns, um die Details zu klären."},
+}
+
+
+def doc_token(order_id: int, kind: str) -> str:
+    """Geheimer Schlüssel für den PDF-Link (nur wer den Link hat, kann das PDF öffnen)."""
+    import hashlib
+    import hmac
+    import os
+    from app.config import ADMIN_PASSWORD
+    secret = (os.getenv("CASA_LINK_SECRET") or ADMIN_PASSWORD or "casa").encode()
+    return hmac.new(secret, f"{int(order_id)}:{kind}".encode(), hashlib.sha256).hexdigest()[:24]
+
+
+def doc_kind_for(order: dict) -> str:
+    return "invoice" if order.get("status") in ("in_bearbeitung", "fertig") else "confirmation"
+
+
+def whatsapp_url(order: dict, base_url: str) -> str | None:
+    """wa.me-Link mit fertigem Text und PDF-Link an die WhatsApp-Nummer der Kundin bzw. des Kunden."""
+    from urllib.parse import quote
+    digits = "".join(c for c in str(order.get("customer_phone") or "") if c.isdigit())
+    if len(digits) < 7:
+        return None
+    if len(digits) == 8:  # Handynummer aus Panamá ohne Landesvorwahl
+        digits = "507" + digits
+    kind = doc_kind_for(order)
+    v = _order_values(order)
+    oid = int(order["id"])
+    url = f"{base_url.rstrip('/')}/api/casa/dokument/{oid}/{kind}/{doc_token(oid, kind)}"
+    name = (order.get("customer_name") or "").split(" ")[0]
+    text = WA_TXT[v["lang"]][kind].format(name=name, id=oid, url=url, dep=_money(v["deposit"]), rest=_money(v["rest"]))
+    return f"https://wa.me/{digits}?text={quote(text)}"
 
 
 def is_casa_order(order: dict) -> bool:
@@ -227,11 +291,20 @@ def build_pdf(order: dict, kind: str) -> bytes:
                               ("TOPPADDING", (0, 0), (-1, -1), 8), ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
                               ("LEFTPADDING", (0, 0), (-1, -1), 10), ("RIGHTPADDING", (0, 0), (-1, -1), 10)]))
 
+    ai_block = []
+    pic = _ai_image(info.get("vorschau"))
+    if pic:
+        img = Image(pic, 55 * mm, 55 * mm)
+        txt = [Paragraph(t["ai_title"], S["h"]), Spacer(1, 2 * mm), Paragraph(t["ai_note"], S["small"])]
+        box = Table([[img, txt]], colWidths=[62 * mm, sum(W) - 62 * mm])
+        box.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 0)]))
+        ai_block = [Spacer(1, 6 * mm), box]
+
     buf = io.BytesIO()
     doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm,
                             topMargin=16 * mm, bottomMargin=16 * mm,
                             title=f"Casa Pastel – {t[kind]} {number}", author="Casa Pastel")
-    doc.build([head, Spacer(1, 8 * mm), who, Spacer(1, 7 * mm), items, Spacer(1, 2 * mm), sums,
+    doc.build([head, Spacer(1, 8 * mm), who, Spacer(1, 7 * mm), items, Spacer(1, 2 * mm), sums, *ai_block,
                Spacer(1, 7 * mm), note, Spacer(1, 5 * mm), Paragraph(t["prices"], S["small"]),
                Spacer(1, 3 * mm), Paragraph(t["thanks"], S["h"])])
     return buf.getvalue()
