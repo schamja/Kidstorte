@@ -23,10 +23,12 @@
   --pink:#EFB1C0;        /* Pastellrosa (Linien, Herzen) */
   --pink-deep:#DC7F97;   /* Rosa für Text/Buttons */
   --pink-soft:#FBE5EB;
-  --sage:#8F9872;        /* Salbeigrün (Buttons, Kopfleiste) */
-  --sage-deep:#77805C;
-  --sage-light:#C5CAB0;
-  --sage-soft:#E9EBDF;
+  --sage:#B5DCC8;        /* Pastell-Mint (Buttons, Kopfleiste) */
+  --sage-hover:#9FD2B9;
+  --sage-deep:#3D7A63;   /* dunkles Mint für Schrift */
+  --on-sage:#1F4A3B;     /* Schrift auf Mint-Flächen */
+  --sage-light:#D2ECDF;
+  --sage-soft:#E9F6EF;
   --ink:#3E3933; --muted:#7B7166; --line:#E2D6C4; --tile:#CFC6B2;
   --shadow:0 10px 30px rgba(110,90,70,.12);
   --serif:'Playfair Display',Georgia,serif;
@@ -47,8 +49,8 @@ h1,h2,h3{margin:0}
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:11px 24px;font:700 1rem var(--sans);cursor:pointer;text-decoration:none;transition:transform .15s,background .15s}
 .btn:active{transform:scale(.97)}
-.btn-sage{background:var(--sage);color:#fff}
-.btn-sage:hover{background:var(--sage-deep)}
+.btn-sage{background:var(--sage);color:var(--on-sage)}
+.btn-sage:hover{background:var(--sage-hover)}
 .btn-pill{border-radius:999px;background:var(--pink-soft);color:var(--ink);border:2px solid var(--pink-deep);padding:10px 26px;font:800 .92rem var(--sans);letter-spacing:.06em;text-transform:uppercase;box-shadow:0 3px 0 rgba(220,127,151,.25)}
 .btn-pill:hover{background:#F8D6DF}
 .btn[disabled]{opacity:.5;cursor:not-allowed}
@@ -63,12 +65,12 @@ header{position:relative;z-index:20;background:var(--bg-2);border-top:6px solid 
 .menu{display:flex;align-items:center;gap:6px;list-style:none;margin:0;padding:0}
 .menu a{display:block;padding:6px 12px;border-radius:8px;color:var(--sage-deep);text-decoration:none;font-weight:700;font-size:1rem}
 .menu a:hover{background:var(--sage-soft)}
-.menu a.on{background:var(--sage);color:#fff}
+.menu a.on{background:var(--sage);color:var(--on-sage)}
 .menu a.pink{color:var(--pink-deep)}
 .menu a.pink.on{background:var(--pink-deep);color:#fff}
 .lang{display:flex;border:2px solid var(--sage-light);border-radius:999px;overflow:hidden;margin-left:10px}
 .lang button{border:0;background:transparent;padding:4px 10px;font:800 .78rem var(--sans);color:var(--sage-deep);cursor:pointer}
-.lang button.on{background:var(--sage);color:#fff}
+.lang button.on{background:var(--sage);color:var(--on-sage)}
 .burger{display:none;background:none;border:0;padding:8px;cursor:pointer}
 .burger span{display:block;width:24px;height:2px;background:var(--sage-deep);margin:5px 0;border-radius:2px}
 
@@ -109,14 +111,14 @@ header{position:relative;z-index:20;background:var(--bg-2);border-top:6px solid 
 
 /* ── Konfigurator ──────────────────────────────────────────── */
 .cfg{margin-top:34px;border:3px solid var(--sage);border-radius:18px;overflow:hidden;background:var(--card);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--pink),var(--shadow)}
-.cfg-title{background:var(--sage);color:#fff;text-align:center;padding:10px;font:800 1.5rem var(--sans);letter-spacing:.04em;text-transform:uppercase}
+.cfg-title{background:var(--sage);color:var(--on-sage);text-align:center;padding:10px;font:800 1.5rem var(--sans);letter-spacing:.04em;text-transform:uppercase}
 .cfg-body{display:grid;grid-template-columns:1.35fr 2px 1fr;gap:0 24px;padding:20px 24px 24px}
 .vline{position:relative;background:var(--sage-light);margin:6px 0}
 .vline::after{content:"♥";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--pink);font-size:1.4rem;background:var(--card);padding:6px 0}
 .step{padding-bottom:16px;margin-bottom:14px;border-bottom:1px dashed var(--line)}
 .step:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
 .step h3{font:800 1.15rem var(--sans);color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.step h3 .ok{display:none;width:20px;height:20px;border-radius:50%;background:var(--sage);color:#fff;font-size:.72rem;line-height:20px;text-align:center}
+.step h3 .ok{display:none;width:20px;height:20px;border-radius:50%;background:var(--sage);color:var(--on-sage);font-size:.72rem;line-height:20px;text-align:center}
 .step.done h3 .ok{display:inline-block}
 .hint{color:var(--muted);font-size:.88rem;margin:0 0 10px}
 .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
@@ -216,8 +218,8 @@ input.bad{border-color:#D9534F}
 .sub-h{font:800 1.05rem var(--sans);color:var(--ink);margin:24px 0 10px}
 .table-wrap{overflow-x:auto;border-radius:14px;box-shadow:0 4px 14px rgba(110,90,70,.08)}
 .ptable{width:100%;border-collapse:collapse;background:var(--white);font-size:.9rem;min-width:560px}
-.ptable th{background:var(--sage);color:#fff;font-weight:800;padding:8px;text-align:center;line-height:1.2}
-.ptable th.grp{background:var(--sage-deep);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:5px}
+.ptable th{background:var(--sage);color:var(--on-sage);font-weight:800;padding:8px;text-align:center;line-height:1.2}
+.ptable th.grp{background:var(--sage-light);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:5px}
 .ptable td{padding:9px 8px;text-align:center;border-bottom:1px solid #F0E8DB}
 .ptable td:first-child,.ptable th:first-child{text-align:left;padding-left:14px}
 .ptable td b{color:var(--ink)}
@@ -253,11 +255,11 @@ input.bad{border-color:#D9534F}
 .chat-fab.hide{display:none}
 .chat{position:fixed;right:18px;bottom:18px;z-index:80;width:370px;max-width:calc(100vw - 24px);height:min(580px,calc(100vh - 36px));display:none;flex-direction:column;background:var(--card);border:3px solid var(--sage);border-radius:18px;box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--pink),0 18px 40px rgba(0,0,0,.18);overflow:hidden}
 .chat.open{display:flex}
-.chat-head{background:var(--sage);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 12px}
+.chat-head{background:var(--sage);color:var(--on-sage);display:flex;align-items:center;gap:10px;padding:10px 12px}
 .chat-head img{width:38px;height:38px;border-radius:50%;background:#fff}
 .chat-head b{display:block;font:600 1.02rem var(--serif)}
 .chat-head small{font-size:.74rem;opacity:.9}
-.chat-x{margin-left:auto;border:0;background:rgba(255,255,255,.22);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem}
+.chat-x{margin-left:auto;border:0;background:rgba(255,255,255,.55);color:var(--on-sage);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem}
 .chat-msgs{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px}
 .msg{max-width:85%;padding:8px 12px;border-radius:14px;font-size:.9rem;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
 .msg.bot{background:#fff;border:1px solid #EFE5D6;align-self:flex-start;border-bottom-left-radius:4px}
@@ -508,7 +510,7 @@ footer{padding:6px 0 30px}
         <p data-i18n="story.p2">[Texto de ejemplo – reemplazar] Me llamo … y vengo de … . Lo que empezó como un pasatiempo para la familia hoy es mi forma de endulzar los momentos más bonitos de nuestros clientes.</p>
       </div>
       <figure class="stamp-wrap" style="margin:0">
-        <div class="stamp"><img src="/static/casa-pastel/logo-600.jpg" alt="" data-i18n-alt="story.photoalt"></div>
+        <div class="stamp"><img src="/static/casa-pastel/familia.jpg" alt="" data-i18n-alt="story.photoalt"></div>
         <figcaption class="stamp-cap" data-i18n="story.caption">¡Hola desde Chitré!</figcaption>
       </figure>
     </section>
@@ -701,7 +703,7 @@ const T = {
   "story.title":"Nuestra Historia",
   "story.p1":"[Texto de ejemplo – reemplazar] Casa Pastel nació en la cocina de casa, con recetas de familia y mucho cariño. Cada pastel lo horneamos y decoramos a mano, aquí en Chitré.",
   "story.p2":"[Texto de ejemplo – reemplazar] Me llamo … y vengo de … . Lo que empezó como un pasatiempo para la familia hoy es mi forma de endulzar los momentos más bonitos de nuestros clientes.",
-  "story.caption":"¡Hola desde Chitré!","story.photoalt":"Foto de la repostera",
+  "story.caption":"¡Hola desde Chitré!","story.photoalt":"Nuestra familia",
   "ig.title":"Galería Instagram","ig.follow":"Síguenos en Instagram",
   "cfg.title":"Configurador de pasteles",
   "s1.title":"Paso 1: Base","pg.next":"Paso 3 y 4: masa y relleno","pg.back":"Paso 1 y 2: base y tamaño",
@@ -758,7 +760,7 @@ const T = {
   "story.title":"Our Story",
   "story.p1":"[Sample text – replace] Casa Pastel was born in our home kitchen, with family recipes and lots of love. Every cake is baked and decorated by hand, right here in Chitré.",
   "story.p2":"[Sample text – replace] My name is … and I’m from … . What started as a hobby for family is now my way of sweetening our customers’ most beautiful moments.",
-  "story.caption":"Hello from Chitré!","story.photoalt":"Photo of the baker",
+  "story.caption":"Hello from Chitré!","story.photoalt":"Our family",
   "ig.title":"Instagram Gallery","ig.follow":"Follow us on Instagram",
   "cfg.title":"Cake configurator",
   "s1.title":"Step 1: Base","pg.next":"Steps 3 & 4: sponge and filling","pg.back":"Steps 1 & 2: base and size",
@@ -816,17 +818,17 @@ const FILL_COLORS={dulcedeleche:"#C68A4E",chocolate:"#3F2419",vainilla:"#FFF6DE"
 
 /* Icons für Kuchenarten (Pastellstil wie im Entwurf) */
 const ICONS={
- fondant:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="56" rx="24" ry="4" fill="#E9EBDF"/><rect x="14" y="30" width="36" height="24" rx="5" fill="#FBE5EB" stroke="#DC7F97" stroke-width="2"/><path d="M14 38q4.5 6 9 0t9 0 9 0 9 0" fill="#F7C9D5" stroke="#DC7F97" stroke-width="2"/><path d="M32 12c-4-5-11 0-7 6l7 7 7-7c4-6-3-11-7-6z" fill="#EFB1C0" stroke="#DC7F97" stroke-width="1.5"/></svg>`,
- crema:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="57" rx="22" ry="4" fill="#E9EBDF"/><path d="M16 38h32l-3 17H19z" fill="#FBE5EB" stroke="#DC7F97" stroke-width="2"/><path d="M14 38c0-7 6-9 9-12 1 4 5-3 9-9 4 6 8 13 9 9 3 3 9 5 9 12z" fill="#FFFDF7" stroke="#C9A98A" stroke-width="2"/><path d="M32 11c-3-4-9 0-6 5l6 5 6-5c3-5-3-9-6-5z" fill="#EFB1C0"/></svg>`,
- fruta:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="56" rx="25" ry="4" fill="#E9EBDF"/><rect x="11" y="32" width="42" height="21" rx="5" fill="#FBE5EB" stroke="#DC7F97" stroke-width="2"/><path d="M11 41h42" stroke="#fff" stroke-width="3"/><path d="M22 31c-6-1-8-8-3-10 3-1 5 1 5 1s2-2 5-1c5 2 3 9-3 10z" fill="#E86A7C"/><path d="M40 31c-6-1-8-8-3-10 3-1 5 1 5 1s2-2 5-1c5 2 3 9-3 10z" fill="#E86A7C"/><path d="M24 20l2-4M42 20l2-4" stroke="#8F9872" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="28" r="4" fill="#F28C9C"/></svg>`,
- simple:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="56" rx="25" ry="4" fill="#E9EBDF"/><rect x="12" y="28" width="40" height="25" rx="5" fill="#E8C597" stroke="#B98E66" stroke-width="2"/><path d="M12 36h40M12 44h40" stroke="#FFF6DE" stroke-width="3"/><path d="M32 12c-4-5-11 0-7 6l7 7 7-7c4-6-3-11-7-6z" fill="#EFB1C0" stroke="#DC7F97" stroke-width="1.5"/></svg>`
+ fondant:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="56" rx="24" ry="4" fill="#E2F1E9"/><rect x="14" y="30" width="36" height="24" rx="5" fill="#FBE5EB" stroke="#DC7F97" stroke-width="2"/><path d="M14 38q4.5 6 9 0t9 0 9 0 9 0" fill="#F7C9D5" stroke="#DC7F97" stroke-width="2"/><path d="M32 12c-4-5-11 0-7 6l7 7 7-7c4-6-3-11-7-6z" fill="#EFB1C0" stroke="#DC7F97" stroke-width="1.5"/></svg>`,
+ crema:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="57" rx="22" ry="4" fill="#E2F1E9"/><path d="M16 38h32l-3 17H19z" fill="#FBE5EB" stroke="#DC7F97" stroke-width="2"/><path d="M14 38c0-7 6-9 9-12 1 4 5-3 9-9 4 6 8 13 9 9 3 3 9 5 9 12z" fill="#FFFDF7" stroke="#C9A98A" stroke-width="2"/><path d="M32 11c-3-4-9 0-6 5l6 5 6-5c3-5-3-9-6-5z" fill="#EFB1C0"/></svg>`,
+ fruta:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="56" rx="25" ry="4" fill="#E2F1E9"/><rect x="11" y="32" width="42" height="21" rx="5" fill="#FBE5EB" stroke="#DC7F97" stroke-width="2"/><path d="M11 41h42" stroke="#fff" stroke-width="3"/><path d="M22 31c-6-1-8-8-3-10 3-1 5 1 5 1s2-2 5-1c5 2 3 9-3 10z" fill="#E86A7C"/><path d="M40 31c-6-1-8-8-3-10 3-1 5 1 5 1s2-2 5-1c5 2 3 9-3 10z" fill="#E86A7C"/><path d="M24 20l2-4M42 20l2-4" stroke="#3D7A63" stroke-width="2" stroke-linecap="round"/><circle cx="32" cy="28" r="4" fill="#F28C9C"/></svg>`,
+ simple:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="56" rx="25" ry="4" fill="#E2F1E9"/><rect x="12" y="28" width="40" height="25" rx="5" fill="#E8C597" stroke="#B98E66" stroke-width="2"/><path d="M12 36h40M12 44h40" stroke="#FFF6DE" stroke-width="3"/><path d="M32 12c-4-5-11 0-7 6l7 7 7-7c4-6-3-11-7-6z" fill="#EFB1C0" stroke="#DC7F97" stroke-width="1.5"/></svg>`
 };
 function sizeIcon(size,on){
   const stroke=on?"#DC7F97":"#D2B8B0", fill=on?"#FBE5EB":"#FFF8F5", band="#F3C4CF";
   const w={s6:24,s8:32,s10:42};
-  if(size.tiers===1){const ww=w[size.id]||32,h=10+ww/4;return `<svg viewBox="8 4 48 40"><ellipse cx="32" cy="40" rx="${ww/2+5}" ry="2.5" fill="#E9EBDF"/><rect x="${32-ww/2}" y="${38-h}" width="${ww}" height="${h}" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M${32-ww/2} ${38-h/2}h${ww}" stroke="${band}" stroke-width="2.5"/></svg>`}
+  if(size.tiers===1){const ww=w[size.id]||32,h=10+ww/4;return `<svg viewBox="8 4 48 40"><ellipse cx="32" cy="40" rx="${ww/2+5}" ry="2.5" fill="#E2F1E9"/><rect x="${32-ww/2}" y="${38-h}" width="${ww}" height="${h}" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M${32-ww/2} ${38-h/2}h${ww}" stroke="${band}" stroke-width="2.5"/></svg>`}
   const [a,b]=size.id==="t6_8"?[22,32]:[30,42];
-  return `<svg viewBox="8 4 48 40"><ellipse cx="32" cy="41" rx="${b/2+5}" ry="2.5" fill="#E9EBDF"/><rect x="${32-b/2}" y="24" width="${b}" height="15" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><rect x="${32-a/2}" y="9" width="${a}" height="15" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M${32-b/2} 31.5h${b}M${32-a/2} 16.5h${a}" stroke="${band}" stroke-width="2.5"/></svg>`;
+  return `<svg viewBox="8 4 48 40"><ellipse cx="32" cy="41" rx="${b/2+5}" ry="2.5" fill="#E2F1E9"/><rect x="${32-b/2}" y="24" width="${b}" height="15" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><rect x="${32-a/2}" y="9" width="${a}" height="15" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M${32-b/2} 31.5h${b}M${32-a/2} 16.5h${a}" stroke="${band}" stroke-width="2.5"/></svg>`;
 }
 
 /* ===================== STATE ===================== */
@@ -885,7 +887,7 @@ function renderFillings(){
 function renderLayers(){
   const n=CFG.layers_per_tier, d=sel.doughs.length?sel.doughs:["vainilla"];
   const fill=FILL_COLORS[sel.filling]||"#FFF6DE";
-  let y=128, out=`<ellipse cx="75" cy="136" rx="66" ry="7" fill="#E9EBDF"/>`;
+  let y=128, out=`<ellipse cx="75" cy="136" rx="66" ry="7" fill="#E2F1E9"/>`;
   const lh=20, fh=6, x=15, w=120;
   for(let i=0;i<n;i++){
     const c=DOUGH_COLORS[d[i%d.length]]||"#F3DFA8";
@@ -893,7 +895,7 @@ function renderLayers(){
     if(i<n-1){y-=fh; out+=`<rect x="${x}" y="${y}" width="${w}" height="${fh}" fill="${fill}"/>`}
   }
   out+=`<rect x="${x}" y="${y}" width="${w}" height="${128-y}" rx="4" fill="none" stroke="#DC7F97" stroke-width="2"/>`;
-  out+=`<text x="75" y="${y-8}" text-anchor="middle" font-family="Nunito" font-size="11" font-weight="700" fill="#77805C">${n} ${t("layers")}</text>`;
+  out+=`<text x="75" y="${y-8}" text-anchor="middle" font-family="Nunito" font-size="11" font-weight="700" fill="#3D7A63">${n} ${t("layers")}</text>`;
   $("#layersSvg").innerHTML=out;
 }
 function renderSummary(){
