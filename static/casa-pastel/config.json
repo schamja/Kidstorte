@@ -1,0 +1,61 @@
+{
+  "_hinweis": "PLATZHALTER: Alle Preise, Größen und Sorten hier anpassen. Diese Datei wird von der Website UND vom Server gelesen. Preise in US-Dollar.",
+  "currency": "USD",
+  "deposit_percent": 50,
+  "whatsapp_business": "50760000000",
+  "instagram_handle": "casapastel.chitre",
+  "instagram_widget_html": "",
+  "min_lead_days": 3,
+  "preview_limit_per_hour": 5,
+
+  "types": [
+    {"id": "fondant", "icon": "fondant", "short": {"es": "Fondant", "en": "Fondant"}, "name": {"es": "Pastel de fondant", "en": "Fondant cake"},
+     "desc": {"es": "Cubierta lisa de fondant, ideal para diseños temáticos y figuras.", "en": "Smooth fondant covering, perfect for themed designs and figures."}},
+    {"id": "crema", "icon": "crema", "short": {"es": "Crema", "en": "Buttercream"}, "name": {"es": "Pastel de crema", "en": "Buttercream cake"},
+     "desc": {"es": "Decorado con crema suave, flores de manga y acabados delicados.", "en": "Decorated with soft cream, piped flowers and delicate finishes."}},
+    {"id": "fruta", "icon": "fruta", "short": {"es": "Frutas", "en": "Fruit"}, "name": {"es": "Pastel de frutas", "en": "Fruit cake"},
+     "desc": {"es": "Fresco y ligero, decorado con frutas de temporada.", "en": "Fresh and light, topped with seasonal fruit."}},
+    {"id": "simple", "icon": "simple", "short": {"es": "Sencillo", "en": "Simple"}, "name": {"es": "Pastel sencillo", "en": "Simple cake"},
+     "desc": {"es": "Clásico y casero, sin decoración elaborada.", "en": "Classic and homemade, without elaborate decoration."}}
+  ],
+
+  "sizes": [
+    {"id": "s6",  "tiers": 1, "name": {"es": "Pequeño · 6\" (15 cm)", "en": "Small · 6\" (15 cm)"},
+     "desc": {"es": "Ø 15 cm, aprox. 10 cm de alto. 8 – 10 porciones.", "en": "Ø 15 cm, approx. 10 cm tall. 8 – 10 servings."}},
+    {"id": "s8",  "tiers": 1, "name": {"es": "Mediano · 8\" (20 cm)", "en": "Medium · 8\" (20 cm)"},
+     "desc": {"es": "Ø 20 cm, aprox. 10 cm de alto. 15 – 20 porciones.", "en": "Ø 20 cm, approx. 10 cm tall. 15 – 20 servings."}},
+    {"id": "s10", "tiers": 1, "name": {"es": "Grande · 10\" (25 cm)", "en": "Large · 10\" (25 cm)"},
+     "desc": {"es": "Ø 25 cm, aprox. 10 cm de alto. 25 – 30 porciones.", "en": "Ø 25 cm, approx. 10 cm tall. 25 – 30 servings."}},
+    {"id": "t6_8",  "tiers": 2, "name": {"es": "2 pisos · 6\" + 8\"", "en": "2 tiers · 6\" + 8\""},
+     "desc": {"es": "Piso inferior Ø 20 cm, superior Ø 15 cm, aprox. 22 cm de alto. 25 – 30 porciones.", "en": "Bottom tier Ø 20 cm, top tier Ø 15 cm, approx. 22 cm tall. 25 – 30 servings."}},
+    {"id": "t8_10", "tiers": 2, "name": {"es": "2 pisos · 8\" + 10\"", "en": "2 tiers · 8\" + 10\""},
+     "desc": {"es": "Piso inferior Ø 25 cm, superior Ø 20 cm, aprox. 22 cm de alto. 40 – 50 porciones.", "en": "Bottom tier Ø 25 cm, top tier Ø 20 cm, approx. 22 cm tall. 40 – 50 servings."}}
+  ],
+
+  "prices": {
+    "fondant": {"s6": 45, "s8": 65, "s10": 90, "t6_8": 120, "t8_10": 170},
+    "crema":   {"s6": 30, "s8": 42, "s10": 60, "t6_8": 80,  "t8_10": 115},
+    "fruta":   {"s6": 35, "s8": 48, "s10": 68, "t6_8": 90,  "t8_10": 130},
+    "simple":  {"s6": 22, "s8": 32, "s10": 45, "t6_8": 60,  "t8_10": 85}
+  },
+
+  "layers_per_tier": 4,
+
+  "doughs": [
+    {"id": "vainilla",  "extra": 0, "name": {"es": "Vainilla", "en": "Vanilla"}},
+    {"id": "chocolate", "extra": 0, "name": {"es": "Chocolate", "en": "Chocolate"}},
+    {"id": "marmoleado","extra": 0, "name": {"es": "Marmoleado", "en": "Marble"}},
+    {"id": "naranja",   "extra": 0, "name": {"es": "Naranja", "en": "Orange"}},
+    {"id": "zanahoria", "extra": 5, "name": {"es": "Zanahoria", "en": "Carrot"}},
+    {"id": "redvelvet", "extra": 5, "name": {"es": "Red velvet", "en": "Red velvet"}}
+  ],
+
+  "fillings": [
+    {"id": "dulcedeleche", "extra": 0, "name": {"es": "Dulce de leche", "en": "Dulce de leche"}},
+    {"id": "chocolate",    "extra": 0, "name": {"es": "Ganache de chocolate", "en": "Chocolate ganache"}},
+    {"id": "vainilla",     "extra": 0, "name": {"es": "Crema de vainilla", "en": "Vanilla cream"}},
+    {"id": "fresa",        "extra": 4, "name": {"es": "Fresas con crema", "en": "Strawberries & cream"}},
+    {"id": "maracuya",     "extra": 4, "name": {"es": "Maracuyá", "en": "Passion fruit"}},
+    {"id": "nutella",      "extra": 6, "name": {"es": "Nutella", "en": "Nutella"}}
+  ]
+}
