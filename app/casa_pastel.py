@@ -4,6 +4,7 @@ Casa Pastel – API für die neue Website (Chitré, Panamá).
 Endpunkte:
   GET  /api/casa/config   → Größen, Sorten, Preise (aus static/casa-pastel/config.json)
   POST /api/casa/preview  → KI-Vorschaubild aus der Beschreibung des Kunden
+  POST /api/casa/chat     → KI-Berater (LangGraph, app/casa_chat.py), nimmt keine Bestellungen an
   POST /api/casa/order    → Bestellung speichern (KEINE Online-Zahlung)
 
 Der Preis wird hier auf dem Server noch einmal berechnet, damit niemand
@@ -88,6 +89,17 @@ class PreviewRequest(BaseModel):
     selection: CakeSelection | None = None
 
 
+class ChatTurn(BaseModel):
+    role: str
+    content: str = Field(max_length=2000)
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(min_length=1, max_length=600)
+    history: list[ChatTurn] = Field(default_factory=list, max_length=20)
+    lang: str = "es"
+
+
 class OrderRequest(BaseModel):
     selection: CakeSelection
     design: str = Field(default="", max_length=1000)
@@ -151,6 +163,31 @@ def preview(body: PreviewRequest, request: Request):
     except Exception as e:
         logger.exception(f"Casa Pastel Vorschau fehlgeschlagen: {e}")
         return JSONResponse(status_code=503, content={"error": "image"})
+
+
+_chat_hits: dict[str, deque] = defaultdict(deque)
+
+
+@router.post("/chat")
+def chat(body: ChatRequest, request: Request):
+    """KI-Berater: beantwortet Fragen, nimmt aber keine Bestellungen an."""
+    cfg = load_config()
+    client = request.client.host if request.client else "unknown"
+    hits, now = _chat_hits[client], time.time()
+    while hits and now - hits[0] > 3600:
+        hits.popleft()
+    if len(hits) >= int(cfg.get("chat_limit_per_hour", 40)):
+        return JSONResponse(status_code=429, content={"error": "limit"})
+    hits.append(now)
+
+    lang = "en" if body.lang == "en" else "es"
+    try:
+        from app.casa_chat import run_chat
+        reply = run_chat(cfg, body.message, [t.model_dump() for t in body.history], lang)
+        return {"reply": reply}
+    except Exception as e:
+        logger.exception(f"Casa Pastel Chat fehlgeschlagen: {e}")
+        return JSONResponse(status_code=503, content={"error": "chat"})
 
 
 @router.post("/order")

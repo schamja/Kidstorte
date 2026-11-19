@@ -199,6 +199,81 @@ input.bad{border-color:#D9534F}
 .success h3{font:600 1.3rem var(--serif);margin-bottom:6px}
 .wa-btn{background:#25D366;color:#fff;margin-top:10px}
 
+/* ── Pasteles y precios ────────────────────────────────────── */
+.products{margin-top:34px;padding:30px 34px 32px}
+.sec-head{display:flex;align-items:center;gap:12px;margin-left:-34px}
+.sec-head.plain{margin-left:0}
+.sec-head .tab{width:44px;height:26px;background:var(--sage);border-radius:0 999px 999px 0;flex:none}
+.sec-head h2{font:500 1.9rem var(--serif);color:var(--ink)}
+.underline{height:2px;background:var(--pink);margin:6px 0 14px;border-radius:2px}
+.prod-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.prod{background:var(--white);border:2px solid #EFE5D6;border-radius:16px;padding:14px 12px;text-align:center;display:flex;flex-direction:column}
+.prod svg{width:72px;height:72px;margin:0 auto 6px}
+.prod h3{font:600 1.05rem var(--serif);color:var(--ink);margin-bottom:4px}
+.prod p{font-size:.82rem;color:var(--muted);margin:0 0 8px;flex:1}
+.prod .from{font:600 1.15rem var(--serif);color:var(--pink-deep);margin-bottom:8px}
+.prod .btn{padding:7px 14px;font-size:.85rem;align-self:center}
+.sub-h{font:800 1.05rem var(--sans);color:var(--ink);margin:24px 0 10px}
+.table-wrap{overflow-x:auto;border-radius:14px;box-shadow:0 4px 14px rgba(110,90,70,.08)}
+.ptable{width:100%;border-collapse:collapse;background:var(--white);font-size:.9rem;min-width:560px}
+.ptable th{background:var(--sage);color:#fff;font-weight:800;padding:8px;text-align:center;line-height:1.2}
+.ptable th.grp{background:var(--sage-deep);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:5px}
+.ptable td{padding:9px 8px;text-align:center;border-bottom:1px solid #F0E8DB}
+.ptable td:first-child,.ptable th:first-child{text-align:left;padding-left:14px}
+.ptable td b{color:var(--ink)}
+.ptable tbody tr:hover{background:var(--pink-soft)}
+.ptable tr.serv td{font-size:.78rem;color:var(--muted);background:#FBF7F1}
+.extras{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.extras span{background:var(--white);border:1px solid #EFE5D6;border-radius:999px;padding:4px 12px;font-size:.82rem}
+.extras b{color:var(--pink-deep)}
+.fine{font-size:.8rem;color:var(--muted);margin:10px 0 0}
+
+/* ── Cómo funciona + Contacto ──────────────────────────────── */
+.info{margin-top:22px;padding:30px 34px 32px;display:grid;grid-template-columns:1.1fr 2px 1fr;gap:0 26px}
+.how-list{list-style:none;margin:0 0 12px;padding:0}
+.how-list li{display:flex;gap:12px;margin-bottom:12px}
+.how-list .n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--pink-soft);color:var(--pink-deep);font:700 1rem var(--serif);display:flex;align-items:center;justify-content:center}
+.how-list b{display:block;font-size:.95rem}
+.how-list span{font-size:.85rem;color:var(--muted)}
+.lead{background:var(--sage-soft);border-radius:10px;padding:8px 12px;font-size:.85rem;color:var(--sage-deep);font-weight:700;margin:0}
+.contact-list{list-style:none;margin:0 0 14px;padding:0}
+.contact-list li{display:flex;gap:10px;margin-bottom:10px;font-size:.9rem}
+.contact-list .ic{flex:none;width:32px;height:32px;border-radius:50%;background:var(--sage-soft);display:flex;align-items:center;justify-content:center}
+.contact-list b{display:block;font-size:.8rem;color:var(--sage-deep)}
+.contact-btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn-wa{background:#25D366;color:#fff}
+.btn-wa:hover{background:#1EBE5A}
+.btn-outline{background:#fff;border:2px solid var(--pink-deep);color:var(--pink-deep);padding:9px 20px}
+.btn-outline:hover{background:var(--pink-soft)}
+
+/* ── KI-Chat-Berater ───────────────────────────────────────── */
+.chat-fab{position:fixed;right:18px;bottom:18px;z-index:70;display:flex;align-items:center;gap:8px;border:0;border-radius:999px;background:var(--pink-deep);color:#fff;padding:12px 18px 12px 14px;font:800 .92rem var(--sans);cursor:pointer;box-shadow:0 6px 18px rgba(220,127,151,.45);transition:transform .15s}
+.chat-fab:hover{transform:translateY(-2px)}
+.chat-fab svg{width:24px;height:24px}
+.chat-fab.hide{display:none}
+.chat{position:fixed;right:18px;bottom:18px;z-index:80;width:370px;max-width:calc(100vw - 24px);height:min(580px,calc(100vh - 36px));display:none;flex-direction:column;background:var(--card);border:3px solid var(--sage);border-radius:18px;box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--pink),0 18px 40px rgba(0,0,0,.18);overflow:hidden}
+.chat.open{display:flex}
+.chat-head{background:var(--sage);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 12px}
+.chat-head img{width:38px;height:38px;border-radius:50%;background:#fff}
+.chat-head b{display:block;font:600 1.02rem var(--serif)}
+.chat-head small{font-size:.74rem;opacity:.9}
+.chat-x{margin-left:auto;border:0;background:rgba(255,255,255,.22);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:85%;padding:8px 12px;border-radius:14px;font-size:.9rem;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.bot{background:#fff;border:1px solid #EFE5D6;align-self:flex-start;border-bottom-left-radius:4px}
+.msg.me{background:var(--pink-deep);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.err{background:#FFF6E5;border-color:#F1D9A8;color:#7A6439}
+.typing{display:inline-flex;gap:4px;padding:3px 0}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--sage);animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.chat-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 8px}
+.chat-chips button{border:1px dashed var(--pink-deep);background:transparent;border-radius:999px;padding:4px 10px;font:700 .76rem var(--sans);color:var(--pink-deep);cursor:pointer}
+.chat-form{display:flex;gap:8px;padding:10px 12px 6px;border-top:3px solid var(--pink);background:var(--bg-2)}
+.chat-form input{flex:1}
+.chat-form .btn{padding:9px 15px}
+.chat-note{font-size:.7rem;color:var(--muted);text-align:center;padding:0 10px 8px;background:var(--bg-2);margin:0}
+
 /* ── Footer ────────────────────────────────────────────────── */
 footer{padding:6px 0 30px}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:16px;font-weight:700}
@@ -208,6 +283,112 @@ footer{padding:6px 0 30px}
 .foot-mid a{color:var(--sage-deep)}
 
 .mbar{display:none}
+
+/* ── Feinschliff nach Entwurf: kompakter Konfigurator + Bestellleiste ── */
+.cfg-title{font-size:1.45rem;padding:8px}
+.cfg-body{padding:16px 22px 18px}
+.page{display:none}
+.page.on{display:block}
+.date-l{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:0;font-size:.76rem}
+.date-l input{width:auto;flex:none;padding:5px 8px;font-size:.85rem}
+.step{border-bottom:0;padding-bottom:0;margin-bottom:14px}
+.step h3{font:800 1.12rem var(--sans);margin-bottom:8px}
+.step h3 .tier-toggle{margin:0 0 0 auto;padding:2px}
+.step h3 .tier-toggle button{padding:3px 10px;font-size:.76rem}
+.tiles{grid-template-columns:repeat(4,88px);gap:12px}
+.tile{padding:8px 4px 6px}
+.tile svg{width:56px;height:56px}
+.tile .t{font-size:.86rem;font-weight:600}
+.size-row{grid-template-columns:1fr 1.2fr;gap:10px}
+.size-info{font-size:.8rem;line-height:1.35;padding-left:14px}
+.sizes .tile{border:0;background:transparent;padding:4px 2px;border-radius:10px}
+.sizes .tile.on{background:var(--sage-soft);box-shadow:inset 0 0 0 2px var(--sage-light)}
+.sizes .tile .t{font-size:.74rem;font-style:italic;color:var(--muted)}
+.sizes .tile.on .t{color:var(--ink);font-style:normal;font-weight:800}
+.pager{border:0;background:none;color:var(--pink-deep);font:800 .85rem var(--sans);cursor:pointer;padding:4px 0;margin-top:2px}
+.pager:hover{text-decoration:underline}
+.pager.ready{background:var(--pink-soft);border-radius:999px;padding:6px 14px}
+.ai h3{margin-bottom:10px}
+.ai textarea{min-height:110px}
+.ai .row{justify-content:flex-end}
+.ai-result[hidden]{display:none}
+.order{padding:12px 18px 14px}
+.order h3{font-size:.95rem}
+.order-grid{grid-template-columns:1.3fr 2px 1fr;align-items:center;gap:0 18px}
+.order-grid .vline{background:transparent}
+.est{justify-content:flex-start;gap:10px}
+.est strong{font-size:1.35rem}
+.est-note{font-size:.76rem;margin:0 0 8px}
+.fields{grid-template-columns:1fr 1fr;gap:8px}
+.fields input{padding:7px 10px;font-size:.9rem}
+#condiciones{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center}
+#condiciones h3{grid-column:1/-1}
+.disc{font-size:.74rem;margin:0;line-height:1.4}
+.form-msg{text-align:left}
+.products{margin-top:34px}
+
+/* Fotos der Kuchenarten (aus Instagram) */
+.tile-pic{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:1;border-radius:9px;object-fit:cover;margin:0 0 5px;background:var(--pink-soft);overflow:hidden}
+.tile-pic.ph svg{width:72%;height:72%;margin:0}
+.tile{padding:5px 5px 6px}
+.prod-pic{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:4/3;border-radius:12px;object-fit:cover;margin:0 0 10px;background:var(--pink-soft);overflow:hidden}
+.prod-pic.ph svg{width:46%;height:auto;margin:0}
+
+/* Proportionen wie im Entwurf (schmale Mittelspalte, kompakt) */
+@media (min-width:921px){
+  .narrow{max-width:700px}
+  .hero{padding-bottom:18px}
+  .hero-grid{grid-template-columns:225px .85fr 1.35fr;gap:6px}
+  .hero-logo{width:225px;margin-top:-62px}
+  .hero-cake{max-height:250px;object-fit:contain}
+  .hero h1{font-size:1.85rem;margin-bottom:14px}
+  .about{padding:20px 26px 22px}
+  .story{grid-template-columns:1fr 112px;gap:18px}
+  .story-head{margin-left:-26px}
+  .story-head .tab{width:36px;height:22px}
+  .story h2{font-size:1.6rem}
+  .story .underline{margin:4px 0 8px}
+  .story p{font-size:.84rem;margin-bottom:4px;line-height:1.45}
+  .stamp{padding:7px}
+  .stamp-cap{font-size:.78rem;margin-top:6px}
+  .hr-heart{margin:14px 0}
+  .ig{padding:8px 8px 10px}
+  .ig-head{margin-bottom:8px}
+  .ig-head h2{font-size:1.45rem}
+  .ig-logo{width:22px;height:22px}
+  .ig-grid{gap:6px}
+  .ig-follow{margin-top:8px;font-size:.82rem}
+  .cfg{margin-top:20px}
+  .cfg-title{font-size:1.3rem;padding:6px}
+  .cfg-body{padding:12px 18px 14px;gap:0 18px}
+  .step{margin-bottom:10px}
+  .step h3{font-size:1rem;margin-bottom:6px}
+  .tiles{grid-template-columns:repeat(4,74px);gap:8px}
+  .tile{padding:6px 3px 5px}
+  .tile svg{width:44px;height:44px;margin-bottom:2px}
+  .tile .t{font-size:.78rem}
+  .size-info{font-size:.74rem}
+  .sizes .tile svg{height:46px}
+  .sizes .tile .t{white-space:nowrap}
+  .order-grid{grid-template-columns:1.2fr 0 1fr;gap:0 16px}
+  .fields{grid-template-columns:1fr 1fr}
+  .disc{font-size:.72rem}
+  .chip{font-size:.8rem;padding:4px 10px 4px 5px}
+  .layer-wrap{grid-template-columns:1fr 100px}
+  .layers-svg{width:100px}
+  .ai h3{font-size:1rem;margin-bottom:6px}
+  .ai textarea{min-height:104px;font-size:.88rem}
+  .ai .row{margin-top:8px}
+  .ai-btn,.ai .btn{padding:8px 18px;font-size:.92rem}
+  .order{margin-top:10px}
+  .products,.info{padding:22px 26px 24px}
+  .sec-head{margin-left:-26px}
+  .sec-head.plain{margin-left:0}
+  .sec-head h2{font-size:1.6rem}
+  .prod-grid{gap:8px}
+  .prod h3{font-size:.95rem}
+  .prod svg{width:56px;height:56px}
+}
 
 /* ── Tablet ────────────────────────────────────────────────── */
 @media (max-width:920px){
@@ -225,6 +406,8 @@ footer{padding:6px 0 30px}
   .vline{height:2px;margin:18px 0}
   .order-grid .vline{margin:16px 0}
   .ai-inner{position:static}
+  .prod-grid{grid-template-columns:repeat(2,1fr)}
+  .info{grid-template-columns:1fr}
 }
 /* ── Handy ─────────────────────────────────────────────────── */
 @media (max-width:600px){
@@ -251,6 +434,22 @@ footer{padding:6px 0 30px}
   .order{padding:16px 14px 18px}
   .fields{grid-template-columns:1fr}
   .submit-row .btn{width:100%}
+  .tiles{grid-template-columns:repeat(4,1fr);gap:6px}
+  .tile svg{width:44px;height:44px}
+  .tile .t{font-size:.78rem}
+  .fields{grid-template-columns:1fr}
+  #condiciones{grid-template-columns:1fr}
+  #condiciones .btn{width:100%;margin-top:8px}
+  .products,.info{padding:22px 16px 20px}
+  .sec-head{margin-left:-16px}
+  .sec-head.plain{margin-left:0}
+  .sec-head .tab{width:24px}
+  .sec-head h2{font-size:1.5rem}
+  .prod{padding:12px 8px}
+  .prod svg{width:58px;height:58px}
+  .chat-fab{bottom:84px;padding:13px}
+  .chat-fab span{display:none}
+  .chat{inset:0;width:auto;max-width:none;height:auto;border-radius:0;border:0;box-shadow:none}
   .foot{flex-wrap:wrap;justify-content:center;text-align:center}
   .foot-mid{order:3;width:100%}
   footer{padding-bottom:96px}
@@ -335,104 +534,120 @@ footer{padding:6px 0 30px}
     </section>
   </div>
 
-  <!-- KONFIGURATOR -->
+  <!-- KONFIGURATOR (wie im Entwurf: links Schritte, rechts KI-Diseño) -->
   <section class="cfg" id="disena">
     <div class="cfg-title" data-i18n="cfg.title">Configurador de pasteles</div>
     <div class="cfg-body">
       <div class="steps">
-        <div class="step" data-step="0">
-          <h3><span data-i18n="s1.title">Paso 1: Tipo de pastel</span><span class="ok">✓</span></h3>
-          <div class="tiles" id="typeOpts"></div>
-          <p class="desc" id="typeDesc"></p>
+        <div class="page on" data-page="1">
+          <div class="step" data-step="0">
+            <h3><span data-i18n="s1.title">Paso 1: Base</span><span class="ok">✓</span></h3>
+            <div class="tiles" id="typeOpts"></div>
+          </div>
+          <div class="step" data-step="1">
+            <h3><span data-i18n="s2.title">Paso 2: Tamaño</span><span class="ok">✓</span>
+              <span class="tier-toggle" id="tierToggle">
+                <button type="button" data-tiers="1" class="on" data-i18n="s2.one">1 piso</button><button type="button" data-tiers="2" data-i18n="s2.two">2 pisos</button>
+              </span></h3>
+            <div class="size-row">
+              <ul class="size-info" id="sizeInfo"></ul>
+              <div class="sizes" id="sizeOpts"></div>
+            </div>
+          </div>
+          <button type="button" class="pager" data-page-go="2"><span data-i18n="pg.next">Paso 3 y 4: masa y relleno</span> →</button>
         </div>
 
-        <div class="step" data-step="1">
-          <h3><span data-i18n="s2.title">Paso 2: Tamaño y pisos</span><span class="ok">✓</span></h3>
-          <div class="tier-toggle" id="tierToggle">
-            <button data-tiers="1" class="on" data-i18n="s2.one">1 piso</button>
-            <button data-tiers="2" data-i18n="s2.two">2 pisos</button>
+        <div class="page" data-page="2">
+          <div class="step" data-step="2">
+            <h3><span data-i18n="s3.title">Paso 3: Masa</span><span class="ok">✓</span></h3>
+            <p class="hint" id="layerHint"></p>
+            <div class="layer-wrap">
+              <div class="chips" id="doughOpts"></div>
+              <svg class="layers-svg" id="layersSvg" viewBox="0 0 150 150" aria-hidden="true"></svg>
+            </div>
           </div>
-          <div class="size-row">
-            <ul class="size-info" id="sizeInfo"></ul>
-            <div class="sizes" id="sizeOpts"></div>
+          <div class="step" data-step="3">
+            <h3><span data-i18n="s4.title">Paso 4: Relleno</span><span class="ok">✓</span></h3>
+            <div class="chips" id="fillingOpts"></div>
           </div>
-        </div>
-
-        <div class="step" data-step="2">
-          <h3><span data-i18n="s3.title">Paso 3: Masa del pastel</span><span class="ok">✓</span></h3>
-          <p class="hint" id="layerHint"></p>
-          <div class="layer-wrap">
-            <div class="chips" id="doughOpts"></div>
-            <svg class="layers-svg" id="layersSvg" viewBox="0 0 150 150" aria-hidden="true"></svg>
-          </div>
-        </div>
-
-        <div class="step" data-step="3">
-          <h3><span data-i18n="s4.title">Paso 4: Relleno y sabor</span><span class="ok">✓</span></h3>
-          <p class="hint" data-i18n="s4.hint">El relleno va entre las capas de masa.</p>
-          <div class="chips" id="fillingOpts"></div>
+          <button type="button" class="pager" data-page-go="1">← <span data-i18n="pg.back">Paso 1 y 2: base y tamaño</span></button>
         </div>
       </div>
 
       <div class="vline" aria-hidden="true"></div>
 
-      <div class="ai"><div class="ai-inner">
+      <div class="ai">
         <h3 data-i18n="ai.title">Diseño con IA</h3>
         <textarea id="aiText" maxlength="600" data-i18n-ph="ai.ph" placeholder="Describe tu pastel…" aria-label="Describe tu pastel"></textarea>
-        <div class="ai-ideas" id="aiIdeas"></div>
-        <div class="row">
-          <span class="count" id="aiCount">0 / 600</span>
-          <button class="btn btn-sage" id="aiBtn" data-i18n="ai.btn">Generar</button>
-        </div>
-        <div class="ai-result" id="aiResult">
-          <div class="empty">
-            <svg viewBox="0 0 64 64" fill="none" stroke="#DC7F97" stroke-width="2"><rect x="6" y="10" width="52" height="44" rx="8"/><circle cx="22" cy="26" r="5"/><path d="M6 46l16-14 12 10 8-6 16 12"/></svg>
-            <span data-i18n="ai.empty">Aquí aparecerá la imagen de tu pastel.</span>
-          </div>
-        </div>
-        <p class="ai-note" data-i18n="ai.note">⚠️ Imagen solo de inspiración: el pastel real puede verse diferente.</p>
-      </div></div>
+        <div class="row"><button class="btn btn-sage" id="aiBtn" data-i18n="ai.btn">Generar</button></div>
+        <div class="ai-result" id="aiResult" hidden></div>
+      </div>
     </div>
   </section>
 
-  <!-- BESTELLUNG -->
-  <section class="order" id="contacto">
+  <!-- BESTELLUNG (kompakte Leiste wie im Entwurf) -->
+  <section class="order" id="pedido">
     <form id="orderForm" novalidate>
       <div class="order-grid">
         <div>
           <div class="est"><h3 data-i18n="sum.estimate">Estimado de precio:</h3><strong id="priceOut">–</strong></div>
-          <p class="est-note" data-i18n-html="sum.note">— Pagarás el <b>50 % de anticipo</b> (<span class="js-dep">–</span>) solo después de confirmar por WhatsApp que tu pedido es posible.</p>
-          <dl class="summary" id="summaryList"></dl>
+          <p class="est-note" data-i18n-html="sum.note">— Pagarás el 50 % de anticipo solo tras confirmar vía WhatsApp su viabilidad.</p>
           <div class="fields">
-            <div><label for="fName" data-i18n="form.name">Nombre</label><input id="fName" autocomplete="name" required data-i18n-ph="form.name" placeholder="Nombre"></div>
-            <div><label for="fWa" data-i18n="form.wa">Número WhatsApp</label><input id="fWa" type="tel" inputmode="tel" autocomplete="tel" placeholder="+507 6000-0000" required></div>
-            <div><label for="fDate" data-i18n="form.date">Fecha de recogida</label><input id="fDate" type="date" required></div>
-            <div><label for="fEmail"><span data-i18n="form.email">Correo</span> <small data-i18n="form.optional">(opcional)</small></label><input id="fEmail" type="email" autocomplete="email"></div>
-            <div class="full"><label for="fNotes"><span data-i18n="form.notes">Comentarios</span> <small data-i18n="form.optional">(opcional)</small></label><textarea id="fNotes" class="notes" rows="2" maxlength="600" data-i18n-ph="form.notesph" placeholder="Ocasión, texto en el pastel, alergias…"></textarea></div>
+            <input id="fName" autocomplete="name" required data-i18n-ph="form.name" placeholder="Nombre" aria-label="Nombre">
+            <input id="fWa" type="tel" inputmode="tel" autocomplete="tel" required data-i18n-ph="form.wa" placeholder="Número WhatsApp" aria-label="WhatsApp">
+            <label class="date-l" for="fDate"><span data-i18n="form.date">Fecha de recogida</span><input id="fDate" type="date" required></label>
           </div>
         </div>
-
         <div class="vline" aria-hidden="true"></div>
-
         <div id="condiciones">
-          <h3 data-i18n="disc.title">Aviso sobre las imágenes IA:</h3>
-          <p class="disc" data-i18n="disc.text">Las imágenes generadas por inteligencia artificial son solo una inspiración y no garantizan el resultado final. El pastel real, hecho a mano, puede verse diferente en colores, forma y detalles. Confirmamos todo contigo por WhatsApp antes de aceptar tu pedido.</p>
-          <ul class="terms">
-            <li data-i18n-html="terms.t1"><b>No pagas en línea.</b> Solo envías tu solicitud.</li>
-            <li data-i18n-html="terms.t2">Revisamos tu pedido y te contactamos <b>por WhatsApp</b>.</li>
-            <li data-i18n-html="terms.t3">Al aceptar: <b>50 % de anticipo</b>, el resto al <b>recoger</b>.</li>
-          </ul>
-          <label class="check"><input type="checkbox" id="fAgree"><span data-i18n="form.agree">Entiendo que esta es una solicitud sin pago en línea. Casa Pastel me contactará por WhatsApp y, al confirmar, pagaré un anticipo del 50 %.</span></label>
+          <h3 data-i18n="disc.title">Aviso sobre imágenes IA:</h3>
+          <p class="disc" data-i18n="disc.text">Las imágenes generadas por IA son solo inspiración y no garantizan el resultado final: el pastel real, hecho a mano, puede verse diferente. Confirmamos todo contigo por WhatsApp.</p>
           <div class="submit-row"><button class="btn btn-sage" type="submit" id="submitBtn" data-i18n="form.submit">Solicitar</button></div>
-          <div class="form-msg" id="formMsg" role="status"></div>
         </div>
       </div>
+      <div class="form-msg" id="formMsg" role="status"></div>
     </form>
     <div class="success" id="success">
       <div class="big">♥</div>
       <h3 data-i18n="ok.title">¡Gracias! Recibimos tu solicitud.</h3>
       <p id="okText"></p>
       <a class="btn wa-btn" id="waBtn" target="_blank" rel="noopener" data-i18n="ok.wa">Escríbenos por WhatsApp</a>
+    </div>
+  </section>
+
+  <!-- PASTELES Y PRECIOS (Inhalte der früheren /chat-Seite, für Casa Pastel) -->
+  <section class="card products" id="pasteles">
+    <div class="sec-head"><span class="tab"></span><h2 data-i18n="prod.title">Nuestros pasteles y precios</h2></div>
+    <div class="underline"></div>
+    <div class="prod-grid" id="prodGrid"></div>
+    <h3 class="sub-h" data-i18n="price.title">Precios por tamaño</h3>
+    <div class="table-wrap"><table class="ptable" id="priceTable"></table></div>
+    <div class="extras" id="extrasList"></div>
+    <p class="fine" data-i18n="price.fine">Precios en dólares (USD). El precio final puede variar según la decoración elegida; lo confirmamos contigo por WhatsApp.</p>
+  </section>
+
+  <!-- CÓMO FUNCIONA + CONTACTO Y HORARIO -->
+  <section class="card info" id="contacto">
+    <div>
+      <div class="sec-head"><span class="tab"></span><h2 data-i18n="how.title">Cómo funciona</h2></div>
+      <div class="underline"></div>
+      <ol class="how-list" id="howList"></ol>
+      <p class="lead" id="leadNote"></p>
+    </div>
+    <div class="vline" aria-hidden="true"></div>
+    <div>
+      <div class="sec-head plain"><h2 data-i18n="contact.title">Contacto y horario</h2></div>
+      <div class="underline"></div>
+      <ul class="contact-list">
+        <li><span class="ic">📍</span><div><b data-i18n="contact.where">Dónde estamos</b>Chitré, Herrera · Panamá<br><span data-i18n="contact.pickup">Solo recogida, con cita previa.</span></div></li>
+        <li><span class="ic">🕐</span><div><b data-i18n="contact.hours">Horario</b><span id="hoursOut"></span></div></li>
+        <li><span class="ic">💬</span><div><b>WhatsApp</b><a class="js-wa-link" href="#" target="_blank" rel="noopener"><span class="js-wa-num"></span></a></div></li>
+        <li><span class="ic">📷</span><div><b>Instagram</b><a class="js-ig-link" href="#" target="_blank" rel="noopener"><span class="js-ig-handle"></span></a></div></li>
+      </ul>
+      <div class="contact-btns">
+        <a class="btn btn-wa js-wa-link" href="#" target="_blank" rel="noopener" data-i18n="contact.wa">Escríbenos por WhatsApp</a>
+        <button type="button" class="btn btn-outline" data-openchat data-i18n="contact.ask">Pregunta al asistente</button>
+      </div>
     </div>
   </section>
 
@@ -453,8 +668,28 @@ footer{padding:6px 0 30px}
 
 <div class="mbar" id="mbar">
   <div><small data-i18n="sum.price">Precio estimado</small><strong id="mPrice">–</strong></div>
-  <a class="btn btn-sage" href="#contacto" data-i18n="form.submit">Solicitar</a>
+  <a class="btn btn-sage" href="#pedido" data-i18n="form.submit">Solicitar</a>
 </div>
+
+<!-- KI-CHAT-BERATER -->
+<button class="chat-fab" id="chatFab" type="button" aria-controls="chat" aria-expanded="false">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01" stroke-width="3" stroke-linecap="round"/></svg>
+  <span data-i18n="chat.fab">¿Preguntas? Chatea</span>
+</button>
+<section class="chat" id="chat" role="dialog" aria-labelledby="chatTitle">
+  <div class="chat-head">
+    <img src="/static/casa-pastel/logo-600.jpg" alt="">
+    <div><b id="chatTitle" data-i18n="chat.title">Asistente Casa Pastel</b><small data-i18n="chat.sub">Con IA · responde al instante</small></div>
+    <button class="chat-x" id="chatClose" type="button" aria-label="Cerrar / Close">✕</button>
+  </div>
+  <div class="chat-msgs" id="chatMsgs" aria-live="polite"></div>
+  <div class="chat-chips" id="chatChips"></div>
+  <form class="chat-form" id="chatForm">
+    <input id="chatInput" maxlength="600" autocomplete="off" data-i18n-ph="chat.ph" placeholder="Escribe tu pregunta…" aria-label="Mensaje / Message">
+    <button class="btn btn-sage" type="submit" id="chatSend" aria-label="Enviar / Send">➤</button>
+  </form>
+  <p class="chat-note" data-i18n="chat.note">Asistente con IA: puede equivocarse. Para pedir, usa el configurador.</p>
+</section>
 
 <script>
 /* ===================== TEXTE (ES / EN) ===================== */
@@ -469,28 +704,28 @@ const T = {
   "story.caption":"¡Hola desde Chitré!","story.photoalt":"Foto de la repostera",
   "ig.title":"Galería Instagram","ig.follow":"Síguenos en Instagram",
   "cfg.title":"Configurador de pasteles",
-  "s1.title":"Paso 1: Tipo de pastel",
-  "s2.title":"Paso 2: Tamaño y pisos","s2.one":"1 piso","s2.two":"2 pisos",
+  "s1.title":"Paso 1: Base","pg.next":"Paso 3 y 4: masa y relleno","pg.back":"Paso 1 y 2: base y tamaño",
+  "s2.title":"Paso 2: Tamaño","s2.one":"1 piso","s2.two":"2 pisos",
   "s2.info1":"Un pastel de 1 piso mide unos 10 cm de alto.","s2.info2":"2 pisos = dos pasteles apilados, el más pequeño arriba.",
   "s2.layers":"Cada piso lleva {n} capas de masa con relleno.","s2.pick":"Elige el tamaño según tus invitados.",
-  "s3.title":"Paso 3: Masa del pastel",
+  "s3.title":"Paso 3: Masa",
   "s3.hint1":"Tu pastel tiene {n} capas de masa. Puedes elegir hasta 2 sabores; se alternan entre las capas.",
   "s3.hint2":"Cada piso tiene {n} capas de masa. Puedes elegir hasta 2 sabores; se alternan entre las capas.",
   "s3.max":"Máximo 2 sabores. Quita uno para elegir otro.",
-  "s4.title":"Paso 4: Relleno y sabor","s4.hint":"El relleno va entre las capas de masa.",
+  "s4.title":"Paso 4: Relleno","s4.hint":"El relleno va entre las capas de masa.",
   "from":"desde",
   "ai.title":"Diseño con IA",
-  "ai.ph":"Describe tu pastel… Ej.: rosado con flores blancas y perlas doradas, para un baby shower.",
+  "ai.ph":"Describe tu pastel…",
   "ai.btn":"Generar","ai.again":"Generar otra","ai.empty":"Aquí aparecerá la imagen de tu pastel.",
   "ai.loading":"Creando tu imagen… puede tardar unos 20–40 segundos.","ai.tag":"Imagen IA · solo inspiración",
   "ai.short":"Escribe un poco más sobre tu idea (mínimo 5 letras).","ai.limit":"Has alcanzado el límite de imágenes por hora. Inténtalo más tarde.","ai.error":"No pudimos crear la imagen ahora. Tu descripción igual se enviará con el pedido.",
   "ai.note":"⚠️ Imagen solo de inspiración: el pastel real puede verse diferente.",
   "ai.ideas":["Rosado con flores","Boda elegante blanca","Cumpleaños con unicornio","Frutas frescas y crema"],
   "sum.estimate":"Estimado de precio:","sum.price":"Precio estimado",
-  "sum.note":"— Pagarás el <b>50 % de anticipo</b> (<span class=\"js-dep\">–</span>) solo después de confirmar por WhatsApp que tu pedido es posible.",
+  "sum.note":"— Pagarás el 50 % de anticipo solo tras confirmar vía WhatsApp su viabilidad.",
   "sum.type":"Tipo","sum.size":"Tamaño","sum.dough":"Masa","sum.filling":"Relleno","sum.design":"Diseño","sum.none":"– por elegir –","sum.designYes":"descrito ✓",
-  "disc.title":"Aviso sobre las imágenes IA:",
-  "disc.text":"Las imágenes generadas por inteligencia artificial son solo una inspiración y no garantizan el resultado final. El pastel real, hecho a mano, puede verse diferente en colores, forma y detalles. Confirmamos todo contigo por WhatsApp antes de aceptar tu pedido.",
+  "disc.title":"Aviso sobre imágenes IA:",
+  "disc.text":"Las imágenes generadas por IA son solo inspiración y no garantizan el resultado final: el pastel real, hecho a mano, puede verse diferente. Confirmamos todo contigo por WhatsApp.",
   "terms.t1":"<b>No pagas en línea.</b> Solo envías tu solicitud.",
   "terms.t2":"Revisamos tu pedido y te contactamos <b>por WhatsApp</b>.",
   "terms.t3":"Al aceptar: <b>50 % de anticipo</b>, el resto al <b>recoger</b>.",
@@ -498,10 +733,22 @@ const T = {
   "form.notes":"Comentarios","form.notesph":"Ocasión, texto en el pastel, alergias…",
   "form.agree":"Entiendo que esta es una solicitud sin pago en línea. Casa Pastel me contactará por WhatsApp y, al confirmar, pagaré un anticipo del 50 %.",
   "form.submit":"Solicitar","form.sending":"Enviando…",
-  "err.config":"Completa los 4 pasos del configurador.","err.name":"Escribe tu nombre.","err.wa":"Escribe un número de WhatsApp válido.","err.date":"Elige una fecha (mínimo {n} días desde hoy).","err.agree":"Por favor confirma las condiciones.","err.server":"No se pudo enviar. Inténtalo de nuevo o escríbenos por WhatsApp.",
+  "err.config":"Completa los 4 pasos del configurador (también masa y relleno).","err.name":"Escribe tu nombre.","err.wa":"Escribe un número de WhatsApp válido.","err.date":"Elige una fecha (mínimo {n} días desde hoy).","err.agree":"Por favor confirma las condiciones.","err.server":"No se pudo enviar. Inténtalo de nuevo o escríbenos por WhatsApp.",
   "ok.title":"¡Gracias! Recibimos tu solicitud.","ok.text":"Tu número de pedido es #{id}. Te escribiremos pronto por WhatsApp para confirmar. Recuerda: no se paga nada todavía.","ok.wa":"Escríbenos por WhatsApp",
   "wa.msg":"¡Hola Casa Pastel! Envié la solicitud #{id}:\n{summary}\nPrecio estimado: {price}\nRecogida: {date}",
   "foot.terms":"Términos","foot.loc":"Ubicación Chitré",
+  "nav.products":"Pasteles y Precios",
+  "prod.title":"Nuestros pasteles y precios","prod.hint":"Cada pastel se hornea fresco y se decora a mano en Chitré. Elige el estilo que más te guste.",
+  "prod.pick":"Elegir","price.title":"Precios por tamaño","price.cake":"Pastel","price.serv":"Porciones","price.one":"1 piso","price.two":"2 pisos",
+  "price.extras":"Extras por piso:","price.fine":"Precios en dólares (USD). El precio final puede variar según la decoración elegida; lo confirmamos contigo por WhatsApp.",
+  "how.title":"Cómo funciona","how.lead":"⏱ Pide con al menos {n} días de anticipación.",
+  "contact.title":"Contacto y horario","contact.where":"Dónde estamos","contact.pickup":"Solo recogida, con cita previa.","contact.hours":"Horario",
+  "contact.wa":"Escríbenos por WhatsApp","contact.ask":"Pregunta al asistente",
+  "chat.fab":"¿Preguntas? Chatea","chat.title":"Asistente Casa Pastel","chat.sub":"Con IA · responde al instante",
+  "chat.ph":"Escribe tu pregunta…","chat.note":"Asistente con IA: puede equivocarse. Para pedir, usa el configurador.",
+  "chat.hello":"¡Hola! 👋 Soy el asistente de Casa Pastel. Pregúntame por sabores, tamaños, precios o cómo hacer tu pedido.",
+  "chat.chips":["¿Cuánto cuesta un pastel de 2 pisos?","¿Qué sabores tienen?","¿Con cuánta anticipación debo pedir?","¿Hacen entregas?"],
+  "chat.error":"Ahora no puedo responder. Escríbenos por WhatsApp y te ayudamos. 💬","chat.limit":"Has enviado muchos mensajes. Inténtalo más tarde o escríbenos por WhatsApp.",
   "layers":"capas"
  },
  en:{
@@ -514,28 +761,28 @@ const T = {
   "story.caption":"Hello from Chitré!","story.photoalt":"Photo of the baker",
   "ig.title":"Instagram Gallery","ig.follow":"Follow us on Instagram",
   "cfg.title":"Cake configurator",
-  "s1.title":"Step 1: Cake type",
-  "s2.title":"Step 2: Size & tiers","s2.one":"1 tier","s2.two":"2 tiers",
+  "s1.title":"Step 1: Base","pg.next":"Steps 3 & 4: sponge and filling","pg.back":"Steps 1 & 2: base and size",
+  "s2.title":"Step 2: Size","s2.one":"1 tier","s2.two":"2 tiers",
   "s2.info1":"A 1-tier cake is about 10 cm tall.","s2.info2":"2 tiers = two cakes stacked, the smaller one on top.",
   "s2.layers":"Each tier has {n} sponge layers with filling.","s2.pick":"Pick the size that fits your guests.",
   "s3.title":"Step 3: Sponge",
   "s3.hint1":"Your cake has {n} sponge layers. Pick up to 2 flavors; they alternate between layers.",
   "s3.hint2":"Each tier has {n} sponge layers. Pick up to 2 flavors; they alternate between layers.",
   "s3.max":"Maximum 2 flavors. Remove one to pick another.",
-  "s4.title":"Step 4: Filling & flavor","s4.hint":"The filling goes between the sponge layers.",
+  "s4.title":"Step 4: Filling","s4.hint":"The filling goes between the sponge layers.",
   "from":"from",
   "ai.title":"AI Design",
-  "ai.ph":"Describe your cake… E.g.: pink with white flowers and gold pearls, for a baby shower.",
+  "ai.ph":"Describe your cake…",
   "ai.btn":"Generate","ai.again":"Generate another","ai.empty":"Your cake image will appear here.",
   "ai.loading":"Creating your image… this can take about 20–40 seconds.","ai.tag":"AI image · inspiration only",
   "ai.short":"Tell us a bit more about your idea (at least 5 letters).","ai.limit":"You’ve reached the hourly image limit. Please try again later.","ai.error":"We couldn’t create the image right now. Your description will still be sent with your order.",
   "ai.note":"⚠️ Inspiration only: the real cake may look different.",
   "ai.ideas":["Pink with flowers","Elegant white wedding","Unicorn birthday","Fresh fruit and cream"],
   "sum.estimate":"Price estimate:","sum.price":"Estimated price",
-  "sum.note":"— You pay a <b>50 % deposit</b> (<span class=\"js-dep\">–</span>) only after we confirm on WhatsApp that your order is possible.",
+  "sum.note":"— You pay the 50 % deposit only after we confirm on WhatsApp that it is possible.",
   "sum.type":"Type","sum.size":"Size","sum.dough":"Sponge","sum.filling":"Filling","sum.design":"Design","sum.none":"– not chosen –","sum.designYes":"described ✓",
-  "disc.title":"About the AI images:",
-  "disc.text":"Images generated by artificial intelligence are for inspiration only and do not guarantee the final result. The real, handmade cake may look different in colors, shape and details. We confirm everything with you on WhatsApp before accepting your order.",
+  "disc.title":"About AI images:",
+  "disc.text":"AI-generated images are only inspiration and do not guarantee the final result: the real, handmade cake may look different. We confirm everything with you on WhatsApp.",
   "terms.t1":"<b>No online payment.</b> You only send a request.",
   "terms.t2":"We review your order and contact you <b>on WhatsApp</b>.",
   "terms.t3":"Once accepted: <b>50 % deposit</b>, the rest at <b>pickup</b>.",
@@ -543,10 +790,22 @@ const T = {
   "form.notes":"Comments","form.notesph":"Occasion, text on the cake, allergies…",
   "form.agree":"I understand this is a request without online payment. Casa Pastel will contact me on WhatsApp and, once confirmed, I will pay a 50 % deposit.",
   "form.submit":"Order","form.sending":"Sending…",
-  "err.config":"Please complete all 4 configurator steps.","err.name":"Please enter your name.","err.wa":"Please enter a valid WhatsApp number.","err.date":"Choose a date (at least {n} days from today).","err.agree":"Please confirm the conditions.","err.server":"Couldn’t send. Please try again or message us on WhatsApp.",
+  "err.config":"Please complete all 4 configurator steps (including sponge and filling).","err.name":"Please enter your name.","err.wa":"Please enter a valid WhatsApp number.","err.date":"Choose a date (at least {n} days from today).","err.agree":"Please confirm the conditions.","err.server":"Couldn’t send. Please try again or message us on WhatsApp.",
   "ok.title":"Thank you! We received your request.","ok.text":"Your order number is #{id}. We’ll message you on WhatsApp soon to confirm. Remember: nothing is paid yet.","ok.wa":"Message us on WhatsApp",
   "wa.msg":"Hi Casa Pastel! I sent request #{id}:\n{summary}\nEstimated price: {price}\nPickup: {date}",
   "foot.terms":"Terms","foot.loc":"Location Chitré",
+  "nav.products":"Cakes & Prices",
+  "prod.title":"Our cakes & prices","prod.hint":"Every cake is baked fresh and decorated by hand in Chitré. Pick the style you like best.",
+  "prod.pick":"Choose","price.title":"Prices by size","price.cake":"Cake","price.serv":"Servings","price.one":"1 tier","price.two":"2 tiers",
+  "price.extras":"Extras per tier:","price.fine":"Prices in US dollars. The final price may vary with the decoration; we confirm it with you on WhatsApp.",
+  "how.title":"How it works","how.lead":"⏱ Order at least {n} days in advance.",
+  "contact.title":"Contact & hours","contact.where":"Where we are","contact.pickup":"Pickup only, by appointment.","contact.hours":"Hours",
+  "contact.wa":"Message us on WhatsApp","contact.ask":"Ask the assistant",
+  "chat.fab":"Questions? Chat","chat.title":"Casa Pastel Assistant","chat.sub":"AI · instant answers",
+  "chat.ph":"Type your question…","chat.note":"AI assistant: it can make mistakes. To order, use the configurator.",
+  "chat.hello":"Hi! 👋 I’m the Casa Pastel assistant. Ask me about flavors, sizes, prices or how to order.",
+  "chat.chips":["How much is a 2-tier cake?","Which flavors do you have?","How far ahead should I order?","Do you deliver?"],
+  "chat.error":"I can’t answer right now. Message us on WhatsApp and we’ll help. 💬","chat.limit":"You’ve sent a lot of messages. Please try later or message us on WhatsApp.",
   "layers":"layers"
  }
 };
@@ -565,9 +824,9 @@ const ICONS={
 function sizeIcon(size,on){
   const stroke=on?"#DC7F97":"#D2B8B0", fill=on?"#FBE5EB":"#FFF8F5", band="#F3C4CF";
   const w={s6:24,s8:32,s10:42};
-  if(size.tiers===1){const ww=w[size.id]||32,h=10+ww/4;return `<svg viewBox="0 0 64 44"><ellipse cx="32" cy="40" rx="${ww/2+5}" ry="2.5" fill="#E9EBDF"/><rect x="${32-ww/2}" y="${38-h}" width="${ww}" height="${h}" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M${32-ww/2} ${38-h/2}h${ww}" stroke="${band}" stroke-width="2.5"/></svg>`}
+  if(size.tiers===1){const ww=w[size.id]||32,h=10+ww/4;return `<svg viewBox="8 4 48 40"><ellipse cx="32" cy="40" rx="${ww/2+5}" ry="2.5" fill="#E9EBDF"/><rect x="${32-ww/2}" y="${38-h}" width="${ww}" height="${h}" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M${32-ww/2} ${38-h/2}h${ww}" stroke="${band}" stroke-width="2.5"/></svg>`}
   const [a,b]=size.id==="t6_8"?[22,32]:[30,42];
-  return `<svg viewBox="0 0 64 44"><ellipse cx="32" cy="41" rx="${b/2+5}" ry="2.5" fill="#E9EBDF"/><rect x="${32-b/2}" y="24" width="${b}" height="15" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><rect x="${32-a/2}" y="9" width="${a}" height="15" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M${32-b/2} 31.5h${b}M${32-a/2} 16.5h${a}" stroke="${band}" stroke-width="2.5"/></svg>`;
+  return `<svg viewBox="8 4 48 40"><ellipse cx="32" cy="41" rx="${b/2+5}" ry="2.5" fill="#E9EBDF"/><rect x="${32-b/2}" y="24" width="${b}" height="15" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><rect x="${32-a/2}" y="9" width="${a}" height="15" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M${32-b/2} 31.5h${b}M${32-a/2} 16.5h${a}" stroke="${band}" stroke-width="2.5"/></svg>`;
 }
 
 /* ===================== STATE ===================== */
@@ -587,6 +846,9 @@ function computePrice(){
 }
 function minPrice(typeId){return Math.min(...Object.values(CFG.prices[typeId]))}
 
+/* Bild für eine Kuchenart: Instagram-Foto (config "photo") oder Symbol */
+function typePic(x,cls="tile-pic"){return x.photo?`<img class="${cls}" src="${x.photo}" alt="" loading="lazy">`:`<span class="${cls} ph">${ICONS[x.icon]||""}</span>`}
+
 /* ===================== RENDER ===================== */
 function applyLang(){
   document.documentElement.lang=lang;
@@ -594,19 +856,18 @@ function applyLang(){
   $$("[data-i18n-html]").forEach(el=>el.innerHTML=t(el.dataset.i18nHtml));
   $$("[data-i18n-ph]").forEach(el=>el.placeholder=t(el.dataset.i18nPh));
   $$("[data-i18n-alt]").forEach(el=>el.alt=t(el.dataset.i18nAlt));
+  $$("[data-i18n-title]").forEach(el=>el.title=t(el.dataset.i18nTitle));
   $$(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.lang===lang));
   if(CFG)renderAll();
 }
 function renderTypes(){
-  $("#typeOpts").innerHTML=CFG.types.map(x=>`<button type="button" class="tile ${sel.type===x.id?"on":""}" data-type="${x.id}" title="${x.name[lang]}">${ICONS[x.icon]||""}<div class="t">${(x.short||x.name)[lang]}</div><div class="p">${t("from")} ${money(minPrice(x.id))}</div></button>`).join("");
-  const cur=sel.type&&by(CFG.types,sel.type);
-  $("#typeDesc").textContent=cur?`${cur.name[lang]}: ${cur.desc[lang]}`:"";
+  $("#typeOpts").innerHTML=CFG.types.map(x=>`<button type="button" class="tile ${sel.type===x.id?"on":""}" data-type="${x.id}" title="${x.name[lang]} – ${x.desc[lang]} (${t("from")} ${money(minPrice(x.id))})">${typePic(x)}<div class="t">${(x.short||x.name)[lang]}</div></button>`).join("");
 }
 function renderSizes(){
   $$("#tierToggle button").forEach(b=>b.classList.toggle("on",+b.dataset.tiers===tiers));
   $("#sizeOpts").innerHTML=CFG.sizes.filter(s=>s.tiers===tiers).map(s=>{
     const p=sel.type?money(CFG.prices[sel.type][s.id]):"";
-    return `<button type="button" class="tile size ${sel.size===s.id?"on":""}" data-size="${s.id}" title="${s.name[lang]}">${sizeIcon(s,sel.size===s.id)}<div class="t">${shortSize(s)}</div><div class="p">${p}</div></button>`}).join("");
+    return `<button type="button" class="tile size ${sel.size===s.id?"on":""}" data-size="${s.id}" title="${s.name[lang]}${p?" – "+p:""}">${sizeIcon(s,sel.size===s.id)}<div class="t">${(shortSize(s).match(/\((.+)\)/)||[])[1]||shortSize(s)}</div></button>`}).join("");
   const cur=sel.size&&by(CFG.sizes,sel.size);
   const items=[t(tiers===1?"s2.info1":"s2.info2"),t("s2.layers",{n:CFG.layers_per_tier}),cur?`<b>${cur.name[lang]}</b>: ${cur.desc[lang]}`:t("s2.pick")];
   $("#sizeInfo").innerHTML=items.map(i=>`<li>${i}</li>`).join("");
@@ -644,18 +905,35 @@ function renderSummary(){
     ["sum.filling",sel.filling?by(CFG.fillings,sel.filling).name[lang]:none],
     ["sum.design",$("#aiText").value.trim().length>=5?t("sum.designYes"):none]
   ];
-  $("#summaryList").innerHTML=rows.map(([k,v])=>`<dt>${t(k)}</dt><dd>${v}</dd>`).join("");
   const p=computePrice();
   $("#priceOut").textContent=p==null?"–":money(p);
   $("#mPrice").textContent=p==null?"–":money(p);
-  $$(".js-dep").forEach(e=>e.textContent=p==null?"–":money(p*CFG.deposit_percent/100));
+  $$(".pager[data-page-go='2']").forEach(b=>b.classList.toggle("ready",!!sel.type&&!!sel.size&&!(sel.doughs.length&&sel.filling)));
 }
 function renderSteps(){
   const done=[!!sel.type,!!sel.size,sel.doughs.length>0,!!sel.filling];
   $$(".step").forEach(s=>s.classList.toggle("done",done[+s.dataset.step]));
 }
-function renderIdeas(){$("#aiIdeas").innerHTML=t("ai.ideas").map(i=>`<button type="button">${i}</button>`).join("")}
-function renderAll(){renderTypes();renderSizes();renderDoughs();renderFillings();renderSummary();renderSteps();renderIdeas()}
+function goPage(n){$$(".page").forEach(p=>p.classList.toggle("on",p.dataset.page===String(n)))}
+
+/* Pasteles y precios (alles aus config.json) */
+function renderProducts(){
+  $("#prodGrid").innerHTML=CFG.types.map(x=>`<div class="prod">${typePic(x,"prod-pic")}<h3>${x.name[lang]}</h3><p>${x.desc[lang]}</p><div class="from">${t("from")} ${money(minPrice(x.id))}</div><button type="button" class="btn btn-sage" data-pick="${x.id}">${t("prod.pick")}</button></div>`).join("");
+  const one=CFG.sizes.filter(s=>s.tiers===1), two=CFG.sizes.filter(s=>s.tiers===2), all=[...one,...two];
+  $("#priceTable").innerHTML=
+    `<thead><tr><th rowspan="2">${t("price.cake")}</th><th class="grp" colspan="${one.length}">${t("price.one")}</th><th class="grp" colspan="${two.length}">${t("price.two")}</th></tr>`+
+    `<tr>${all.map(s=>`<th>${shortSize(s)}</th>`).join("")}</tr></thead><tbody>`+
+    CFG.types.map(x=>`<tr><td><b>${x.name[lang]}</b></td>${all.map(s=>`<td>${money(CFG.prices[x.id][s.id])}</td>`).join("")}</tr>`).join("")+
+    `<tr class="serv"><td>${t("price.serv")}</td>${all.map(s=>`<td>${s.servings||""}</td>`).join("")}</tr></tbody>`;
+  const ex=[...CFG.doughs,...CFG.fillings].filter(i=>i.extra);
+  $("#extrasList").innerHTML=ex.length?`<span style="border:0;background:none;padding-left:0"><b style="color:var(--ink)">${t("price.extras")}</b></span>`+ex.map(i=>`<span>${i.name[lang]} <b>+${money(i.extra)}</b></span>`).join(""):"";
+}
+function renderInfo(){
+  $("#howList").innerHTML=(CFG.process||[]).map((p,i)=>`<li><span class="n">${i+1}</span><div><b>${p[lang].t}</b><span>${p[lang].p}</span></div></li>`).join("");
+  $("#leadNote").textContent=t("how.lead",{n:CFG.min_lead_days||3});
+  $("#hoursOut").textContent=CFG.hours?CFG.hours[lang]:"";
+}
+function renderAll(){renderTypes();renderSizes();renderDoughs();renderFillings();renderSummary();renderSteps();renderProducts();renderInfo();renderChat()}
 
 /* ===================== EVENTS ===================== */
 document.addEventListener("click",e=>{
@@ -668,19 +946,22 @@ document.addEventListener("click",e=>{
     if(i>-1)sel.doughs.splice(i,1);else if(sel.doughs.length<2)sel.doughs.push(id);else{flash(t("s3.max"));return}
     renderDoughs();renderSummary();renderSteps();return}
   if(b.dataset.filling){sel.filling=b.dataset.filling;renderFillings();renderSummary();renderSteps();return}
-  if(b.closest("#aiIdeas")){const ta=$("#aiText");ta.value=(ta.value?ta.value.trim()+", ":"")+b.textContent;ta.dispatchEvent(new Event("input"));return}
+  if(b.dataset.pick){sel.type=b.dataset.pick;renderTypes();renderSizes();renderSummary();renderSteps();$("#disena").scrollIntoView({behavior:"smooth"});return}
+  if(b.hasAttribute("data-openchat")){openChat();return}
+  if(b.closest("#chatChips")){sendChat(b.textContent);return}
+  if(b.dataset.pageGo){goPage(b.dataset.pageGo);return}
   if(b.closest("#menu")&&b.tagName==="A")toggleMenu(false);
 });
 function toggleMenu(force){const m=$("#menu"),open=force??!m.classList.contains("open");m.classList.toggle("open",open);$(".burger").setAttribute("aria-expanded",open)}
 function flash(msg){const h=$("#layerHint");h.textContent=msg;h.style.color="#C0392B";setTimeout(()=>{h.style.color="";renderDoughs()},1800)}
 
-$("#aiText").addEventListener("input",e=>{$("#aiCount").textContent=e.target.value.length+" / 600";renderSummary()});
+$("#aiText").addEventListener("input",renderSummary);
 
 /* Aktiver Menüpunkt beim Scrollen */
 const navLinks=$$("#menu a[href^='#']");
 function spyNav(){
   let cur="inicio";
-  if(scrollY>120)["historia","galeria","disena","contacto"].forEach(id=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<innerHeight*.4)cur=id});
+  if(scrollY>120)[["historia"],["galeria"],["pasteles"],["disena"],["pedido","disena"],["contacto"]].forEach(([id,nav])=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<innerHeight*.4)cur=nav||id});
   if(innerHeight+scrollY>=document.documentElement.scrollHeight-4)cur="contacto";
   navLinks.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+cur));
 }
@@ -689,6 +970,7 @@ addEventListener("scroll",spyNav,{passive:true}); spyNav();
 /* KI-Vorschau */
 $("#aiBtn").onclick=async()=>{
   const desc=$("#aiText").value.trim(), box=$("#aiResult"), btn=$("#aiBtn");
+  box.hidden=false;
   if(desc.length<5){box.innerHTML=`<div class="empty">${t("ai.short")}</div>`;return}
   btn.disabled=true; box.innerHTML=`<div class="empty"><div class="spinner"></div>${t("ai.loading")}</div>`;
   try{
@@ -702,6 +984,35 @@ $("#aiBtn").onclick=async()=>{
   finally{btn.disabled=false}
 };
 
+/* KI-Chat-Berater (LangGraph-Agent unter /api/casa/chat) */
+const chatLog=[]; let chatBusy=false;
+const esc=s=>s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+function renderChat(){
+  const box=$("#chatMsgs");
+  box.innerHTML=`<div class="msg bot">${esc(t("chat.hello"))}</div>`+chatLog.map(m=>`<div class="msg ${m.role==="user"?"me":"bot"}${m.err?" err":""}">${fmt(m.content)}</div>`).join("")+(chatBusy?`<div class="msg bot"><span class="typing"><i></i><i></i><i></i></span></div>`:"");
+  $("#chatChips").innerHTML=chatLog.length?"":t("chat.chips").map(c=>`<button type="button">${c}</button>`).join("");
+  box.scrollTop=box.scrollHeight;
+}
+function openChat(){$("#chat").classList.add("open");$("#chatFab").classList.add("hide");$("#chatFab").setAttribute("aria-expanded","true");renderChat();setTimeout(()=>$("#chatInput").focus(),50)}
+function closeChat(){$("#chat").classList.remove("open");$("#chatFab").classList.remove("hide");$("#chatFab").setAttribute("aria-expanded","false");$("#chatFab").focus()}
+async function sendChat(text){
+  text=(text||"").trim(); if(!text||chatBusy)return;
+  const history=chatLog.filter(m=>!m.err).slice(-10).map(({role,content})=>({role,content}));
+  chatLog.push({role:"user",content:text}); chatBusy=true; $("#chatSend").disabled=true; renderChat();
+  try{
+    const r=await fetch("/api/casa/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text.slice(0,600),history,lang})});
+    if(r.status===429)throw new Error("limit");
+    const j=await r.json(); if(!r.ok||!j.reply)throw new Error("chat");
+    chatLog.push({role:"assistant",content:j.reply});
+  }catch(err){chatLog.push({role:"assistant",content:t(err.message==="limit"?"chat.limit":"chat.error"),err:true})}
+  finally{chatBusy=false;$("#chatSend").disabled=false;renderChat();$("#chatInput").focus()}
+}
+$("#chatFab").onclick=openChat;
+$("#chatClose").onclick=closeChat;
+$("#chatForm").addEventListener("submit",e=>{e.preventDefault();const i=$("#chatInput");const v=i.value;i.value="";sendChat(v)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#chat").classList.contains("open"))closeChat()});
+
 /* Bestellung */
 function summaryText(){
   return [by(CFG.types,sel.type).name[lang],by(CFG.sizes,sel.size).name[lang],
@@ -712,16 +1023,15 @@ $("#orderForm").addEventListener("submit",async e=>{
   const msg=$("#formMsg"); msg.className="form-msg err"; $$("#orderForm input").forEach(i=>i.classList.remove("bad"));
   const name=$("#fName").value.trim(), wa=$("#fWa").value.trim(), date=$("#fDate").value;
   const bad=(id,k,v)=>{if(id)$(id).classList.add("bad");msg.textContent=t(k,v);if(id)$(id).focus();};
-  if(computePrice()==null){msg.textContent=t("err.config");$("#disena").scrollIntoView({behavior:"smooth"});return}
+  if(computePrice()==null){msg.textContent=t("err.config");goPage(sel.type&&sel.size?2:1);$("#disena").scrollIntoView({behavior:"smooth"});return}
   if(name.length<2)return bad("#fName","err.name");
   if(wa.replace(/\D/g,"").length<7)return bad("#fWa","err.wa");
   if(!date||date<$("#fDate").min)return bad("#fDate","err.date",{n:CFG.min_lead_days});
-  if(!$("#fAgree").checked)return bad(null,"err.agree");
   const btn=$("#submitBtn"); btn.disabled=true; btn.textContent=t("form.sending"); msg.textContent="";
   try{
     const r=await fetch("/api/casa/order",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
       selection:{...sel},design:$("#aiText").value.trim(),preview_url:previewUrl,name,whatsapp:wa,
-      email:$("#fEmail").value.trim(),pickup_date:date,notes:$("#fNotes").value.trim(),lang})});
+      email:"",pickup_date:date,notes:"",lang})});
     const j=await r.json(); if(!r.ok)throw new Error();
     $("#orderForm").style.display="none"; $("#success").classList.add("on");
     $("#okText").textContent=t("ok.text",{id:j.order_id});

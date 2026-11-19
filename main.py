@@ -2,11 +2,12 @@
 Kidstorte – FastAPI Server mit Session-basiertem LangGraph Agent
 """
 import asyncio
+import os
 import datetime
 import time
 import logging
 from fastapi import FastAPI, Request, Response, HTTPException, Form, Body
-from fastapi.responses import JSONResponse, FileResponse, HTMLResponse
+from fastapi.responses import JSONResponse, FileResponse, HTMLResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -96,15 +97,31 @@ class ChatRequest(BaseModel):
 # CHAT ENDPOINTS
 # ==========================================
 
+# Casa Pastel ist zuerst nur unter /casa zu sehen. Mit CASA_PASTEL_AT_ROOT=1 in der .env
+# wird sie zur Startseite (/), und die bisherige Kidstorte-Seite verschwindet.
+CASA_PASTEL_AT_ROOT = os.getenv("CASA_PASTEL_AT_ROOT", "0") == "1"
+_NO_CACHE = {"Cache-Control": "no-cache"}
+
+
 @app.get("/")
 def index():
-    return FileResponse("templates/index.html", headers={"Cache-Control": "no-cache"})
+    if CASA_PASTEL_AT_ROOT:
+        return FileResponse("templates/index.html", headers=_NO_CACHE)
+    return FileResponse("templates/kidstorte_chat.html", headers=_NO_CACHE)
+
+
+@app.get("/casa")
+def casa_pastel_page():
+    """Casa-Pastel-Seite (Testadresse, solange sie noch nicht die Startseite ist)."""
+    if CASA_PASTEL_AT_ROOT:
+        return RedirectResponse("/", status_code=302)
+    return FileResponse("templates/index.html", headers=_NO_CACHE)
 
 
 @app.get("/chat")
-def kidstorte_chat():
-    """Bisherige Kidstorte-Seite mit dem KI-Chat."""
-    return FileResponse("templates/kidstorte_chat.html", headers={"Cache-Control": "no-cache"})
+def old_chat_page():
+    """Frühere Kidstorte-Seite: läuft jetzt unter /; ist Casa Pastel die Startseite, geht es dorthin."""
+    return RedirectResponse("/", status_code=302)
 
 
 @app.post("/api/chat")
