@@ -11,6 +11,12 @@
 
   "hours": {"es": "Lunes a sábado · 8:00 – 18:00 · solo con cita previa", "en": "Monday to Saturday · 8 am – 6 pm · by appointment only", "de": "Montag bis Samstag · 8–18 Uhr · nur nach Absprache"},
 
+  "custom_designs": {
+    "es": "Hacemos diseños personalizados: figuras de fondant (futbolistas, muñecas, animales, personajes), avatar 2D o foto de una persona impresa en papel comestible, pasteles de muñeca (la falda es el pastel) y cualquier temática. Descríbelo en el diseño con IA o en los comentarios; confirmamos detalles y posible costo extra por WhatsApp.",
+    "en": "We make custom designs: fondant figures (football players, dolls, animals, characters), a 2D avatar or photo of a person printed on edible paper, doll cakes (the skirt is the cake) and any theme. Describe it in the AI design or in the comments; we confirm details and any extra cost on WhatsApp.",
+    "de": "Wir machen individuelle Designs: Fondantfiguren (Fußballspieler, Puppen, Tiere, Figuren), einen 2D-Avatar oder ein Foto einer Person auf essbarem Papier, Puppentorten (der Rock ist die Torte) und jedes Motiv. Beschreib es im KI-Design oder in den Anmerkungen; Details und mögliche Aufpreise klären wir per WhatsApp."
+  },
+
   "process": [
     {"es": {"t": "Diseña y solicita", "p": "Elige tu pastel en el configurador o pregúntale a nuestro asistente. Sin pago en línea."},
      "en": {"t": "Design & request", "p": "Build your cake in the configurator or ask our assistant. No online payment."},

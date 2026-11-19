@@ -144,6 +144,43 @@ def gallery():
     return {"images": [f"/static/casa-pastel/galeria/{f.name}" for f in files[:12]]}
 
 
+_DESIGN_SYSTEM = (
+    "You write prompts for an image generator. The image shows ONE celebration cake from a small artisan bakery. "
+    "The customer's wish can be in Spanish, English or German. Translate it into English and keep EVERY element "
+    "the customer asks for, especially decorations on or around the cake: figures and toppers (for example a "
+    "football player, dolls, animals, cartoon-style characters, a princess), a 2D avatar or photo of a person "
+    "(show it as a flat edible printed image on the cake), doll cakes (a doll whose dress or skirt is the cake), "
+    "sports, hobbies, colors, flowers, number of tiers. Show all figures as handmade edible decorations "
+    "(fondant or sugar-paste figures, or edible print). "
+    "Include ONLY what the customer asked for plus the cake style: do not invent extra figures, photo prints, "
+    "numbers or objects. "
+    "Replace names of real people, clubs, brands, toys or copyrighted characters (for example Messi, Real Madrid, "
+    "Barbie, Disney, Paw Patrol) with a neutral visual description of the look (for example: 'a football player "
+    "figure in a blue and garnet striped jersey', 'two fashion doll figures'), so the image can be made. "
+    "Never add written words, names or letters on the cake. Reply with the prompt only, at most 90 words."
+)
+
+
+def _design_prompt(description: str, details: str) -> str:
+    """Kundenwunsch (ES/EN/DE) → englischer Bild-Prompt, der Figuren, Avatare, Puppen usw. behält."""
+    wish = f'Customer\'s wish: "{description}".{details}'
+    try:
+        from app.nodes import _llm_chat
+        wish = _llm_chat(
+            [{"role": "system", "content": _DESIGN_SYSTEM},
+             {"role": "user", "content": description + details}],
+            temperature=0.2, max_tokens=220,
+        ).strip().strip('"')
+    except Exception as e:  # ohne Übersetzung weiter, Bild klappt meist trotzdem
+        logger.warning(f"Casa Pastel: Design-Prompt konnte nicht aufbereitet werden: {e}")
+    return (
+        "Professional product photo of a single handmade celebration cake from a small artisan bakery. "
+        f"{wish} "
+        "Show the whole cake with all its decorations and figures, centered on a cake stand, soft natural light, "
+        "light cream background, photorealistic, appetizing. No written text, no lettering, no watermark."
+    )
+
+
 @router.post("/preview")
 def preview(body: PreviewRequest, request: Request):
     cfg = load_config()
@@ -160,13 +197,7 @@ def preview(body: PreviewRequest, request: Request):
         if s:
             details += f" {'Two-tier' if s['tiers'] == 2 else 'Single-tier'} round cake."
 
-    prompt = (
-        "Professional product photo of a single handmade celebration cake from a small artisan bakery. "
-        f"Customer's wish (may be in Spanish or English): \"{body.description.strip()}\".{details} "
-        "Show the whole cake from the outside, centered on a cake stand, soft natural light, "
-        "light cream background, photorealistic, appetizing. No text, no lettering, no watermark, "
-        "only one cake in the image."
-    )
+    prompt = _design_prompt(body.description.strip(), details)
     try:
         from app.nodes import _generate_openai
         url = _generate_openai(prompt, "casa-pastel")

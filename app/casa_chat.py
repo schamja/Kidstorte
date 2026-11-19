@@ -74,6 +74,8 @@ def build_knowledge(cfg: dict, lang: str) -> str:
                  "Casa Pastel confirms on WhatsApp what is possible.")
     if cfg.get("hours"):
         lines.append(f"- Opening hours: {cfg['hours'][L]}")
+    if cfg.get("custom_designs"):
+        lines.append(f"- CUSTOM DESIGNS: {cfg['custom_designs'][L]}")
     lines.append("- The website has an AI design tool that creates an inspiration image of the cake. "
                  "It is only inspiration: the real handmade cake may look different.")
     lines.append(f"- WhatsApp: +{cfg.get('whatsapp_business', '')} · Instagram: @{cfg.get('instagram_handle', '')}")
@@ -89,6 +91,10 @@ def system_prompt(cfg: dict, lang: str) -> str:
         "- Be warm and short: at most about 80 words. Use **bold** only for prices or key facts.\n"
         "- Only talk about Casa Pastel: cakes, flavors, sizes, prices, ordering, pickup. "
         "Politely decline anything else.\n"
+        "- Custom designs are welcome: when the customer asks for figures (football player, dolls, animals, "
+        "characters), a 2D avatar or photo print, a doll cake or another theme, say YES, it can be made, explain "
+        "how (see CUSTOM DESIGNS), suggest describing it in the AI design field, and that Casa Pastel confirms "
+        "details and any extra cost on WhatsApp.\n"
         "- Use ONLY the facts below. Prices in US dollars exactly as listed; never invent prices, "
         "products, discounts, delivery, allergen guarantees or dates. If something is not listed, "
         "say Casa Pastel will confirm it on WhatsApp.\n"
