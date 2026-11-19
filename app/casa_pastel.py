@@ -262,6 +262,17 @@ def order(body: OrderRequest, request: Request):
     f = _by_id(cfg["fillings"], body.selection.filling)
     deposit = round(price * cfg.get("deposit_percent", 50) / 100, 2)
 
+    # Preispositionen für die Rechnung (gleiche Rechnung wie calculate_price)
+    tiers = s["tiers"]
+    positions = [{"kind": "base", "text": f"{t['name'][lang]} · {s['name'][lang]}",
+                  "usd": cfg["prices"][t["id"]][s["id"]]}]
+    for d in body.selection.doughs:
+        dd = _by_id(cfg["doughs"], d)
+        positions.append({"kind": "dough", "text": dd["name"][lang], "unit": dd["extra"],
+                          "tiers": tiers, "usd": dd["extra"] * tiers})
+    positions.append({"kind": "filling", "text": f["name"][lang], "unit": f["extra"],
+                      "tiers": tiers, "usd": f["extra"] * tiers})
+
     # Schlüssel auf Deutsch, damit der bestehende Admin-Bereich sie lesbar anzeigt
     order_info = {
         "art": t["name"][lang],
@@ -277,6 +288,7 @@ def order(body: OrderRequest, request: Request):
         "liefertermin": body.pickup_date,
         "anzahlung": f"${deposit:.2f} (50 %)",
         "preis_usd": price,
+        "positionen": positions,
         "anzahlung_usd": deposit,
         "sprache": lang,
         "quelle": "Casa Pastel Website",
