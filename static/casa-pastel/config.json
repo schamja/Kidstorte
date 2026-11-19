@@ -25,9 +25,9 @@
   ],
 
   "types": [
-    {"id": "fondant", "icon": "fondant", "photo": "/static/casa-pastel/tipos/fondant.jpg", "short": {"es": "Fondant", "en": "Fondant"}, "name": {"es": "Pastel de fondant", "en": "Fondant cake"},
+    {"id": "fondant", "icon": "fondant", "photo": "/static/casa-pastel/tipos/fondant.jpg", "card_photo": "/static/casa-pastel/tipos/fondant-karte.jpg", "short": {"es": "Fondant", "en": "Fondant"}, "name": {"es": "Pastel de fondant", "en": "Fondant cake"},
      "desc": {"es": "Cubierta lisa de fondant, ideal para diseños temáticos y figuras.", "en": "Smooth fondant covering, perfect for themed designs and figures."}},
-    {"id": "crema", "icon": "crema", "photo": "/static/casa-pastel/tipos/crema.jpg", "short": {"es": "Crema", "en": "Buttercream"}, "name": {"es": "Pastel de crema", "en": "Buttercream cake"},
+    {"id": "crema", "icon": "crema", "photo": "/static/casa-pastel/tipos/crema.jpg", "card_photo": "/static/casa-pastel/tipos/crema-karte.jpg", "short": {"es": "Crema", "en": "Buttercream"}, "name": {"es": "Pastel de crema", "en": "Buttercream cake"},
      "desc": {"es": "Decorado con crema suave, flores de manga y acabados delicados.", "en": "Decorated with soft cream, piped flowers and delicate finishes."}},
     {"id": "fruta", "icon": "fruta", "photo": "/static/casa-pastel/tipos/fruta.jpg", "short": {"es": "Fruta", "en": "Fruit"}, "name": {"es": "Pastel de frutas", "en": "Fruit cake"},
      "desc": {"es": "Fresco y ligero, decorado con frutas de temporada.", "en": "Fresh and light, topped with seasonal fruit."}},
@@ -35,24 +35,25 @@
      "desc": {"es": "Clásico y casero, sin decoración elaborada.", "en": "Classic and homemade, without elaborate decoration."}}
   ],
 
+  "_hinweis_groessen": "photo = Foto der Größe, scale = wie groß es in der Kachel erscheint (0.5–1). diam = Durchmesser in cm (Ersatz-Grafik, falls kein Foto; bei 2 Etagen [oben, unten]).",
   "sizes": [
-    {"id": "s6",  "tiers": 1, "servings": "8 – 10", "name": {"es": "Pequeño · 6\" (15 cm)", "en": "Small · 6\" (15 cm)"},
+    {"id": "s3",  "tiers": 1, "diam": [8], "photo": "/static/casa-pastel/tamanos/s3.jpg", "scale": 0.55,  "servings": "2 – 4", "name": {"es": "Mini · 8 cm", "en": "Mini · 8 cm"},
+     "desc": {"es": "Ø 8 cm, mini pastel individual. 2 – 4 porciones.", "en": "Ø 8 cm, individual mini cake. 2 – 4 servings."}},
+    {"id": "s6",  "tiers": 1, "diam": [15], "photo": "/static/casa-pastel/tamanos/s6.jpg", "scale": 0.75, "servings": "8 – 10", "name": {"es": "Mediano · 15 cm", "en": "Medium · 15 cm"},
      "desc": {"es": "Ø 15 cm, aprox. 10 cm de alto. 8 – 10 porciones.", "en": "Ø 15 cm, approx. 10 cm tall. 8 – 10 servings."}},
-    {"id": "s8",  "tiers": 1, "servings": "15 – 20", "name": {"es": "Mediano · 8\" (20 cm)", "en": "Medium · 8\" (20 cm)"},
-     "desc": {"es": "Ø 20 cm, aprox. 10 cm de alto. 15 – 20 porciones.", "en": "Ø 20 cm, approx. 10 cm tall. 15 – 20 servings."}},
-    {"id": "s10", "tiers": 1, "servings": "25 – 30", "name": {"es": "Grande · 10\" (25 cm)", "en": "Large · 10\" (25 cm)"},
+    {"id": "s10", "tiers": 1, "diam": [25], "photo": "/static/casa-pastel/tamanos/s10.jpg", "scale": 1, "servings": "25 – 30", "name": {"es": "Grande · 25 cm", "en": "Large · 25 cm"},
      "desc": {"es": "Ø 25 cm, aprox. 10 cm de alto. 25 – 30 porciones.", "en": "Ø 25 cm, approx. 10 cm tall. 25 – 30 servings."}},
-    {"id": "t6_8",  "tiers": 2, "servings": "25 – 30", "name": {"es": "2 pisos · 6\" + 8\"", "en": "2 tiers · 6\" + 8\""},
+    {"id": "t6_8",  "tiers": 2, "diam": [15, 20], "photo": "/static/casa-pastel/tamanos/t6_8.jpg", "scale": 0.88, "servings": "25 – 30", "name": {"es": "2 pisos · 15 + 20 cm", "en": "2 tiers · 15 + 20 cm"},
      "desc": {"es": "Piso inferior Ø 20 cm, superior Ø 15 cm, aprox. 22 cm de alto. 25 – 30 porciones.", "en": "Bottom tier Ø 20 cm, top tier Ø 15 cm, approx. 22 cm tall. 25 – 30 servings."}},
-    {"id": "t8_10", "tiers": 2, "servings": "40 – 50", "name": {"es": "2 pisos · 8\" + 10\"", "en": "2 tiers · 8\" + 10\""},
+    {"id": "t8_10", "tiers": 2, "diam": [20, 25], "photo": "/static/casa-pastel/tamanos/t8_10.jpg", "scale": 1, "servings": "40 – 50", "name": {"es": "2 pisos · 20 + 25 cm", "en": "2 tiers · 20 + 25 cm"},
      "desc": {"es": "Piso inferior Ø 25 cm, superior Ø 20 cm, aprox. 22 cm de alto. 40 – 50 porciones.", "en": "Bottom tier Ø 25 cm, top tier Ø 20 cm, approx. 22 cm tall. 40 – 50 servings."}}
   ],
 
   "prices": {
-    "fondant": {"s6": 45, "s8": 65, "s10": 90, "t6_8": 120, "t8_10": 170},
-    "crema":   {"s6": 30, "s8": 42, "s10": 60, "t6_8": 80,  "t8_10": 115},
-    "fruta":   {"s6": 35, "s8": 48, "s10": 68, "t6_8": 90,  "t8_10": 130},
-    "simple":  {"s6": 22, "s8": 32, "s10": 45, "t6_8": 60,  "t8_10": 85}
+    "fondant": {"s3": 25, "s6": 45, "s10": 90, "t6_8": 120, "t8_10": 170},
+    "crema":   {"s3": 16, "s6": 30, "s10": 60, "t6_8": 80,  "t8_10": 115},
+    "fruta":   {"s3": 18, "s6": 35, "s10": 68, "t6_8": 90,  "t8_10": 130},
+    "simple":  {"s3": 12, "s6": 22, "s10": 45, "t6_8": 60,  "t8_10": 85}
   },
 
   "layers_per_tier": 4,
