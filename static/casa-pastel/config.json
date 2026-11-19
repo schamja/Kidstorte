@@ -1,5 +1,5 @@
 {
-  "_hinweis": "PLATZHALTER: Alle Preise, Größen und Sorten hier anpassen. Diese Datei wird von der Website UND vom Server gelesen. Preise in US-Dollar.",
+  "_hinweis": "PLATZHALTER: Alle Preise, Größen, Sorten, Öffnungszeiten (hours) und Ablauf (process) hier anpassen. Diese Datei wird von der Website UND vom Server gelesen. Preise in US-Dollar.",
   "currency": "USD",
   "deposit_percent": 50,
   "whatsapp_business": "50760000000",
@@ -7,28 +7,44 @@
   "instagram_widget_html": "",
   "min_lead_days": 3,
   "preview_limit_per_hour": 5,
+  "chat_limit_per_hour": 40,
+
+  "hours": {"es": "Lunes a sábado · 8:00 – 18:00 · solo con cita previa", "en": "Monday to Saturday · 8 am – 6 pm · by appointment only"},
+
+  "process": [
+    {"es": {"t": "Diseña y solicita", "p": "Elige tu pastel en el configurador o pregúntale a nuestro asistente. Sin pago en línea."},
+     "en": {"t": "Design & request", "p": "Build your cake in the configurator or ask our assistant. No online payment."}},
+    {"es": {"t": "Te contactamos", "p": "Revisamos si tu pedido es posible y lo confirmamos contigo por WhatsApp."},
+     "en": {"t": "We contact you", "p": "We check that your order is possible and confirm it with you on WhatsApp."}},
+    {"es": {"t": "Anticipo del 50 %", "p": "Cuando aceptamos tu pedido, pagas el 50 % de anticipo."},
+     "en": {"t": "50 % deposit", "p": "Once we accept your order, you pay a 50 % deposit."}},
+    {"es": {"t": "Hecho a mano", "p": "Horneamos tu pastel fresco y lo decoramos a mano en Chitré."},
+     "en": {"t": "Made by hand", "p": "We bake your cake fresh and decorate it by hand in Chitré."}},
+    {"es": {"t": "Recoges tu pastel", "p": "Lo recoges en Chitré en la fecha acordada y pagas el resto."},
+     "en": {"t": "Pick up your cake", "p": "Pick it up in Chitré on the agreed date and pay the rest."}}
+  ],
 
   "types": [
-    {"id": "fondant", "icon": "fondant", "short": {"es": "Fondant", "en": "Fondant"}, "name": {"es": "Pastel de fondant", "en": "Fondant cake"},
+    {"id": "fondant", "icon": "fondant", "photo": "/static/casa-pastel/tipos/fondant.jpg", "short": {"es": "Fondant", "en": "Fondant"}, "name": {"es": "Pastel de fondant", "en": "Fondant cake"},
      "desc": {"es": "Cubierta lisa de fondant, ideal para diseños temáticos y figuras.", "en": "Smooth fondant covering, perfect for themed designs and figures."}},
-    {"id": "crema", "icon": "crema", "short": {"es": "Crema", "en": "Buttercream"}, "name": {"es": "Pastel de crema", "en": "Buttercream cake"},
+    {"id": "crema", "icon": "crema", "photo": "/static/casa-pastel/tipos/crema.jpg", "short": {"es": "Crema", "en": "Buttercream"}, "name": {"es": "Pastel de crema", "en": "Buttercream cake"},
      "desc": {"es": "Decorado con crema suave, flores de manga y acabados delicados.", "en": "Decorated with soft cream, piped flowers and delicate finishes."}},
-    {"id": "fruta", "icon": "fruta", "short": {"es": "Frutas", "en": "Fruit"}, "name": {"es": "Pastel de frutas", "en": "Fruit cake"},
+    {"id": "fruta", "icon": "fruta", "photo": "/static/casa-pastel/tipos/fruta.jpg", "short": {"es": "Fruta", "en": "Fruit"}, "name": {"es": "Pastel de frutas", "en": "Fruit cake"},
      "desc": {"es": "Fresco y ligero, decorado con frutas de temporada.", "en": "Fresh and light, topped with seasonal fruit."}},
-    {"id": "simple", "icon": "simple", "short": {"es": "Sencillo", "en": "Simple"}, "name": {"es": "Pastel sencillo", "en": "Simple cake"},
+    {"id": "simple", "icon": "simple", "photo": "/static/casa-pastel/tipos/simple.jpg", "short": {"es": "Simple", "en": "Simple"}, "name": {"es": "Pastel sencillo", "en": "Simple cake"},
      "desc": {"es": "Clásico y casero, sin decoración elaborada.", "en": "Classic and homemade, without elaborate decoration."}}
   ],
 
   "sizes": [
-    {"id": "s6",  "tiers": 1, "name": {"es": "Pequeño · 6\" (15 cm)", "en": "Small · 6\" (15 cm)"},
+    {"id": "s6",  "tiers": 1, "servings": "8 – 10", "name": {"es": "Pequeño · 6\" (15 cm)", "en": "Small · 6\" (15 cm)"},
      "desc": {"es": "Ø 15 cm, aprox. 10 cm de alto. 8 – 10 porciones.", "en": "Ø 15 cm, approx. 10 cm tall. 8 – 10 servings."}},
-    {"id": "s8",  "tiers": 1, "name": {"es": "Mediano · 8\" (20 cm)", "en": "Medium · 8\" (20 cm)"},
+    {"id": "s8",  "tiers": 1, "servings": "15 – 20", "name": {"es": "Mediano · 8\" (20 cm)", "en": "Medium · 8\" (20 cm)"},
      "desc": {"es": "Ø 20 cm, aprox. 10 cm de alto. 15 – 20 porciones.", "en": "Ø 20 cm, approx. 10 cm tall. 15 – 20 servings."}},
-    {"id": "s10", "tiers": 1, "name": {"es": "Grande · 10\" (25 cm)", "en": "Large · 10\" (25 cm)"},
+    {"id": "s10", "tiers": 1, "servings": "25 – 30", "name": {"es": "Grande · 10\" (25 cm)", "en": "Large · 10\" (25 cm)"},
      "desc": {"es": "Ø 25 cm, aprox. 10 cm de alto. 25 – 30 porciones.", "en": "Ø 25 cm, approx. 10 cm tall. 25 – 30 servings."}},
-    {"id": "t6_8",  "tiers": 2, "name": {"es": "2 pisos · 6\" + 8\"", "en": "2 tiers · 6\" + 8\""},
+    {"id": "t6_8",  "tiers": 2, "servings": "25 – 30", "name": {"es": "2 pisos · 6\" + 8\"", "en": "2 tiers · 6\" + 8\""},
      "desc": {"es": "Piso inferior Ø 20 cm, superior Ø 15 cm, aprox. 22 cm de alto. 25 – 30 porciones.", "en": "Bottom tier Ø 20 cm, top tier Ø 15 cm, approx. 22 cm tall. 25 – 30 servings."}},
-    {"id": "t8_10", "tiers": 2, "name": {"es": "2 pisos · 8\" + 10\"", "en": "2 tiers · 8\" + 10\""},
+    {"id": "t8_10", "tiers": 2, "servings": "40 – 50", "name": {"es": "2 pisos · 8\" + 10\"", "en": "2 tiers · 8\" + 10\""},
      "desc": {"es": "Piso inferior Ø 25 cm, superior Ø 20 cm, aprox. 22 cm de alto. 40 – 50 porciones.", "en": "Bottom tier Ø 25 cm, top tier Ø 20 cm, approx. 22 cm tall. 40 – 50 servings."}}
   ],
 
